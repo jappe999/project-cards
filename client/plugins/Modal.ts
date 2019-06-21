@@ -7,8 +7,8 @@ export class Modal {
   constructor(
     { confirmed, open }: ModalOptions = {
       confirmed: false,
-      open: false
-    }
+      open: false,
+    },
   ) {
     this.confirmed = confirmed
     this.isOpen = open

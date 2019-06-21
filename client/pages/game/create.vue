@@ -43,14 +43,14 @@ import * as types from '~/store/mutation-types'
     AppCardContent: () => import('~/components/card/card-content.vue'),
     AppInput: () => import('~/components/form/input.vue'),
     AppButton: () => import('~/components/button/button.vue'),
-    AppLink: () => import('~/components/link.vue')
-  }
+    AppLink: () => import('~/components/link.vue'),
+  },
 })
 export default class CreateGame extends Vue {
   playerInputVisible = true
   game: Form<Game> = new Form<Game>({
     name: '',
-    private: false
+    private: false,
   })
 
   constructor() {
@@ -59,8 +59,8 @@ export default class CreateGame extends Vue {
     Object.assign(
       this,
       mapMutations({
-        [types.ADD_GAME]: `games/${types.ADD_GAME}`
-      })
+        [types.ADD_GAME]: `games/${types.ADD_GAME}`,
+      }),
     )
   }
 

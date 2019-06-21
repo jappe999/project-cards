@@ -1,12 +1,11 @@
-import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { GamesModule } from './games/games.module';
+import { SessionsGateway } from './sessions/sessions.gateway';
 
 @Module({
   imports: [TypeOrmModule.forRoot(), GamesModule],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [SessionsGateway],
 })
 export class AppModule {}

@@ -157,7 +157,7 @@ export class Form<TForm> {
   async submit<TResponse>(
     method: Method,
     url: string,
-    config: AxiosRequestConfig = {}
+    config: AxiosRequestConfig = {},
   ): Promise<AxiosResponse<TResponse>> {
     this.startProcessing()
 
@@ -168,7 +168,7 @@ export class Form<TForm> {
         url: this.route(url),
         method,
         data,
-        ...config
+        ...config,
       })
 
       this.finishProcessing()

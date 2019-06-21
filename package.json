@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "ts-node": "^8.3.0"
+  }
+}

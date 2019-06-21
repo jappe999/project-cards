@@ -13,10 +13,10 @@ const config: NuxtConfiguration = {
       {
         hid: 'description',
         name: 'description',
-        content: process.env.npm_package_description || ''
-      }
+        content: process.env.npm_package_description || '',
+      },
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
+    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
   /*
    ** Customize the progress-bar color
@@ -37,7 +37,7 @@ const config: NuxtConfiguration = {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
-    '@nuxtjs/eslint-module'
+    '@nuxtjs/eslint-module',
   ],
   /*
    ** Axios module configuration
@@ -47,8 +47,9 @@ const config: NuxtConfiguration = {
     baseUrl:
       process.env.NODE_ENV === 'production'
         ? '#{host}'
-        : 'http://localhost:3000',
-    prefix: '/api/'
+        : 'http://localhost:3001',
+    port: 3001,
+    prefix: '/api/',
   },
   /*
    ** Build configuration
@@ -56,14 +57,14 @@ const config: NuxtConfiguration = {
   build: {
     postcss: {
       plugins: {
-        tailwindcss: './tailwind.config.ts'
-      }
-    }
+        tailwindcss: './tailwind.config.ts',
+      },
+    },
     /*
      ** You can extend webpack config here
      */
     // extend(config, ctx) {}
-  }
+  },
 }
 
 export default config

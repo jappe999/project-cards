@@ -18,7 +18,7 @@ export class Errors {
     } else {
       this.set({
         ...this.errors,
-        [field]: arrayWrap(messages)
+        [field]: arrayWrap(messages),
       })
     }
   }

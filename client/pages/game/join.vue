@@ -7,11 +7,11 @@
         </h2>
         <hr class="w-full mt-2 mb-4 border-b border-gray" />
 
-        <form @submit.prevent="joinGame">
+        <form @submit.prevent="openGame">
           <app-input name="roomName" label="Room name" required />
 
           <div class="flex justify-end">
-            <app-button @click.native="joinGame">Join game</app-button>
+            <app-button @click.native="openGame">Join game</app-button>
           </div>
         </form>
       </app-card-content>
@@ -23,7 +23,8 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { GameJoin } from '~/models/Game'
+import { Action } from 'vuex-class'
+import { GameJoin, Game } from '~/models/Game'
 import { Form } from '~/plugins'
 
 @Component({
@@ -32,17 +33,25 @@ import { Form } from '~/plugins'
     AppCardContent: () => import('~/components/card/card-content.vue'),
     AppInput: () => import('~/components/form/input.vue'),
     AppButton: () => import('~/components/button/button.vue'),
-    AppLink: () => import('~/components/link.vue')
-  }
+    AppLink: () => import('~/components/link.vue'),
+  },
 })
 export default class JoinGame extends Vue {
+  games: Game[] = []
   game = new Form<GameJoin>({
-    name: ''
+    name: '',
   })
 
-  async joinGame() {
-    await this.$store.dispatch('games/joinGame')
-    this.$router.push(`/games/${this.game.data().name}/play`)
+  @Action('games/joinGame') joinGame
+  @Action('games/fetchGames') fetchGames
+
+  async mounted() {
+    this.games = await this.fetchGames()
+  }
+
+  async openGame() {
+    const game = await this.joinGame(this.game)
+    this.$router.push(`/games/${game.name}/play`)
   }
 }
 </script>

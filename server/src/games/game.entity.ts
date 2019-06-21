@@ -18,14 +18,3 @@ export class Game {
   @IsBoolean()
   private!: boolean;
 }
-
-export class GameCreateDto {
-  @IsNotEmpty()
-  name!: string;
-
-  @IsNumber()
-  userLimit?: number;
-
-  @IsBoolean()
-  private!: boolean;
-}
