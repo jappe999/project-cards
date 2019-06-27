@@ -20,7 +20,7 @@
           </label>
 
           <div class="flex justify-end">
-            <app-button @click.native="createGame">Create game</app-button>
+            <app-button type="submit">Create game</app-button>
           </div>
         </form>
       </app-card-content>
@@ -36,6 +36,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import { Form } from '~/plugins'
 import { Game, GameView } from '~/models/Game'
 import * as types from '~/store/mutation-types'
+import { Action, Mutation } from 'vuex-class'
 
 @Component({
   components: {
@@ -64,14 +65,16 @@ export default class CreateGame extends Vue {
     )
   }
 
+  @Action('games/joinGame') joinGame
+  @Mutation(types.ADD_GAME) ADD_GAME
+
   async createGame() {
     try {
       const { data: game } = await this.game.post<GameView>(`games`)
-      this[types.ADD_GAME](game)
+      this.ADD_GAME(game)
 
-      await this.$store.dispatch('games/joinGame', game)
-
-      this.$router.push(`/game/${game.name}/play`)
+      const lowerCaseName = game.name.replace(' ', '-').toLowerCase()
+      this.$router.push(`/game/${game.id}-${lowerCaseName}/play`)
     } catch (e) {
       // TODO: Notify user
     }

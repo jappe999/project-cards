@@ -18,12 +18,12 @@ export class GamesController {
   }
 
   @Get(':id')
-  findGame(@Param() { id }: { id: number }): Promise<Game> {
+  findGame(@Param() { id }: { id: string }): Promise<Game> {
     return this.gamesService.findOne({ where: { id } });
   }
 
   @Post(':id/join')
-  async joinGame(@Param() { id }: { id: number }): Promise<void> {
+  async joinGame(@Param() { id }: { id: string }): Promise<void> {
     const game = await this.gamesService.findOne({ where: { id } });
 
     return this.gamesService.joinGame(game);

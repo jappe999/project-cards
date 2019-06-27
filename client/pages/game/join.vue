@@ -51,7 +51,12 @@ export default class JoinGame extends Vue {
 
   async openGame() {
     const game = await this.joinGame(this.game)
-    this.$router.push(`/games/${game.name}/play`)
+    const lowerCaseName = this.game
+      .data()
+      .name.replace(' ', '-')
+      .toLowerCase()
+
+    this.$router.push(`/games/${game.id}${lowerCaseName}/play`)
   }
 }
 </script>

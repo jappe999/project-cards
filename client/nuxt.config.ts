@@ -2,6 +2,9 @@ import NuxtConfiguration from '@nuxt/config'
 
 const config: NuxtConfiguration = {
   mode: 'spa',
+  env: {
+    WS_URL: process.env.WS_URL || 'http://localhost:3001',
+  },
   /*
    ** Headers of the page
    */
@@ -57,7 +60,7 @@ const config: NuxtConfiguration = {
   build: {
     postcss: {
       plugins: {
-        tailwindcss: './tailwind.config.ts',
+        tailwindcss: './tailwind.config.js',
       },
     },
     /*

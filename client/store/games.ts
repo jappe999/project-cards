@@ -5,9 +5,9 @@ type state = {
   games: GameView[]
 }
 
-export const state: state = {
+export const state = (): state => ({
   games: [],
-}
+})
 
 export const getters = {
   games: ({ games }: state) => games,
@@ -33,16 +33,11 @@ export const actions: { [key: string]: any } = {
     return data
   },
 
-  async fetchGame(state: state, name: string): Promise<GameView> {
-    console.log(name)
+  async fetchGame(state: state, id: string): Promise<GameView> {
     try {
-      const { data }: { data: GameView } = await this.$axios.get(
-        `games/${name}`,
-      )
+      const { data }: { data: GameView } = await this.$axios.get(`games/${id}`)
       return data
     } catch (error) {
-      const c = console
-      c.error(error)
       return <GameView>{}
     }
   },

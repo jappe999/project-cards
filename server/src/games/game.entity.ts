@@ -3,18 +3,16 @@ import { IsNotEmpty, IsNumber, IsBoolean } from 'class-validator';
 
 @Entity()
 export class Game {
-  @PrimaryGeneratedColumn()
-  id!: number;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
   @Column({ length: 128 })
   @IsNotEmpty()
   name!: string;
 
-  @Column()
-  @IsNumber()
+  @Column('int')
   userLimit?: number;
 
   @Column()
-  @IsBoolean()
   private!: boolean;
 }

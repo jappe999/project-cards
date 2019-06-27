@@ -1,9 +1,13 @@
 // See default config https://github.com/tailwindcss/tailwindcss/blob/master/stubs/defaultConfig.stub.js
 export default {
   theme: {
-    extend: {},
+    extend: {
+      spacing: {
+        '80': '20rem',
+      },
+    },
   },
   variants: {
-    border: ['responive', 'hover', 'focus'],
+    border: ['responsive', 'hover', 'focus'],
   },
 }

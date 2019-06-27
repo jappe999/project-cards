@@ -1,7 +1,8 @@
-import { IsNotEmpty, IsNumber, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsBoolean, MaxLength } from 'class-validator';
 
 export class GameCreateDto {
   @IsNotEmpty()
+  @MaxLength(128)
   name!: string;
 
   @IsNumber()
@@ -9,4 +10,13 @@ export class GameCreateDto {
 
   @IsBoolean()
   private!: boolean;
+}
+
+export class GameJoinDto {
+  @IsNotEmpty()
+  id!: string;
+
+  @IsNotEmpty()
+  @MaxLength(128)
+  name!: string;
 }
