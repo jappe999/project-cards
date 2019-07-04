@@ -6,7 +6,5 @@ import { CardsModule } from './cards/cards.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot(), GamesModule, SessionsModule, CardsModule],
-  controllers: [],
-  providers: [],
 })
-export class AppModule {}
+export class AppModule { }

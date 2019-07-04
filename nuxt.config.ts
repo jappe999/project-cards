@@ -1,6 +1,7 @@
 import NuxtConfiguration from '@nuxt/config'
 
 const config: NuxtConfiguration = {
+  dev: process.env.NODE_ENV !== 'production',
   mode: 'spa',
   env: {
     WS_URL: process.env.WS_URL || 'http://localhost:3001',
@@ -32,7 +33,7 @@ const config: NuxtConfiguration = {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ['~/plugins/Form', '~/plugins/vue-select-on-focus'],
+  plugins: ['~/plugins/Form', '~/plugins/SelectOnFocus'],
   /*
    ** Nuxt.js modules
    */

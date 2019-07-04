@@ -11,13 +11,13 @@
       "use": "@now/static-build"
     },
     {
-      "src": "server/dist/src/main.js",
+      "src": "dist/src/main.js",
       "use": "@now/node-server"
     }
   ],
   "routes": [{
       "src": "/api/(.*)",
-      "dest": "/server/dist/main.js"
+      "dest": "/dist/main.js"
     },
     {
       "src": "/(.*)",

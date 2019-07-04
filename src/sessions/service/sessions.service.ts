@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Session } from '../session.entity';
 import { Repository } from 'typeorm';
 import { Socket } from 'socket.io';
-import { GameJoinDto } from 'src/games/game.dto';
+import { GameJoinDto } from '../../games/game.dto';
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { WsResponse } from '@nestjs/websockets';
