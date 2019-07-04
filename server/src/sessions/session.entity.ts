@@ -2,10 +2,11 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { Game } from '../games/game.entity';
+import { Card } from '../cards/card.entity';
 
 @Entity()
 export class Session {
@@ -15,7 +16,11 @@ export class Session {
   @Column()
   room!: string;
 
-  @ManyToOne(type => Game)
+  @OneToOne(type => Game)
   @JoinColumn()
   game!: Game;
+
+  @OneToOne(type => Card)
+  @JoinColumn()
+  currentCard!: Card;
 }

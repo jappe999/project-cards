@@ -27,8 +27,8 @@ export default class AppPlayCard extends Vue {
 
   get cardClass() {
     return {
-      'h-80 w-64 bg-black text-white': this.color === 'black',
-      'h-64 w-48 bg-white text-black': this.color === 'white',
+      'bg-black text-white': this.color === 'black',
+      'bg-white text-black': this.color === 'white',
     }
   }
 
@@ -41,8 +41,10 @@ export default class AppPlayCard extends Vue {
 }
 </script>
 
-<style>
-.h-80 {
-  height: 20rem;
+<style lang="postcss">
+@screen sm {
+  .sm\:h-96 {
+    height: 22rem;
+  }
 }
 </style>

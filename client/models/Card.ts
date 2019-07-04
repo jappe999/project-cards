@@ -2,14 +2,12 @@ import Model from './Model'
 
 export interface ICard {
   id?: string
-  name: string
-  private: boolean
+  text: string
 }
 
 export class Card extends Model implements ICard {
   id?: string
-  name!: string
-  private!: boolean
+  text!: string
 }
 
 export class CardView extends Card {

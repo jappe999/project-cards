@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "nodemon",
+    "seed": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed --config ormconfig.json",
     "start:dev": "concurrently --handle-input \"wait-on dist/main.js && nodemon\" \"tsc -w -p tsconfig.build.json\" ",
     "start:debug": "nodemon --config nodemon-debug.json",
     "prestart:prod": "rimraf dist && npm run build",
@@ -36,7 +37,8 @@
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3",
     "swagger-ui-express": "^4.0.6",
-    "typeorm": "^0.2.18"
+    "typeorm": "^0.2.18",
+    "typeorm-seeding": "^1.0.0-rc.3"
   },
   "devDependencies": {
     "@nestjs/testing": "^6.0.0",

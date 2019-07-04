@@ -21,7 +21,7 @@
 import { Vue, Component } from 'vue-property-decorator'
 
 @Component
-export default class Index extends Vue {
+export default class Game extends Vue {
   get gameJoined() {
     return typeof this.$route.params.game !== 'undefined'
   }

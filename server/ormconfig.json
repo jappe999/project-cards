@@ -1,10 +1,12 @@
 {
   "type": "mysql",
-  "host": "mysql.localhost",
-  "port": 3307,
+  "host": "localhost",
+  "port": 3306,
   "username": "root",
   "password": "root",
-  "database": "test",
+  "database": "projectcards",
   "entities": ["**/*.entity{.ts,.js}"],
-  "synchronize": true
+  "synchronize": true,
+  "seeds": ["database/seeders/**/*.seeder.ts"],
+  "factories": ["database/factories/**/*.factory.ts"]
 }

@@ -24,7 +24,7 @@ const config: NuxtConfiguration = {
   /*
    ** Customize the progress-bar color
    */
-  loading: { color: '#fff' },
+  loading: false, //{ color: '#fff' },
   /*
    ** Global CSS
    */
@@ -32,7 +32,7 @@ const config: NuxtConfiguration = {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ['~/plugins/Form'],
+  plugins: ['~/plugins/Form', '~/plugins/vue-select-on-focus'],
   /*
    ** Nuxt.js modules
    */
@@ -47,10 +47,7 @@ const config: NuxtConfiguration = {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseUrl:
-      process.env.NODE_ENV === 'production'
-        ? '#{host}'
-        : 'http://localhost:3001',
+    host: process.env.NODE_ENV === 'production' ? '#{host}' : 'localhost',
     port: 3001,
     prefix: '/api/',
   },
@@ -66,7 +63,7 @@ const config: NuxtConfiguration = {
     /*
      ** You can extend webpack config here
      */
-    // extend(config, ctx) {}
+    extend(config, ctx) { },
   },
 }
 

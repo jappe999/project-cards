@@ -21,6 +21,11 @@ export class SessionsGateway implements OnGatewayDisconnect {
     return this.sessionsService.joinGame(client, game);
   }
 
+  @SubscribeMessage('session-exit')
+  exitSession(client: Socket, game: Game): Observable<WsResponse<Session>> {
+    return this.sessionsService.exitGame(client, game);
+  }
+
   @SubscribeMessage('session-play-card')
   playCard(
     client: Socket,

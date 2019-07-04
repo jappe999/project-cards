@@ -11,4 +11,8 @@ export const actions = {
   join(state: any, game: GameView) {
     socket.emit('session-join', game)
   },
+
+  exit(state: any, game: GameView) {
+    socket.emit('session-exit', game)
+  },
 }

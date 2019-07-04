@@ -14,8 +14,22 @@ export const getters = {
 }
 
 export const mutations = {
-  [types.ADD_GAME](state: state, game: GameView) {
-    state.games = [...state.games, game]
+  [types.FETCH_GAMES](state: state, games: GameView[]) {
+    state.games = [
+      ...state.games,
+      ...games.filter(
+        game => state.games.findIndex(x => x.id === game.id) === -1,
+      ),
+    ]
+  },
+
+  [types.FETCH_GAME](state: state, game: GameView) {
+    state.games = [
+      ...state.games,
+      ...[game].filter(
+        game => state.games.findIndex(x => x.id === game.id) === -1,
+      ),
+    ]
   },
 
   [types.UPDATE_GAME](state: state, game: GameView) {
@@ -28,14 +42,16 @@ export const mutations = {
 }
 
 export const actions: { [key: string]: any } = {
-  async fetchGames(): Promise<GameView[]> {
+  async fetchGames({ commit }): Promise<GameView[]> {
     const { data }: { data: GameView[] } = await this.$axios.get(`games`)
+    commit(types.FETCH_GAMES, data)
     return data
   },
 
-  async fetchGame(state: state, id: string): Promise<GameView> {
+  async fetchGame({ commit }, id: string): Promise<GameView> {
     try {
       const { data }: { data: GameView } = await this.$axios.get(`games/${id}`)
+      commit(types.FETCH_GAME, data)
       return data
     } catch (error) {
       return <GameView>{}

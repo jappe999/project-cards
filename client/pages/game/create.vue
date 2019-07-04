@@ -31,12 +31,12 @@
 </template>
 
 <script lang="ts">
-import { mapMutations } from 'vuex'
 import { Vue, Component } from 'vue-property-decorator'
+import { mapMutations } from 'vuex'
+import { Action, Mutation } from 'vuex-class'
 import { Form } from '~/plugins'
 import { Game, GameView } from '~/models/Game'
 import * as types from '~/store/mutation-types'
-import { Action, Mutation } from 'vuex-class'
 
 @Component({
   components: {
@@ -60,18 +60,18 @@ export default class CreateGame extends Vue {
     Object.assign(
       this,
       mapMutations({
-        [types.ADD_GAME]: `games/${types.ADD_GAME}`,
+        [types.FETCH_GAME]: `games/${types.FETCH_GAME}`,
       }),
     )
   }
 
   @Action('games/joinGame') joinGame
-  @Mutation(types.ADD_GAME) ADD_GAME
+  @Mutation(types.FETCH_GAME) FETCH_GAME
 
   async createGame() {
     try {
       const { data: game } = await this.game.post<GameView>(`games`)
-      this.ADD_GAME(game)
+      this.FETCH_GAME(game)
 
       const lowerCaseName = game.name.replace(' ', '-').toLowerCase()
       this.$router.push(`/game/${game.id}-${lowerCaseName}/play`)

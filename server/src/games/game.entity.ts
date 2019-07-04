@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import { IsNotEmpty, IsNumber, IsBoolean } from 'class-validator';
 
 @Entity()
 export class Game {
@@ -7,10 +6,9 @@ export class Game {
   id!: string;
 
   @Column({ length: 128 })
-  @IsNotEmpty()
   name!: string;
 
-  @Column('int')
+  @Column({type:'int', nullable: true})
   userLimit?: number;
 
   @Column()
