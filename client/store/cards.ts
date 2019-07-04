@@ -13,13 +13,13 @@ interface IQueryOptions {
 }
 
 const getQuery = (options: IQueryOptions = {}): string => {
-  const url = new URL('http://localhost')
+  const params = new URLSearchParams()
 
   Object.entries(options).forEach(([key, value]) => {
-    url.searchParams.set(key, value)
+    params.set(key, value)
   })
 
-  return url.search
+  return '?' + params.toString()
 }
 
 export const state = (): state => ({

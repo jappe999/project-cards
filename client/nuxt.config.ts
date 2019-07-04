@@ -47,8 +47,8 @@ const config: NuxtConfiguration = {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    host: process.env.NODE_ENV === 'production' ? '#{host}' : 'localhost',
-    port: 3001,
+    host: process.env.HOST || 'localhost',
+    port: process.env.PORT || 3001,
     prefix: '/api/',
   },
   /*
