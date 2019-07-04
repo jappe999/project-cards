@@ -5,27 +5,17 @@
   "author": "Jasper van der Linden",
   "private": true,
   "scripts": {
-    "nuxt:lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore .",
-    "nuxt:precommit": "yarn nuxt:lint",
-    "nuxt:test": "jest",
-    "nuxt:dev": "nuxt dev",
-    "nuxt:build": "nuxt build",
-    "nuxt:start": "nuxt start",
-    "nuxt:generate": "nuxt generate",
-    "now-build": "nuxt generate",
-    "build": "tsc -p server/tsconfig.build.json",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "start": "nodemon --config=server/nodemon.json",
+    "format": "prettier --write \"**/*.ts\"",
+    "start": "cross-env NODE_ENV=production node dist/server/main.js",
+    "start:dev": "cross-env NODE_ENV=development webpack --config webpack.config.js",
+    "build": "cross-env NODE_ENV=production npm run clean && nuxt build && tsc",
+    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "lintfix": "tslint -p tsconfig.json --fix",
+    "clean": "rimraf dist",
     "seed": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed --config server/ormconfig.json",
-    "start:dev": "concurrently --handle-input \"wait-on server/dist/main.js && nodemon\" \"tsc -w -p server/tsconfig.build.json\" ",
-    "start:debug": "nodemon --config server/nodemon-debug.json",
-    "prestart:prod": "rimraf server/dist && yarn nuxt:build",
-    "start:prod": "node server/dist/main.js",
-    "lint": "tslint -p server/tsconfig.json -c server/tslint.json",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./server/test/jest-e2e.json"
   },
   "dependencies": {
@@ -55,9 +45,11 @@
     "typeorm": "^0.2.18",
     "typeorm-seeding": "^1.0.0-rc.3",
     "vue-property-decorator": "^8.1.1",
-    "vuex-class": "^0.3.2"
+    "vuex-class": "^0.3.2",
+    "webpack-shell-plugin": "^0.5.0"
   },
   "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.5.0",
     "@nestjs/testing": "^6.0.0",
     "@nuxt/typescript": "^2.8.1",
     "@nuxtjs/eslint-config": "^0.0.1",
@@ -97,8 +89,11 @@
     "ts-node": "^8.3.0",
     "tsconfig-paths": "3.8.0",
     "tslint": "5.16.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
     "typescript": "3.4.3",
     "vue-jest": "^3.0.3",
-    "wait-on": "^3.2.0"
+    "wait-on": "^3.2.0",
+    "webpack-cli": "^3.3.5"
   }
 }

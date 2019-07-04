@@ -1,11 +1,16 @@
 import NuxtConfiguration from '@nuxt/config'
 
 const config: NuxtConfiguration = {
-  dev: process.env.NODE_ENV !== 'production',
-  mode: 'spa',
+  mode: 'universal',
   env: {
-    WS_URL: process.env.WS_URL || 'http://localhost:3001',
+    host: 'localhost',
+    port: '3100',
+    WS_URL: process.env.WS_URL || 'http://localhost:3100',
   },
+
+  srcDir: './client/',
+  dev: process.env.NODE_ENV !== 'production',
+
   /*
    ** Headers of the page
    */
@@ -49,16 +54,20 @@ const config: NuxtConfiguration = {
    */
   axios: {
     host: process.env.HOST || 'localhost',
-    port: process.env.PORT || 3001,
+    port: process.env.PORT || 3100,
     prefix: '/api/',
   },
   /*
    ** Build configuration
    */
   build: {
+    cache: true,
+    babel: {
+      plugins: ['@babel/plugin-transform-modules-commonjs'],
+    },
     postcss: {
       plugins: {
-        tailwindcss: './tailwind.config.js',
+        tailwindcss: './client/tailwind.config.js',
       },
     },
     /*

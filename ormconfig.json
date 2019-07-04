@@ -5,7 +5,6 @@
   "username": "root",
   "password": "root",
   "database": "projectcards",
-  "entities": ["**/*.entity{.ts,.js}"],
   "synchronize": true,
   "seeds": ["database/seeders/**/*.seeder.ts"],
   "factories": ["database/factories/**/*.factory.ts"]
