@@ -3,8 +3,8 @@ import NuxtConfiguration from '@nuxt/config'
 const config: NuxtConfiguration = {
   mode: 'universal',
   env: {
-    host: 'localhost',
-    port: '3100',
+    host: process.env.HOST,
+    port: process.env.PORT,
     WS_URL: process.env.WS_URL || 'http://localhost:3100',
   },
 

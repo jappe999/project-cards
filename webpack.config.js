@@ -5,7 +5,6 @@ const WebpackShellPlugin = require('webpack-shell-plugin')
 module.exports = {
   entry: ['webpack/hot/poll?1000', './server/src/main.ts'],
   watch: true,
-  target: 'node',
   externals: [
     nodeExternals({
       whitelist: ['webpack/hot/poll?1000'],

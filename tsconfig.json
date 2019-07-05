@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "module": "esnext",
-    "target": "esnext",
+    "module": "commonjs",
+    "target": "es5",
     "declaration": false,
     "removeComments": true,
-    "noLib": false,
+    "lib": ["es2015", "es2015.iterable", "dom"],
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -21,8 +21,10 @@
     "types": [
       "@types/node",
       "@nuxt/vue-app",
-      "@types/mocha",
       "@types/jest"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
     ]
   },
   "include": [
