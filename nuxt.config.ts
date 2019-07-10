@@ -5,6 +5,7 @@ const isDev = process.env.NODE_ENV !== 'production'
 const config: NuxtConfiguration = {
   mode: 'spa',
   env: {
+    host: '0.0.0.0',
     port: process.env.PORT || '3100',
   },
 
@@ -57,7 +58,6 @@ const config: NuxtConfiguration = {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    host: process.env.HOST || 'localhost',
     port: process.env.PORT || 3100,
     prefix: '/api/',
   },
