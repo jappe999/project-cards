@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
+import consola from 'consola'
+import pkg from '../../package.json'
 import { AppModule } from './app.module'
 import config from '../../nuxt.config'
-import consola from 'consola'
 import NuxtServer from './nuxt'
 import { NuxtFilter } from './nuxt/nuxt.filter'
 
@@ -16,7 +17,7 @@ async function bootstrap() {
     const options = new DocumentBuilder()
       .setTitle('Project Cards')
       .setDescription('The Project Cards API description')
-      .setVersion('1.0')
+      .setVersion(pkg.version)
       .build()
     const document = SwaggerModule.createDocument(app, options)
     SwaggerModule.setup('docs', app, document)
