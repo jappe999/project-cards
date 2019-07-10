@@ -5,9 +5,7 @@ const isDev = process.env.NODE_ENV !== 'production'
 const config: NuxtConfiguration = {
   mode: 'spa',
   env: {
-    host: process.env.HOST || 'localhost',
     port: process.env.PORT || '3100',
-    WS_URL: process.env.WS_URL || 'http://localhost:3100',
   },
 
   srcDir: './client/',
