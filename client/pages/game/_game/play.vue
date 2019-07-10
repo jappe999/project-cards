@@ -20,13 +20,12 @@
               d="M5.41 11H21a1 1 0 0 1 0 2H5.41l5.3 5.3a1 1 0 0 1-1.42 1.4l-7-7a1 1 0 0 1 0-1.4l7-7a1 1 0 0 1 1.42 1.4L5.4 11z"
             />
           </svg>
-          <span class="pl-2">
-            Back to all games
-          </span>
+          <span class="pl-2">Back to all games</span>
         </nuxt-link>
       </nav>
       <h1>
-        Game: <b v-select-on-focus contenteditable>{{ game.name }}</b>
+        Game:
+        <b v-select-on-focus contenteditable>{{ game.name }}</b>
       </h1>
     </div>
 
@@ -34,12 +33,12 @@
       <div
         class="min-w-64 sticky top-0 flex flex-col items-center p-4 sm:p-8 sm:border-r border-gray-400 bg-gray-200 shadow sm:shadow-none"
       >
-        <app-play-card color="black" class="sm:h-96 w-full sm:w-64 mb-4">
-          {{ blackCard.text }}
-        </app-play-card>
-        <app-button class="w-full" @click.native="playCard">
-          Play Card
-        </app-button>
+        <app-play-card color="black" class="sm:h-96 w-full sm:w-64 mb-4">{{
+          blackCard.text
+        }}</app-play-card>
+        <app-button class="w-full" @click.native="playCard"
+          >Play Card</app-button
+        >
       </div>
       <div class="flex flex-wrap flex-grow py-8 px-2 sm:px-6">
         <div
@@ -47,9 +46,7 @@
           :key="card.id"
           class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 2xl:w-1/5 pb-4 px-2"
         >
-          <app-play-card class="h-full">
-            {{ card.text }}
-          </app-play-card>
+          <app-play-card class="h-full">{{ card.text }}</app-play-card>
         </div>
       </div>
     </main>
@@ -61,7 +58,6 @@ import { Context } from '@nuxt/vue-app'
 import { Vue, Component } from 'vue-property-decorator'
 import { Action } from 'vuex-class'
 import { Game } from '~/models/Game'
-import socket from '~/plugins/socket.io'
 import { CardView } from '~/models/Card'
 
 @Component({
@@ -85,6 +81,7 @@ import { CardView } from '~/models/Card'
   },
 })
 export default class PlayGame extends Vue {
+  $socket!: SocketIOClient.Socket
   game!: Game
   session!: any
   blackCards: CardView[] = []
@@ -99,17 +96,17 @@ export default class PlayGame extends Vue {
   }
 
   beforeMount() {
-    socket.on('session-join', ({ currentCard: blackCard, ...event }) => {
+    this.$socket.on('session-join', ({ currentCard: blackCard, ...event }) => {
       this.session = event
       this.blackCards = [...this.blackCards, blackCard]
     })
 
-    socket.on('next-card', (blackCard: CardView) => {
+    this.$socket.on('next-card', (blackCard: CardView) => {
       window.navigator.vibrate(100)
       this.blackCards = [...this.blackCards, blackCard]
     })
 
-    socket.on('session-play-card', event => {
+    this.$socket.on('session-play-card', event => {
       this.cardsPlayed.push(event)
     })
 
@@ -117,7 +114,7 @@ export default class PlayGame extends Vue {
   }
 
   playCard() {
-    socket.emit('session-play-card', {
+    this.$socket.emit('session-play-card', {
       session: this.session,
       card: Math.random().toString(36),
     })

@@ -38,7 +38,11 @@ const config: NuxtConfiguration = {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ['~/plugins/Form', '~/plugins/SelectOnFocus'],
+  plugins: [
+    '~/plugins/Form',
+    '~/plugins/SelectOnFocus',
+    { src: '~/plugins/socket.io', ssr: false },
+  ],
   /*
    ** Nuxt.js modules
    */
@@ -58,7 +62,7 @@ const config: NuxtConfiguration = {
     prefix: '/api/',
   },
   workbox: {
-    dev: isDev,
+    dev: !isDev,
   },
   /*
    ** Build configuration
