@@ -1,5 +1,7 @@
 import NuxtConfiguration from '@nuxt/config'
 
+const isDev = process.env.NODE_ENV !== 'production'
+
 const config: NuxtConfiguration = {
   mode: 'spa',
   env: {
@@ -9,7 +11,7 @@ const config: NuxtConfiguration = {
   },
 
   srcDir: './client/',
-  dev: process.env.NODE_ENV !== 'production',
+  dev: isDev,
 
   /*
    ** Headers of the page
@@ -46,8 +48,8 @@ const config: NuxtConfiguration = {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
-    '@nuxtjs/eslint-module',
   ],
+  devModules: ['@nuxtjs/eslint-module'],
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
@@ -58,7 +60,7 @@ const config: NuxtConfiguration = {
     prefix: '/api/',
   },
   workbox: {
-    dev: process.env.NODE_ENV !== 'production',
+    dev: isDev,
   },
   /*
    ** Build configuration
