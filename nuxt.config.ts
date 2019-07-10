@@ -60,6 +60,7 @@ const config: NuxtConfiguration = {
   axios: {
     host: process.env.API_HOST || 'localhost',
     port: process.env.API_PORT || 3100,
+    https: true,
     prefix: '/api/',
   },
   workbox: {
