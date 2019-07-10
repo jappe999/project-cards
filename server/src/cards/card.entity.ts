@@ -1,21 +1,21 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
 
-export type CardType = 'A' | 'Q';
+export type CardType = 'A' | 'Q'
 
 @Entity()
 export class Card {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id!: string
 
   @Column({ length: 1 })
-  type!: CardType | string;
+  type!: CardType | string
 
   @Column()
-  text!: string;
+  text!: string
 
   @Column()
-  numAnswers!: number;
+  numAnswers!: number
 
   @Column()
-  expansion!: string;
+  expansion!: string
 }

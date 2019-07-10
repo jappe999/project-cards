@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es5",
+    "target": "es2015",
     "declaration": false,
     "removeComments": true,
+    "noLib": false,
     "lib": ["es2015", "es2015.iterable", "dom"],
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
@@ -22,9 +23,6 @@
       "@types/node",
       "@nuxt/vue-app",
       "@types/jest"
-    ],
-    "typeRoots": [
-      "node_modules/@types"
     ]
   },
   "include": [

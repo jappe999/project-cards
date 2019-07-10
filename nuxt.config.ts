@@ -1,10 +1,10 @@
 import NuxtConfiguration from '@nuxt/config'
 
 const config: NuxtConfiguration = {
-  mode: 'universal',
+  mode: 'spa',
   env: {
-    host: process.env.HOST,
-    port: process.env.PORT,
+    host: process.env.HOST || 'localhost',
+    port: process.env.PORT || '3100',
     WS_URL: process.env.WS_URL || 'http://localhost:3100',
   },
 
@@ -57,6 +57,9 @@ const config: NuxtConfiguration = {
     port: process.env.PORT || 3100,
     prefix: '/api/',
   },
+  workbox: {
+    dev: process.env.NODE_ENV !== 'production',
+  },
   /*
    ** Build configuration
    */
@@ -73,7 +76,7 @@ const config: NuxtConfiguration = {
     /*
      ** You can extend webpack config here
      */
-    extend(config, ctx) { },
+    extend(config, ctx) {},
   },
 }
 

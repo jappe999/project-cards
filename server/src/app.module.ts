@@ -3,14 +3,19 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { GamesModule } from './games/games.module'
 import { SessionsModule } from './sessions/sessions.module'
 import { CardsModule } from './cards/cards.module'
-import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
-import config from '../../ormconfig.json'
-import { getMetadataArgsStorage } from 'typeorm';
+import config from '../../ormconfig'
+import { getMetadataArgsStorage } from 'typeorm'
+import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions'
 
 @Module({
-  imports: [TypeOrmModule.forRoot({
-    ...config as MysqlConnectionOptions,
-    entities: getMetadataArgsStorage().tables.map(tbl => tbl.target),
-  }), GamesModule, SessionsModule, CardsModule],
+  imports: [
+    TypeOrmModule.forRoot({
+      ...(config as PostgresConnectionOptions),
+      entities: getMetadataArgsStorage().tables.map(tbl => tbl.target),
+    }),
+    GamesModule,
+    SessionsModule,
+    CardsModule,
+  ],
 })
-export class AppModule { }
+export class AppModule {}
