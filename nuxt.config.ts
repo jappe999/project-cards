@@ -63,9 +63,6 @@ const config: NuxtConfiguration = {
     https: true,
     prefix: '/api/',
   },
-  workbox: {
-    dev: !isDev,
-  },
   /*
    ** Build configuration
    */
