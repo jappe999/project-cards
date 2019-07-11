@@ -1,17 +1,23 @@
-# project-cards
+<center style="text-align:center">
 
-> Project Cards App
+![Project Cards Logo](client/static/logo.svg)
+
+# Project Cards
+
+_Yet Another Cards Against Humanity App_
+
+</center>
 
 ## Build Setup
 
-``` bash
+```bash
 # install dependencies
-$ yarn install
+yarn
 
 # serve with hot reload at localhost:3000
-$ yarn start:dev
+yarn start:dev
 
 # build for production and launch server
-$ yarn build
-$ yarn start
+yarn build
+yarn start
 ```
