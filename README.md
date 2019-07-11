@@ -14,7 +14,7 @@
 # install dependencies
 yarn
 
-# serve with hot reload at localhost:3000
+# serve with hot reload at localhost:3100
 yarn start:dev
 
 # build for production and launch server
