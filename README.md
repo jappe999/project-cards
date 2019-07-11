@@ -1,12 +1,12 @@
-<center style="text-align:center">
-
-![Project Cards Logo](client/static/logo.svg)
-
-# Project Cards
-
-_Yet Another Cards Against Humanity App_
-
-</center>
+<p align="center">
+  <img src="client/static/logo.svg" title="Project Cards Logo" alt="Project Cards Logo" />
+</p>
+<h1 align="center">
+  Project Cards
+</h1>
+<p align="center">
+  <i>Yet Another Cards Against Humanity App</i>
+</p>
 
 ## Build Setup
 
