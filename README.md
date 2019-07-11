@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="client/static/logo.svg" title="Project Cards Logo" alt="Project Cards Logo" />
+  <img src="client/static/logo.svg" title="Project Cards Logo" alt="Project Cards Logo" width="200px" />
 </p>
 <h1 align="center">
   Project Cards
