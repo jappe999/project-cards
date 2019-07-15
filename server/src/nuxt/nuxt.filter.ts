@@ -14,6 +14,14 @@ export class NuxtFilter implements ExceptionFilter {
     this.nuxt = nuxt
   }
 
+  getResponse(exception: HttpException): Object {
+    let response = exception.getResponse()
+    if (typeof exception.getResponse() === 'string') {
+      response = { error: exception.getResponse() }
+    }
+    return response
+  }
+
   async catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
     const res = ctx.getResponse()
@@ -25,7 +33,9 @@ export class NuxtFilter implements ExceptionFilter {
         await this.nuxt.render(req, res)
       }
     } else {
+      const response = this.getResponse(exception)
       res.status(status).json({
+        ...response,
         statusCode: status,
         timestamp: new Date().toISOString(),
         path: req.url,

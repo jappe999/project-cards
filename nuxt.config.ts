@@ -51,6 +51,7 @@ const config: NuxtConfiguration = {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
+    '@nuxtjs/auth',
   ],
   devModules: ['@nuxtjs/eslint-module'],
   /*
@@ -62,6 +63,28 @@ const config: NuxtConfiguration = {
     port: process.env.API_PORT || 3100,
     https: true,
     prefix: '/api/',
+  },
+  auth: {
+    redirect: {
+      home: '/game',
+      logout: '/login',
+    },
+    strategies: {
+      local: {
+        endpoints: {
+          login: {
+            url: 'auth/login',
+            method: 'post',
+            propertyName: 'access_token',
+          },
+          user: { url: 'auth/me', method: 'get', propertyName: false },
+          logout: false,
+        },
+      },
+    },
+  },
+  router: {
+    middleware: ['auth'],
   },
   /*
    ** Build configuration

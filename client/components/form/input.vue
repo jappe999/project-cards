@@ -19,10 +19,10 @@ import { Vue, Prop, Component, Emit } from 'vue-property-decorator'
 
 @Component
 export default class AppInput extends Vue {
-  @Prop(String) readonly type!: string
+  @Prop({ type: String, default: 'text' }) readonly type!: string
   @Prop(String) readonly name!: string
   @Prop(String) readonly label!: string
-  @Prop([String, Number]) value!: string
+  @Prop([String, Number]) readonly value!: string
 
   @Emit()
   input({ target: { value } }) {

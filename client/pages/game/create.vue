@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full flex flex-col items-center">
+  <div class="w-96 flex flex-col items-center">
     <app-card class="w-full">
       <app-card-content>
         <h2 class="text-2xl font-bold">
