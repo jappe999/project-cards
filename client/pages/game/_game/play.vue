@@ -6,7 +6,7 @@
       <nav>
         <nuxt-link
           class="flex -ml-2 px-2"
-          to="/"
+          to="/game"
           @click.native="exitSession(game)"
         >
           <svg
@@ -33,12 +33,20 @@
       <div
         class="min-w-64 sticky top-0 flex flex-col items-center p-4 sm:p-8 sm:border-r border-gray-400 bg-gray-200 shadow sm:shadow-none"
       >
-        <app-play-card color="black" class="sm:h-96 w-full sm:w-64 mb-4">{{
-          blackCard.text
-        }}</app-play-card>
-        <app-button class="w-full" @click.native="playCard"
-          >Play Card</app-button
+        <app-play-card
+          color="black"
+          class="sm:h-96 w-full sm:w-64 mb-4"
+          :disabled="true"
         >
+          {{ blackCard.text }}
+        </app-play-card>
+        <app-button
+          class="w-full"
+          :disabled="canSelectCard"
+          @click.native="playCard"
+        >
+          Play Card
+        </app-button>
       </div>
       <div class="flex flex-wrap flex-grow py-8 px-2 sm:px-6">
         <div
@@ -46,7 +54,14 @@
           :key="card.id"
           class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 2xl:w-1/5 pb-4 px-2"
         >
-          <app-play-card class="h-full">{{ card.text }}</app-play-card>
+          <app-play-card
+            class="h-full"
+            :step="cardIndex(card)"
+            :disabled="!(canSelectCard || cardIndex(card) > 0)"
+            @toggle="toggleCard(card)"
+          >
+            {{ card.text }}
+          </app-play-card>
         </div>
       </div>
     </main>
@@ -87,30 +102,56 @@ export default class PlayGame extends Vue {
   blackCards: CardView[] = []
   cards: CardView[] = []
   cardsPlayed: string[] = []
+  selectedCards: CardView[] = []
 
   @Action('sessions/join') joinSession
   @Action('sessions/exit') exitSession
 
-  get blackCard() {
-    return this.blackCards[this.blackCards.length - 1] || {}
+  get blackCard(): CardView {
+    return this.blackCards[this.blackCards.length - 1] || <CardView>{}
+  }
+
+  get canSelectCard() {
+    return this.selectedCards.length < this.blackCard.numAnswers
   }
 
   beforeMount() {
-    this.$socket.on('session-join', ({ currentCard: blackCard, ...event }) => {
-      this.session = event
-      this.blackCards = [...this.blackCards, blackCard]
-    })
-
-    this.$socket.on('next-card', (blackCard: CardView) => {
-      window.navigator.vibrate(100)
-      this.blackCards = [...this.blackCards, blackCard]
-    })
-
-    this.$socket.on('session-play-card', event => {
-      this.cardsPlayed.push(event)
-    })
+    this.$socket.on('session-join', this.onSessionJoin.bind(this))
+    this.$socket.on('session-next-round', this.onSessionNextRound.bind(this))
+    this.$socket.on('session-play-card', this.onSessionPlayCard.bind(this))
 
     this.joinSession(this.game)
+  }
+
+  onSessionJoin({ currentCard: blackCard, ...event }) {
+    this.session = event
+    this.blackCards = [...this.blackCards, blackCard]
+  }
+
+  onSessionNextRound(blackCard: CardView) {
+    window.navigator.vibrate(100)
+    this.blackCards = [...this.blackCards, blackCard]
+  }
+
+  onSessionPlayCard(event) {
+    this.cardsPlayed.push(event)
+  }
+
+  cardIndex(card: CardView): number {
+    return this.selectedCards.findIndex(c => c.id === card.id) + 1
+  }
+
+  /**
+   * Add a card if it's not already selected. Else remove it from the array.
+   *
+   * @param card - The card to toggle in the list of selected cards.
+   */
+  toggleCard(card: CardView) {
+    if (this.canSelectCard && !this.selectedCards.includes(card)) {
+      this.selectedCards.push(card)
+    } else {
+      this.selectedCards = this.selectedCards.filter(c => c.id !== card.id)
+    }
   }
 
   playCard() {

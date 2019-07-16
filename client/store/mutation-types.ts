@@ -6,3 +6,7 @@ export const REMOVE_GAME = 'REMOVE_GAME'
 
 // Cards
 export const FETCH_CARDS = 'FETCH_CARDS'
+
+// Authentication
+export const SIGN_IN = 'SIGN_IN'
+export const SIGN_OUT = 'SIGN_OUT'

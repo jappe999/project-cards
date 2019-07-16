@@ -4,7 +4,7 @@ export class Errors {
   /**
    * Create a new error bag instance.
    */
-  constructor(public errors = {}) {}
+  constructor(private errors = {}) {}
 
   /**
    * Set the errors object or field error messages.
