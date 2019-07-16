@@ -8,14 +8,18 @@ import { UserCreateDto } from '../user.dto'
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private readonly gameRepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
   ) {}
 
   findOne(options?: FindOneOptions): Promise<User> {
-    return this.gameRepository.findOne(options)
+    return this.userRepository.findOne(options)
   }
 
   create(user: UserCreateDto): Promise<User> {
-    return this.gameRepository.save(user)
+    return this.userRepository.save(user)
+  }
+
+  update(where: { [key: string]: any }, update: { [key: string]: any }) {
+    this.userRepository.update(where, update)
   }
 }

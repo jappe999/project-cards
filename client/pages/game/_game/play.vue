@@ -116,21 +116,25 @@ export default class PlayGame extends Vue {
   }
 
   beforeMount() {
-    this.$socket.on('session-join', ({ currentCard: blackCard, ...event }) => {
-      this.session = event
-      this.blackCards = [...this.blackCards, blackCard]
-    })
-
-    this.$socket.on('next-card', (blackCard: CardView) => {
-      window.navigator.vibrate(100)
-      this.blackCards = [...this.blackCards, blackCard]
-    })
-
-    this.$socket.on('session-play-card', event => {
-      this.cardsPlayed.push(event)
-    })
+    this.$socket.on('session-join', this.onSessionJoin.bind(this))
+    this.$socket.on('session-next-round', this.onSessionNextRound.bind(this))
+    this.$socket.on('session-play-card', this.onSessionPlayCard.bind(this))
 
     this.joinSession(this.game)
+  }
+
+  onSessionJoin({ currentCard: blackCard, ...event }) {
+    this.session = event
+    this.blackCards = [...this.blackCards, blackCard]
+  }
+
+  onSessionNextRound(blackCard: CardView) {
+    window.navigator.vibrate(100)
+    this.blackCards = [...this.blackCards, blackCard]
+  }
+
+  onSessionPlayCard(event) {
+    this.cardsPlayed.push(event)
   }
 
   cardIndex(card: CardView): number {

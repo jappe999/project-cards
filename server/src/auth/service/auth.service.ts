@@ -16,7 +16,7 @@ export class AuthService {
   ): Promise<UserViewDto | null> {
     const user = await this.usersService.findOne({ where: { username } })
 
-    if (user && user.password === pass) {
+    if (user && user.password === pass && !user.loginTime) {
       const { password, ...result } = user
       return result
     }
@@ -32,10 +32,16 @@ export class AuthService {
     return null
   }
 
-  async login(user: any) {
-    const payload = { username: user.username, sub: user.userId }
+  async login({ username, userId }: any) {
+    const payload = { username, sub: userId }
+    this.usersService.update({ username }, { loginTime: new Date() })
+
     return {
       access_token: this.jwtService.sign(payload),
     }
+  }
+
+  async logout({ username }: any) {
+    this.usersService.update({ username }, { loginTime: null })
   }
 }

@@ -16,7 +16,7 @@ const config: NuxtConfiguration = {
    ** Headers of the page
    */
   head: {
-    title: process.env.npm_package_name || '',
+    title: 'Project Cards',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -64,6 +64,10 @@ const config: NuxtConfiguration = {
     https: true,
     prefix: '/api/',
   },
+  meta: {
+    name: 'Project Cards',
+    theme_color: '#1a202c',
+  },
   auth: {
     redirect: {
       home: '/game',
@@ -77,8 +81,11 @@ const config: NuxtConfiguration = {
             method: 'post',
             propertyName: 'access_token',
           },
+          logout: {
+            url: 'auth/logout',
+            method: 'post',
+          },
           user: { url: 'auth/me', method: 'get', propertyName: false },
-          logout: false,
         },
       },
     },
