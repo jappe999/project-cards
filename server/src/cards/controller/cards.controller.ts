@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common'
-import { CardViewDto } from 'server/src/cards/card.dto'
-import { CardsService } from 'server/src/cards/service/cards.service'
+import { CardViewDto } from '../card.dto'
+import { CardsService } from '../service/cards.service'
 
 @Controller('api/cards')
 export class CardsController {

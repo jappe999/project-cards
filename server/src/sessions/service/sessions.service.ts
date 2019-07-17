@@ -3,21 +3,19 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Session } from '../session.entity'
 import { Repository } from 'typeorm'
 import { Socket } from 'socket.io'
-import { GameJoinDto } from '../../games/game.dto'
 import { from, Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { WsResponse } from '@nestjs/websockets'
-import { CardsService } from 'server/src/cards/service/cards.service'
-import { CardViewDto } from 'server/src/cards/card.dto'
-import { AuthService } from 'server/src/auth/service/auth.service'
+import { GameJoinDto } from '../../games/game.dto'
+import { CardsService } from '../../cards/service/cards.service'
+import { CardViewDto } from '../../cards/card.dto'
 
 @Injectable()
 export class SessionsService {
   constructor(
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
-    private cardsService: CardsService,
-    private authService: AuthService,
+    private readonly cardsService: CardsService,
   ) {}
 
   /**
@@ -42,10 +40,9 @@ export class SessionsService {
 
   exitGame(client: Socket, game: GameJoinDto): Observable<WsResponse<Session>> {
     const room = this.getRoomName(game)
+    const session = this.sessionRepository.findOneOrFail({ room })
 
     client.leave(room)
-
-    const session = this.sessionRepository.findOneOrFail({ room, game })
 
     return from(session).pipe(
       map(item => ({ event: 'session-exit', data: item })),

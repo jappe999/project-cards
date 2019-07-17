@@ -1,11 +1,13 @@
-import { Injectable, UseGuards, Request } from '@nestjs/common'
-import { UsersService } from 'server/src/users/service/users.service'
-import { UserViewDto } from 'server/src/users/user.dto'
+import { Injectable } from '@nestjs/common'
+import { UsersService } from '../../users/service/users.service'
+import { UserViewDto } from '../../users/user.dto'
 import { JwtService } from '@nestjs/jwt'
-import { AuthGuard } from '@nestjs/passport'
 
 @Injectable()
 export class AuthService {
+  private static readonly ERROR_USER_LOGGED_IN = 'User already logged in.'
+  private static readonly ERROR_LOGIN_INCORRECT = 'User or password incorrect.'
+
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
@@ -14,7 +16,7 @@ export class AuthService {
   async validateUser(
     username: string,
     pass: string,
-  ): Promise<UserViewDto | null> {
+  ): Promise<UserViewDto | string> {
     const user = await this.usersService.findOne({ where: { username } })
 
     if (user) {
@@ -22,7 +24,7 @@ export class AuthService {
         user.loginTime &&
         user.loginTime.getTime() + 60 * 60 * 1000 > Date.now()
       ) {
-        return null
+        return AuthService.ERROR_USER_LOGGED_IN
       }
 
       if (user.password === pass) {
@@ -37,7 +39,11 @@ export class AuthService {
       return result
     }
 
-    return null
+    return AuthService.ERROR_LOGIN_INCORRECT
+  }
+
+  profile({ id }) {
+    return this.usersService.findOne({ where: { id } })
   }
 
   async login({ id, username }: any) {

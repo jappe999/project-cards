@@ -9,8 +9,6 @@ import { Observable } from 'rxjs'
 import { Game } from '../../games/game.entity'
 import { SessionsService } from '../service/sessions.service'
 import { Session } from '../session.entity'
-import { UseGuards } from '@nestjs/common'
-import { AuthGuard } from '@nestjs/passport'
 import { CardViewDto } from 'server/src/cards/card.dto'
 
 @WebSocketGateway()
