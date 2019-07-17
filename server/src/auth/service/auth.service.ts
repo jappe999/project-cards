@@ -16,12 +16,19 @@ export class AuthService {
   ): Promise<UserViewDto | null> {
     const user = await this.usersService.findOne({ where: { username } })
 
-    if (user && user.password === pass && !user.loginTime) {
-      const { password, ...result } = user
-      return result
-    }
+    if (user) {
+      if (
+        user.loginTime &&
+        user.loginTime.getTime() + 60 * 60 * 1000 > Date.now()
+      ) {
+        return null
+      }
 
-    if (!user) {
+      if (user.password === pass) {
+        const { password, ...result } = user
+        return result
+      }
+    } else {
       const { password, ...result } = await this.usersService.create({
         username,
         password: pass,

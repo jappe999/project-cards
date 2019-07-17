@@ -8,6 +8,7 @@ import { from, Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { WsResponse } from '@nestjs/websockets'
 import { CardsService } from '../../cards/service/cards.service'
+import { CardViewDto } from 'server/src/cards/card.dto'
 
 @Injectable()
 export class SessionsService {
@@ -51,13 +52,13 @@ export class SessionsService {
 
   playCard(
     client: Socket,
-    { session, card }: { session: Session; card: string },
-  ): Observable<WsResponse<string>> {
+    { session, cards }: { session: Session; cards: CardViewDto[] },
+  ): Observable<WsResponse<CardViewDto[]>> {
     client.broadcast
       .to(client.rooms[session.room])
-      .emit('session-play-card', card)
+      .emit('session-play-card', cards)
 
-    return from([card]).pipe(
+    return from([cards]).pipe(
       map(item => ({ event: 'session-play-card', data: item })),
     )
   }

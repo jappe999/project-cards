@@ -25,7 +25,7 @@ import { Component, Vue, Prop, Emit } from 'vue-property-decorator'
     AppCardContent: () => import('~/components/card/card-content.vue'),
   },
 })
-export default class AppPlayCard extends Vue {
+export default class AppPlaycard extends Vue {
   @Prop({ default: 'white', type: String }) color!: 'black' | 'white'
   @Prop({ default: null, type: [String, Number] }) step!: number
   @Prop({ default: false, type: [Boolean] }) disabled!: boolean
