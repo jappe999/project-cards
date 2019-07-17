@@ -1,6 +1,6 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { CardViewDto } from '../card.dto';
-import { CardsService } from '../service/cards.service';
+import { Controller, Get, Query } from '@nestjs/common'
+import { CardViewDto } from 'server/src/cards/card.dto'
+import { CardsService } from 'server/src/cards/service/cards.service'
 
 @Controller('api/cards')
 export class CardsController {
@@ -8,6 +8,6 @@ export class CardsController {
 
   @Get()
   fetchAll(@Query() query: { [key: string]: any }): Promise<CardViewDto[]> {
-    return this.cardsService.findAll(query);
+    return this.cardsService.findAll(query)
   }
 }

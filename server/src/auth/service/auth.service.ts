@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common'
-import { UsersService } from '../../users/service/users.service'
+import { Injectable, UseGuards, Request } from '@nestjs/common'
+import { UsersService } from 'server/src/users/service/users.service'
 import { UserViewDto } from 'server/src/users/user.dto'
 import { JwtService } from '@nestjs/jwt'
+import { AuthGuard } from '@nestjs/passport'
 
 @Injectable()
 export class AuthService {
@@ -39,16 +40,15 @@ export class AuthService {
     return null
   }
 
-  async login({ username, userId }: any) {
-    const payload = { username, sub: userId }
-    this.usersService.update({ username }, { loginTime: new Date() })
+  async login({ id, username }: any) {
+    await this.usersService.update({ username }, { loginTime: new Date() })
 
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign({ sub: id, username }),
     }
   }
 
-  async logout({ username }: any) {
-    this.usersService.update({ username }, { loginTime: null })
+  logout({ id }: any) {
+    return this.usersService.update({ id }, { loginTime: null })
   }
 }

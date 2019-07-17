@@ -7,8 +7,9 @@ import { GameJoinDto } from '../../games/game.dto'
 import { from, Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { WsResponse } from '@nestjs/websockets'
-import { CardsService } from '../../cards/service/cards.service'
+import { CardsService } from 'server/src/cards/service/cards.service'
 import { CardViewDto } from 'server/src/cards/card.dto'
+import { AuthService } from 'server/src/auth/service/auth.service'
 
 @Injectable()
 export class SessionsService {
@@ -16,6 +17,7 @@ export class SessionsService {
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
     private cardsService: CardsService,
+    private authService: AuthService,
   ) {}
 
   /**
@@ -75,6 +77,7 @@ export class SessionsService {
       .createQueryBuilder('session')
       .leftJoinAndSelect('session.game', 'game')
       .leftJoinAndSelect('session.currentCard', 'card')
+      .leftJoinAndSelect('session.players', 'user')
       .where({ room })
       .getOne()
 
@@ -85,7 +88,11 @@ export class SessionsService {
         type: 'Q',
       })
       // Save session details for later usage.
-      session = await this.sessionRepository.save({ room, game, currentCard })
+      session = await this.sessionRepository.save({
+        room,
+        game,
+        currentCard,
+      })
     }
 
     return session

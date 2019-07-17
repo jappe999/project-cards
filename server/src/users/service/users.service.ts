@@ -20,6 +20,6 @@ export class UsersService {
   }
 
   update(where: { [key: string]: any }, update: { [key: string]: any }) {
-    this.userRepository.update(where, update)
+    return this.userRepository.update(where, update)
   }
 }

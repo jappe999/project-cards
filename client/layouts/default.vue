@@ -4,7 +4,7 @@
   >
     <div
       v-if="!gameJoined"
-      class="md:sticky top-0 flex flex-col items-center p-4 md:p-8 md:border-r border-gray-400 bg-gray-200 border-b md:border-b-0 text-center"
+      class="md:sticky top-0 flex flex-col items-center p-4 md:p-8 md:border-r border-gray-400 bg-gray-200 border-b md:border-b-0 text-center overflow-y-auto"
       :class="
         $auth.loggedIn
           ? 'h-screen md:w-96 justify-between'
