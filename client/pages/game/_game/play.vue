@@ -124,6 +124,9 @@ export default class PlayGame extends Vue {
   }
 
   onSessionJoin(session) {
+    const c = console
+    c.log(session)
+
     this.session = session
     this.blackCards = [...this.blackCards, session.currentCard]
   }
@@ -133,7 +136,11 @@ export default class PlayGame extends Vue {
     this.onSessionJoin(data)
   }
 
-  onSessionPlayCard({ cards }) {
+  onSessionPlayCard(data) {
+    const c = console
+    c.log(data)
+
+    const cards = data.cards
     const alreadyPlayed = this.playedCards[this.round] || []
     this.playedCards[this.round] = [...alreadyPlayed, cards]
     this.playedCards = [...this.playedCards]

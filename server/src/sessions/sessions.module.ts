@@ -5,9 +5,15 @@ import { SessionsService } from './service/sessions.service'
 import { Session } from './session.entity'
 import { CardsModule } from '../cards/cards.module'
 import { AuthModule } from '../auth/auth.module'
+import { PlayerSessionModule } from '../player-session/player-session.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Session]), CardsModule, AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([Session]),
+    CardsModule,
+    AuthModule,
+    PlayerSessionModule,
+  ],
   providers: [SessionsService, SessionsGateway],
 })
 export class SessionsModule {}

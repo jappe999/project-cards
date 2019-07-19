@@ -4,12 +4,11 @@ import {
   Column,
   JoinColumn,
   OneToOne,
-  ManyToMany,
-  JoinTable,
+  OneToMany,
 } from 'typeorm'
 import { Game } from '../games/game.entity'
 import { Card } from '../cards/card.entity'
-import { User } from '../users/user.entity'
+import { PlayerInSession } from '../player-session/player-session.entity'
 
 @Entity()
 export class Session {
@@ -27,7 +26,6 @@ export class Session {
   @JoinColumn()
   currentCard!: Card
 
-  @ManyToMany(() => User, user => user.sessions)
-  @JoinTable()
-  players!: User[]
+  @OneToMany(() => PlayerInSession, playerInSession => playerInSession.session)
+  public playerInSession!: PlayerInSession[]
 }

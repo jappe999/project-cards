@@ -12,6 +12,7 @@ import { CardViewDto } from 'server/src/cards/card.dto'
 import { UseGuards } from '@nestjs/common'
 import { WsJwtGuard } from '../../auth/guard/ws-jwt.guard'
 import { User } from 'server/src/users/user.entity'
+import { PlayerInSession } from 'server/src/player-session/player-session.entity'
 
 @WebSocketGateway()
 export class SessionsGateway {
@@ -37,12 +38,10 @@ export class SessionsGateway {
 
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('session-play-card')
-  playCard(
+  playCards(
     client: Socket,
     payload: { user: User; session: Session; cards: CardViewDto[] },
-  ): Observable<
-    WsResponse<{ user: User; session: Session; cards: CardViewDto[] }>
-  > {
-    return this.sessionsService.playCard(client, payload)
+  ): Observable<WsResponse<PlayerInSession>> {
+    return this.sessionsService.playCards(client, payload)
   }
 }

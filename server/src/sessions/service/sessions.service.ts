@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Session } from '../session.entity'
-import { Repository } from 'typeorm'
+import { Repository, QueryBuilder } from 'typeorm'
 import { Socket } from 'socket.io'
 import { from, Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, tap } from 'rxjs/operators'
 import { WsResponse } from '@nestjs/websockets'
 import { GameJoinDto } from '../../games/game.dto'
 import { CardsService } from '../../cards/service/cards.service'
 import { CardViewDto } from '../../cards/card.dto'
-import { User } from 'server/src/users/user.entity'
+import { User } from '../../users/user.entity'
+import { PlayerSessionService } from '../../player-session/service/player-session.service'
+import { PlayerInSession } from '../../player-session/player-session.entity'
 
 @Injectable()
 export class SessionsService {
@@ -17,6 +19,7 @@ export class SessionsService {
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
     private readonly cardsService: CardsService,
+    private readonly playerInSessionsService: PlayerSessionService,
   ) {}
 
   /**
@@ -38,6 +41,7 @@ export class SessionsService {
     const session = this.createSession(user, game, room)
 
     return from(session).pipe(
+      tap(session => console.log(session)),
       map(item => ({ event: 'session-join', data: item })),
     )
   }
@@ -56,19 +60,18 @@ export class SessionsService {
     )
   }
 
-  playCard(
+  playCards(
     client: Socket,
     data: { user: User; session: Session; cards: CardViewDto[] },
-  ): Observable<
-    WsResponse<{ user: User; session: Session; cards: CardViewDto[] }>
-  > {
-    client.broadcast
-      .to(client.rooms[data.session.room])
-      .emit('session-play-card', data)
+  ): Observable<WsResponse<PlayerInSession>> {
+    const playerInSession = this.playerInSessionsService.playCards(data)
 
-    // Save to database
-
-    return from([data]).pipe(
+    return from(playerInSession).pipe(
+      tap(item => {
+        client.broadcast
+          .to(client.rooms[data.session.room])
+          .emit('session-play-card', item)
+      }),
       map(item => ({ event: 'session-play-card', data: item })),
     )
   }
@@ -78,8 +81,10 @@ export class SessionsService {
   }
 
   private addPlayerToSession(user: User, session: Session) {
-    session.players = [...session.players, user]
-    this.sessionRepository.save(session)
+    return this.playerInSessionsService.create({
+      playerId: user.id,
+      sessionId: session.id,
+    })
   }
 
   private getSession(room: string): Promise<Session> {
@@ -87,7 +92,10 @@ export class SessionsService {
       .createQueryBuilder('session')
       .leftJoinAndSelect('session.game', 'game')
       .leftJoinAndSelect('session.currentCard', 'card')
-      .leftJoinAndSelect('session.players', 'user')
+      .leftJoinAndSelect(qb => {
+        return qb.select().from(PlayerInSession, 'playerSession')
+        // .leftJoinAndSelect('playerSession.playerCards', 'player_in_card')
+      }, 'session.playerInSession')
       .where({ room })
       .getOne()
   }
@@ -97,7 +105,7 @@ export class SessionsService {
     game: GameJoinDto,
     room: string,
   ): Promise<Session> {
-    let session = await this.getSession(room)
+    let session = await this.sessionRepository.findOne({ where: { room } })
 
     if (!session) {
       const [currentCard] = await this.cardsService.findAll({
@@ -116,6 +124,6 @@ export class SessionsService {
 
     await this.addPlayerToSession(user, session)
 
-    return session
+    return this.getSession(room)
   }
 }
