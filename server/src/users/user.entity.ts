@@ -22,6 +22,5 @@ export class User {
   loginTime?: Date
 
   @ManyToMany(() => Session, session => session.players)
-  @JoinColumn()
   sessions!: Session[]
 }

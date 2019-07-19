@@ -7,11 +7,11 @@ export const getters = {}
 export const mutations = {}
 
 export const actions = {
-  join(state: any, game: GameView) {
-    this.$socket.emit('session-join', game)
+  join(_: any, game: GameView) {
+    this.$socket.emit('session-join', { game })
   },
 
-  exit(state: any, game: GameView) {
-    this.$socket.emit('session-exit', game)
+  exit(_: any, game: GameView) {
+    this.$socket.emit('session-exit', { game })
   },
 }

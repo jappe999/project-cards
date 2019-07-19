@@ -30,18 +30,26 @@
     </div>
 
     <main class="h-full w-full">
-      <app-choose-cards
-        v-if="state === 'choose-cards'"
-        :selected-cards="selectedCards"
-        :black-card="blackCard"
-        :session="session"
-        @select="selectCards"
-      />
+      <transition name="page">
+        <app-choose-cards
+          v-if="state === 'choose-cards'"
+          :selected-cards="selectedCards"
+          :black-card="blackCard"
+          :session="session"
+          @select="selectCards"
+          @submit="playCards"
+        />
 
-      <app-choose-card-combination
-        v-if="state === 'choose-card-combination'"
-        :cards="selectedCards"
-      />
+        <app-choose-card-combination
+          v-if="state === 'choose-card-combination'"
+          :selected-cards="selectedCards"
+          :cards="playedCards"
+          :black-card="blackCard"
+          :session="session"
+          @select="selectCards"
+          @submit="chooseCombination"
+        />
+      </transition>
     </main>
   </div>
 </template>
@@ -68,6 +76,8 @@ import { CardView } from '~/models/Card'
   components: {
     AppPlaycard: () => import('~/components/game/playcard.vue'),
     AppChooseCards: () => import('~/components/game/choose-cards.vue'),
+    AppChooseCardCombination: () =>
+      import('~/components/game/choose-card-combination.vue'),
   },
 })
 export default class PlayGame extends Vue {
@@ -78,7 +88,7 @@ export default class PlayGame extends Vue {
   game!: Game
 
   /** @var round - The number of the current round. */
-  round: number = 1
+  round: number = 0
 
   /** @var session - The session the user is currently in. */
   session: any = {}
@@ -88,8 +98,8 @@ export default class PlayGame extends Vue {
   /** @var blackCards - The black cards that have been or are being used for a round. */
   blackCards: CardView[] = []
 
-  /** @var cardsPlayed - Cards played in a round. */
-  cardsPlayed: CardView[][] = []
+  /** @var playedCards - Cards played in a round. */
+  playedCards: CardView[][] = []
 
   /** @var selectedCards - The cards that the player has selected this round. */
   selectedCards: CardView[] = []
@@ -102,7 +112,7 @@ export default class PlayGame extends Vue {
 
   /** The black card for the current round. */
   get blackCard(): CardView {
-    return this.blackCards[this.round - 1] || <CardView>{}
+    return this.session.currentCard || <CardView>{}
   }
 
   beforeMount() {
@@ -113,23 +123,32 @@ export default class PlayGame extends Vue {
     this.joinSession(this.game)
   }
 
-  onSessionJoin({ currentCard: blackCard, ...event }) {
-    this.session = event
-    this.blackCards = [...this.blackCards, blackCard]
+  onSessionJoin(session) {
+    this.session = session
+    this.blackCards = [...this.blackCards, session.currentCard]
   }
 
-  onSessionNextRound(blackCard: CardView) {
+  onSessionNextRound(data) {
     window.navigator.vibrate(100)
-    this.blackCards = [...this.blackCards, blackCard]
+    this.onSessionJoin(data)
   }
 
-  onSessionPlayCard(cards) {
-    const alreadyPlayed = this.cardsPlayed[this.round] || []
-    this.cardsPlayed[this.round] = [alreadyPlayed, cards]
+  onSessionPlayCard({ cards }) {
+    const alreadyPlayed = this.playedCards[this.round] || []
+    this.playedCards[this.round] = [...alreadyPlayed, cards]
+    this.playedCards = [...this.playedCards]
   }
 
   selectCards(cards: CardView[]) {
     this.selectedCards = cards
+  }
+
+  playCards() {
+    this.state = 'choose-card-combination'
+  }
+
+  chooseCombination() {
+    //
   }
 }
 </script>

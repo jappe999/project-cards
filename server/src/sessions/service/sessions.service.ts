@@ -9,6 +9,7 @@ import { WsResponse } from '@nestjs/websockets'
 import { GameJoinDto } from '../../games/game.dto'
 import { CardsService } from '../../cards/service/cards.service'
 import { CardViewDto } from '../../cards/card.dto'
+import { User } from 'server/src/users/user.entity'
 
 @Injectable()
 export class SessionsService {
@@ -24,21 +25,27 @@ export class SessionsService {
    * @param client - The socket.IO client
    * @param game - The game to join
    */
-  joinGame(client: Socket, game: GameJoinDto): Observable<WsResponse<Session>> {
+  joinGame(
+    client: Socket,
+    { user, game }: { user: User; game: GameJoinDto },
+  ): Observable<WsResponse<Session>> {
     // Construct room name.
     const room = this.getRoomName(game)
 
     // Join socket room.
     client.join(room)
 
-    const session = this.createSession(game, room)
+    const session = this.createSession(user, game, room)
 
     return from(session).pipe(
       map(item => ({ event: 'session-join', data: item })),
     )
   }
 
-  exitGame(client: Socket, game: GameJoinDto): Observable<WsResponse<Session>> {
+  exitGame(
+    client: Socket,
+    { game }: { user: User; game: GameJoinDto },
+  ): Observable<WsResponse<Session>> {
     const room = this.getRoomName(game)
     const session = this.sessionRepository.findOneOrFail({ room })
 
@@ -51,13 +58,17 @@ export class SessionsService {
 
   playCard(
     client: Socket,
-    { session, cards }: { session: Session; cards: CardViewDto[] },
-  ): Observable<WsResponse<CardViewDto[]>> {
+    data: { user: User; session: Session; cards: CardViewDto[] },
+  ): Observable<
+    WsResponse<{ user: User; session: Session; cards: CardViewDto[] }>
+  > {
     client.broadcast
-      .to(client.rooms[session.room])
-      .emit('session-play-card', cards)
+      .to(client.rooms[data.session.room])
+      .emit('session-play-card', data)
 
-    return from([cards]).pipe(
+    // Save to database
+
+    return from([data]).pipe(
       map(item => ({ event: 'session-play-card', data: item })),
     )
   }
@@ -66,17 +77,27 @@ export class SessionsService {
     return `${game.id}-${game.name.replace(' ', '-')}`
   }
 
-  private async createSession(
-    game: GameJoinDto,
-    room: string,
-  ): Promise<Session> {
-    let session = await this.sessionRepository
+  private addPlayerToSession(user: User, session: Session) {
+    session.players = [...session.players, user]
+    this.sessionRepository.save(session)
+  }
+
+  private getSession(room: string): Promise<Session> {
+    return this.sessionRepository
       .createQueryBuilder('session')
       .leftJoinAndSelect('session.game', 'game')
       .leftJoinAndSelect('session.currentCard', 'card')
       .leftJoinAndSelect('session.players', 'user')
       .where({ room })
       .getOne()
+  }
+
+  private async createSession(
+    user: User,
+    game: GameJoinDto,
+    room: string,
+  ): Promise<Session> {
+    let session = await this.getSession(room)
 
     if (!session) {
       const [currentCard] = await this.cardsService.findAll({
@@ -84,6 +105,7 @@ export class SessionsService {
         take: 1,
         type: 'Q',
       })
+
       // Save session details for later usage.
       session = await this.sessionRepository.save({
         room,
@@ -91,6 +113,8 @@ export class SessionsService {
         currentCard,
       })
     }
+
+    await this.addPlayerToSession(user, session)
 
     return session
   }

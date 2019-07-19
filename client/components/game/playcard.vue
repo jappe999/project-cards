@@ -5,13 +5,22 @@
     @click="!disabled && selectCard()"
   >
     <app-card-content class="h-full">
-      <slot></slot>
+      <p>
+        <slot></slot>
+      </p>
     </app-card-content>
 
-    <app-card-content v-if="selected" class="flex">
-      <span class="h-6 w-6 text-center rounded-full text-white bg-black">
-        {{ step }}
-      </span>
+    <app-card-content class="flex justify-between items-center">
+      <small>Project Cards</small>
+
+      <slot name="footer">
+        <span
+          v-if="step"
+          class="h-6 w-6 text-center rounded-full text-white bg-black"
+        >
+          {{ step }}
+        </span>
+      </slot>
     </app-card-content>
   </div>
 </template>
