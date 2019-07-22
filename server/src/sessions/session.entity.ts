@@ -5,6 +5,7 @@ import {
   JoinColumn,
   OneToOne,
   OneToMany,
+  JoinTable,
 } from 'typeorm'
 import { Game } from '../games/game.entity'
 import { Card } from '../cards/card.entity'
@@ -27,5 +28,6 @@ export class Session {
   currentCard!: Card
 
   @OneToMany(() => PlayerInSession, playerInSession => playerInSession.session)
+  @JoinTable()
   public playerInSession!: PlayerInSession[]
 }

@@ -4,6 +4,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   OneToMany,
+  JoinTable,
 } from 'typeorm'
 import { User } from '../users/user.entity'
 import { Session } from '../sessions/session.entity'
@@ -27,5 +28,6 @@ export class PlayerInSession {
   public session!: Session
 
   @OneToMany(() => PlayerInCard, playerInCard => playerInCard.playerSession)
+  @JoinTable()
   public playerCards!: PlayerInCard[]
 }

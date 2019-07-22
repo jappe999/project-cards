@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, ExecutionContext } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
+import { verify } from 'jsonwebtoken'
 import { UsersService } from '../../users/service/users.service'
 import { UserViewDto } from '../../users/user.dto'
-import { JwtService } from '@nestjs/jwt'
+import { Socket } from 'socket.io'
 
 @Injectable()
 export class AuthService {
@@ -12,6 +14,11 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
+
+  getTokenFromWsClient(client: Socket) {
+    const token = client.handshake.headers.authorization.split(' ').pop()
+    return <{ sub: string }>verify(token, process.env.JWT_SECRET)
+  }
 
   async validateUser(
     username: string,

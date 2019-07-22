@@ -22,4 +22,15 @@ export class UsersService {
   update(where: { [key: string]: any }, update: { [key: string]: any }) {
     return this.userRepository.update(where, update)
   }
+
+  activeSessions(where: { [key: string]: any }) {
+    return this.userRepository.findOne({
+      relations: [
+        'playerInSession',
+        'playerInSession.session',
+        'playerInSession.session.game',
+      ],
+      where,
+    })
+  }
 }

@@ -117,18 +117,42 @@ export default class PlayGame extends Vue {
 
   beforeMount() {
     this.$socket.on('session-join', this.onSessionJoin.bind(this))
+    this.$socket.on('session-exit', this.onSessionExit.bind(this))
     this.$socket.on('session-next-round', this.onSessionNextRound.bind(this))
     this.$socket.on('session-play-card', this.onSessionPlayCard.bind(this))
 
     this.joinSession(this.game)
+
+    window.onbeforeunload = () => {
+      this.exitSession(this.game)
+    }
+  }
+
+  destroy() {
+    window.onbeforeunload = null
+    this.exitSession(this.game)
   }
 
   onSessionJoin(session) {
     const c = console
     c.log(session)
-
+    session.playerInSession.forEach(playerSession => {
+      playerSession.playerCards.forEach(playerCard => {
+        const alreadyPlayed = this.playedCards[playerCard.round - 1] || []
+        this.playedCards[playerCard.round - 1] = [
+          ...alreadyPlayed,
+          playerCard.cards,
+        ]
+      })
+    })
     this.session = session
     this.blackCards = [...this.blackCards, session.currentCard]
+  }
+
+  onSessionExit({ user, session }) {
+    // this.playedCards[this.round]
+    const c = console
+    c.log(user, session)
   }
 
   onSessionNextRound(data) {
@@ -137,10 +161,7 @@ export default class PlayGame extends Vue {
   }
 
   onSessionPlayCard(data) {
-    const c = console
-    c.log(data)
-
-    const cards = data.cards
+    const cards = data.playerCards[this.round].cards
     const alreadyPlayed = this.playedCards[this.round] || []
     this.playedCards[this.round] = [...alreadyPlayed, cards]
     this.playedCards = [...this.playedCards]

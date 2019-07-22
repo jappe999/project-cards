@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm'
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  JoinTable,
+} from 'typeorm'
 import { PlayerInSession } from '../player-session/player-session.entity'
 
 @Entity()
@@ -15,6 +21,7 @@ export class User {
   @Column({ nullable: true })
   loginTime?: Date
 
-  @OneToMany(() => PlayerInSession, playerInSession => playerInSession.session)
+  @OneToMany(() => PlayerInSession, playerInSession => playerInSession.player)
+  @JoinTable()
   public playerInSession!: PlayerInSession[]
 }

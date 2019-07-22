@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Session } from '../session.entity'
-import { Repository, QueryBuilder } from 'typeorm'
+import { Repository } from 'typeorm'
 import { Socket } from 'socket.io'
 import { from, Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
@@ -32,31 +32,36 @@ export class SessionsService {
     client: Socket,
     { user, game }: { user: User; game: GameJoinDto },
   ): Observable<WsResponse<Session>> {
-    // Construct room name.
     const room = this.getRoomName(game)
 
-    // Join socket room.
     client.join(room)
 
     const session = this.createSession(user, game, room)
 
-    return from(session).pipe(
-      tap(session => console.log(session)),
-      map(item => ({ event: 'session-join', data: item })),
-    )
+    return from(session).pipe(map(data => ({ event: 'session-join', data })))
   }
 
+  /**
+   *
+   * @param client - The socket client of the connected user.
+   * @param payload - The payload sent with the socket request.
+   * @param payload.user - The user that is about to exit the game.
+   * @param payload.game - The game the user is leaving.
+   */
   exitGame(
     client: Socket,
-    { game }: { user: User; game: GameJoinDto },
-  ): Observable<WsResponse<Session>> {
+    { user, game }: { user: User; game: GameJoinDto },
+  ): Observable<WsResponse<{ user: User; session: Session }>> {
     const room = this.getRoomName(game)
-    const session = this.sessionRepository.findOneOrFail({ room })
-
-    client.leave(room)
+    const session = this.exitRoom(client, user, room)
 
     return from(session).pipe(
-      map(item => ({ event: 'session-exit', data: item })),
+      tap(session => {
+        client.broadcast
+          .to(session.room)
+          .emit('session-exit', { user, session })
+      }),
+      map(session => ({ event: 'session-exit', data: { user, session } })),
     )
   }
 
@@ -68,9 +73,7 @@ export class SessionsService {
 
     return from(playerInSession).pipe(
       tap(item => {
-        client.broadcast
-          .to(client.rooms[data.session.room])
-          .emit('session-play-card', item)
+        client.broadcast.to(data.session.room).emit('session-play-card', item)
       }),
       map(item => ({ event: 'session-play-card', data: item })),
     )
@@ -80,27 +83,27 @@ export class SessionsService {
     return `${game.id}-${game.name.replace(' ', '-')}`
   }
 
-  private addPlayerToSession(user: User, session: Session) {
+  addPlayerToSession(user: User, session: Session) {
     return this.playerInSessionsService.create({
       playerId: user.id,
       sessionId: session.id,
     })
   }
 
-  private getSession(room: string): Promise<Session> {
-    return this.sessionRepository
-      .createQueryBuilder('session')
-      .leftJoinAndSelect('session.game', 'game')
-      .leftJoinAndSelect('session.currentCard', 'card')
-      .leftJoinAndSelect(qb => {
-        return qb.select().from(PlayerInSession, 'playerSession')
-        // .leftJoinAndSelect('playerSession.playerCards', 'player_in_card')
-      }, 'session.playerInSession')
-      .where({ room })
-      .getOne()
+  getSession(where: { [key: string]: any }): Promise<Session> {
+    return this.sessionRepository.findOne({
+      relations: [
+        'game',
+        'currentCard',
+        'playerInSession',
+        'playerInSession.playerCards',
+        'playerInSession.playerCards.cards',
+      ],
+      where,
+    })
   }
 
-  private async createSession(
+  async createSession(
     user: User,
     game: GameJoinDto,
     room: string,
@@ -123,7 +126,19 @@ export class SessionsService {
     }
 
     await this.addPlayerToSession(user, session)
+    return this.getSession({ room })
+  }
 
-    return this.getSession(room)
+  async exitRoom(client: Socket, user: User, room: string) {
+    client.leave(room)
+
+    const session = await this.sessionRepository.findOne({ where: { room } })
+
+    this.playerInSessionsService.remove({
+      playerId: user.id,
+      sessionId: session.id,
+    })
+
+    return this.getSession({ id: session.id })
   }
 }

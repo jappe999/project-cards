@@ -5,12 +5,15 @@ import { PlayerInSession } from '../player-session.entity'
 import { Card } from '../../cards/card.entity'
 import { User } from '../../users/user.entity'
 import { Session } from '../../sessions/session.entity'
+import { PlayerInCard } from '../player-card.entity'
 
 @Injectable()
 export class PlayerSessionService {
   constructor(
     @InjectRepository(PlayerInSession)
     private readonly playerInSessionRepository: Repository<PlayerInSession>,
+    @InjectRepository(PlayerInCard)
+    private readonly playerInCardRepository: Repository<PlayerInCard>,
   ) {}
 
   async create(
@@ -28,7 +31,12 @@ export class PlayerSessionService {
     return this.playerInSessionRepository.update(where, update)
   }
 
-  playCards({
+  async remove(where: { [key: string]: any }) {
+    await this.playerInCardRepository.delete(where)
+    return this.playerInSessionRepository.delete(where)
+  }
+
+  async playCards({
     user,
     cards,
     session,
@@ -37,10 +45,19 @@ export class PlayerSessionService {
     cards: Card[]
     session: Session
   }) {
-    return this.playerInSessionRepository.save({
+    const playerSession = await this.playerInSessionRepository.save({
       player: user,
-      playerCards: cards,
       session,
+    })
+
+    await this.playerInCardRepository.save({
+      round: 1,
+      playerSession,
+      cards,
+    })
+
+    return this.playerInSessionRepository.findOne(playerSession.id, {
+      relations: ['playerCards', 'playerCards.cards'],
     })
   }
 }
