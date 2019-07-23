@@ -1,8 +1,6 @@
 <template>
-  <div class="h-full w-full flex flex-col sm:flex-row overflow-auto">
-    <div
-      class="min-w-64 sticky top-0 flex flex-col items-center p-4 sm:p-8 sm:border-r border-gray-400 bg-gray-200 shadow sm:shadow-none"
-    >
+  <app-game-view>
+    <template slot="side">
       <app-playcard
         color="black"
         class="sm:h-96 w-full sm:w-64 mb-4"
@@ -28,16 +26,16 @@
       >
         Play Card
       </app-button>
-    </div>
+    </template>
 
-    <div class="flex flex-wrap flex-grow py-8 px-2 sm:px-6">
+    <template slot="main">
       <div
         v-for="card in cards"
         :key="card.id"
-        class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 2xl:w-1/5 pb-4 px-2"
+        class="w-full md:w-1/2 lg:w-auto p-2"
       >
         <app-playcard
-          class="h-full"
+          class="h-full lg:h-96 w-full lg:w-64"
           :step="cardNumber(card)"
           :disabled="!(canSelectCard || cardNumber(card) > 0)"
           @toggle="toggleCard(card)"
@@ -45,8 +43,8 @@
           {{ card.text }}
         </app-playcard>
       </div>
-    </div>
-  </div>
+    </template>
+  </app-game-view>
 </template>
 
 <script lang="ts">
@@ -58,6 +56,7 @@ import { CardView } from '~/models/Card'
   components: {
     AppButton: () => import('~/components/button/button.vue'),
     AppPlaycard: () => import('~/components/game/playcard.vue'),
+    AppGameView: () => import('~/components/game/game-view.vue'),
   },
 })
 export default class AppChooseCards extends Vue {
@@ -67,6 +66,7 @@ export default class AppChooseCards extends Vue {
   /** @var cards - The cards in the hand of the player. */
   cards: CardView[] = []
 
+  @Prop({ default: 0, type: Number }) round!: number
   @Prop({ default: {}, type: Object }) blackCard!: CardView
   @Prop({ default: [], type: Array }) selectedCards!: CardView[]
   @Prop({ default: {}, type: Object }) session!: any
@@ -104,6 +104,7 @@ export default class AppChooseCards extends Vue {
     this.$socket.emit('session-play-card', {
       session: this.session,
       cards: this.selectedCards,
+      round: this.round,
     })
   }
 }

@@ -29,13 +29,14 @@
       </h1>
     </div>
 
-    <main class="h-full w-full">
+    <main class="h-full w-full overflow-auto">
       <transition name="page">
         <app-choose-cards
           v-if="state === 'choose-cards'"
           :selected-cards="selectedCards"
           :black-card="blackCard"
           :session="session"
+          :round="round"
           @select="selectCards"
           @submit="playCards"
         />
@@ -46,8 +47,16 @@
           :cards="playedCards[round]"
           :black-card="blackCard"
           :session="session"
+          :round="round"
           @select="selectCards"
-          @submit="chooseCombination"
+        />
+
+        <app-show-best-combination
+          v-if="state === 'show-best-combination'"
+          :cards="bestCards[round]"
+          :black-card="blackCard"
+          :session="session"
+          :round="round"
         />
       </transition>
     </main>
@@ -78,6 +87,8 @@ import { CardView } from '~/models/Card'
     AppChooseCards: () => import('~/components/game/choose-cards.vue'),
     AppChooseCardCombination: () =>
       import('~/components/game/choose-card-combination.vue'),
+    AppShowBestCombination: () =>
+      import('~/components/game/show-best-combination.vue'),
   },
 })
 export default class PlayGame extends Vue {
@@ -101,6 +112,9 @@ export default class PlayGame extends Vue {
   /** @var playedCards - Cards played in a round. */
   playedCards: CardView[][] = []
 
+  /** @var bestCards - The best cards from each round. */
+  bestCards: CardView[][] = []
+
   /** @var selectedCards - The cards that the player has selected this round. */
   selectedCards: CardView[] = []
 
@@ -120,6 +134,10 @@ export default class PlayGame extends Vue {
     this.$socket.on('session-exit', this.onSessionExit.bind(this))
     this.$socket.on('session-next-round', this.onSessionNextRound.bind(this))
     this.$socket.on('session-play-card', this.onSessionPlayCard.bind(this))
+    this.$socket.on(
+      'session-choose-card-combination',
+      this.onSessionChooseCardCombination.bind(this),
+    )
 
     this.joinSession(this.game)
 
@@ -153,17 +171,26 @@ export default class PlayGame extends Vue {
     this.updatePlayedCards(session)
   }
 
-  onSessionNextRound(data) {
+  onSessionNextRound(session) {
+    this.round++
     window.navigator.vibrate(100)
-    this.onSessionJoin(data)
+    this.onSessionJoin(session)
+    this.state = 'choose-cards'
   }
 
   onSessionPlayCard(data) {
-    const cards = data.playerCards[this.round].cards
+    const cards = data.playerCards[0].cards
     const playedCards = this.playedCards[this.round] || []
     this.playedCards[this.round] = [...playedCards, cards]
 
     this.playedCards = [...this.playedCards]
+    this.selectedCards = []
+  }
+
+  onSessionChooseCardCombination({ cards }) {
+    this.bestCards[this.round] = cards
+    this.selectedCards = []
+    this.state = 'show-best-combination'
   }
 
   updatePlayedCards({ playerInSession }) {
@@ -187,10 +214,6 @@ export default class PlayGame extends Vue {
 
   playCards() {
     this.state = 'choose-card-combination'
-  }
-
-  chooseCombination() {
-    //
   }
 }
 </script>
