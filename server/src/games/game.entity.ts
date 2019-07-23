@@ -1,16 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
 
 @Entity()
 export class Game {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id!: string
 
   @Column({ length: 128 })
-  name!: string;
+  name!: string
 
-  @Column({type:'int', nullable: true})
-  userLimit?: number;
+  @Column({ type: 'int', nullable: true })
+  userLimit?: number
 
   @Column()
-  private!: boolean;
+  private!: boolean
 }

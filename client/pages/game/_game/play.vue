@@ -6,7 +6,7 @@
       <nav>
         <nuxt-link
           class="flex -ml-2 px-2"
-          to="/"
+          to="/game"
           @click.native="exitSession(game)"
         >
           <svg
@@ -29,26 +29,36 @@
       </h1>
     </div>
 
-    <main class="h-full w-full flex flex-col sm:flex-row overflow-auto">
-      <div
-        class="min-w-64 sticky top-0 flex flex-col items-center p-4 sm:p-8 sm:border-r border-gray-400 bg-gray-200 shadow sm:shadow-none"
-      >
-        <app-play-card color="black" class="sm:h-96 w-full sm:w-64 mb-4">{{
-          blackCard.text
-        }}</app-play-card>
-        <app-button class="w-full" @click.native="playCard"
-          >Play Card</app-button
-        >
-      </div>
-      <div class="flex flex-wrap flex-grow py-8 px-2 sm:px-6">
-        <div
-          v-for="card in cards"
-          :key="card.id"
-          class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 2xl:w-1/5 pb-4 px-2"
-        >
-          <app-play-card class="h-full">{{ card.text }}</app-play-card>
-        </div>
-      </div>
+    <main class="h-full w-full overflow-auto">
+      <transition name="page">
+        <app-choose-cards
+          v-if="state === 'choose-cards'"
+          :selected-cards="selectedCards"
+          :black-card="blackCard"
+          :session="session"
+          :round="round"
+          @select="selectCards"
+          @submit="playCards"
+        />
+
+        <app-choose-card-combination
+          v-if="state === 'choose-card-combination'"
+          :selected-cards="selectedCards"
+          :cards="playedCards[round]"
+          :black-card="blackCard"
+          :session="session"
+          :round="round"
+          @select="selectCards"
+        />
+
+        <app-show-best-combination
+          v-if="state === 'show-best-combination'"
+          :cards="bestCards[round]"
+          :black-card="blackCard"
+          :session="session"
+          :round="round"
+        />
+      </transition>
     </main>
   </div>
 </template>
@@ -68,56 +78,142 @@ import { CardView } from '~/models/Card'
       .slice(0, 5)
       .join('-')
     const game = await context.store.dispatch('games/fetchGame', gameId)
-    const cards = await context.store.dispatch('cards/fetchCards', {
-      type: 'A',
-    })
 
-    return { game, cards }
+    return { game }
   },
 
   components: {
-    AppButton: () => import('~/components/button/button.vue'),
-    AppPlayCard: () => import('~/components/play-card.vue'),
+    AppPlaycard: () => import('~/components/game/playcard.vue'),
+    AppChooseCards: () => import('~/components/game/choose-cards.vue'),
+    AppChooseCardCombination: () =>
+      import('~/components/game/choose-card-combination.vue'),
+    AppShowBestCombination: () =>
+      import('~/components/game/show-best-combination.vue'),
   },
 })
 export default class PlayGame extends Vue {
+  /** @var $socket - The socket connection to the server. */
   $socket!: SocketIOClient.Socket
-  game!: Game
-  session!: any
-  blackCards: CardView[] = []
-  cards: CardView[] = []
-  cardsPlayed: string[] = []
 
+  /** @var game - The game that is currently being played. */
+  game!: Game
+
+  /** @var round - The number of the current round. */
+  round: number = 0
+
+  /** @var session - The session the user is currently in. */
+  session: any = {}
+
+  state: string = 'choose-cards'
+
+  /** @var blackCards - The black cards that have been or are being used for a round. */
+  blackCards: CardView[] = []
+
+  /** @var playedCards - Cards played in a round. */
+  playedCards: CardView[][] = []
+
+  /** @var bestCards - The best cards from each round. */
+  bestCards: CardView[][] = []
+
+  /** @var selectedCards - The cards that the player has selected this round. */
+  selectedCards: CardView[] = []
+
+  /** Vuex action to join a game session. */
   @Action('sessions/join') joinSession
+
+  /** Vuex action to exit a game session. */
   @Action('sessions/exit') exitSession
 
-  get blackCard() {
-    return this.blackCards[this.blackCards.length - 1] || {}
+  /** The black card for the current round. */
+  get blackCard(): CardView {
+    return this.session.currentCard || <CardView>{}
   }
 
   beforeMount() {
-    this.$socket.on('session-join', ({ currentCard: blackCard, ...event }) => {
-      this.session = event
-      this.blackCards = [...this.blackCards, blackCard]
-    })
-
-    this.$socket.on('next-card', (blackCard: CardView) => {
-      window.navigator.vibrate(100)
-      this.blackCards = [...this.blackCards, blackCard]
-    })
-
-    this.$socket.on('session-play-card', event => {
-      this.cardsPlayed.push(event)
-    })
+    this.$socket.on('session-join', this.onSessionJoin.bind(this))
+    this.$socket.on('session-exit', this.onSessionExit.bind(this))
+    this.$socket.on('session-next-round', this.onSessionNextRound.bind(this))
+    this.$socket.on('session-play-card', this.onSessionPlayCard.bind(this))
+    this.$socket.on(
+      'session-choose-card-combination',
+      this.onSessionChooseCardCombination.bind(this),
+    )
 
     this.joinSession(this.game)
+
+    window.onbeforeunload = () => {
+      this.exitSession(this.game)
+    }
   }
 
-  playCard() {
-    this.$socket.emit('session-play-card', {
-      session: this.session,
-      card: Math.random().toString(36),
-    })
+  destroy() {
+    window.onbeforeunload = null
+    this.exitSession(this.game)
+  }
+
+  onSessionJoin(session) {
+    this.updatePlayedCards(session)
+    this.session = session
+    this.blackCards = [...this.blackCards, session.currentCard]
+  }
+
+  /**
+   * Invoked when a player has left the game.
+   * This updates the list of chosen cards.
+   * @param payload - The payload sent by the server.
+   * @param payload.session - The session of the current game.
+   * @param payload.user - The user that has left the game.
+   */
+  onSessionExit({ session, user }) {
+    session.playerInSession = session.playerInSession.filter(
+      ({ playerId }) => playerId !== user.id,
+    )
+    this.updatePlayedCards(session)
+  }
+
+  onSessionNextRound(session) {
+    this.round++
+    window.navigator.vibrate(100)
+    this.onSessionJoin(session)
+    this.state = 'choose-cards'
+  }
+
+  onSessionPlayCard(data) {
+    const cards = data.playerCards[0].cards
+    const playedCards = this.playedCards[this.round] || []
+    this.playedCards[this.round] = [...playedCards, cards]
+
+    this.playedCards = [...this.playedCards]
+    this.selectedCards = []
+  }
+
+  onSessionChooseCardCombination({ cards }) {
+    this.bestCards[this.round] = cards
+    this.selectedCards = []
+    this.state = 'show-best-combination'
+  }
+
+  updatePlayedCards({ playerInSession }) {
+    const cardsByActivePlayers = playerInSession
+      // Get the cards played by the user.
+      .map(({ playerCards }) => {
+        const round = playerCards.find(({ round }) => round === this.round)
+        return (round || {}).cards
+      })
+      // Filter items that are falsy.
+      .filter(item => !!item)
+
+    this.playedCards[this.round] = cardsByActivePlayers
+
+    this.playedCards = [...this.playedCards]
+  }
+
+  selectCards(cards: CardView[]) {
+    this.selectedCards = cards
+  }
+
+  playCards() {
+    this.state = 'choose-card-combination'
   }
 }
 </script>

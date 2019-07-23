@@ -16,5 +16,7 @@ module.exports = {
   variants: {
     maxWidth: ['group-hover', 'responsive'],
     border: ['responsive', 'hover', 'focus'],
+    backgroundColor: ['responsive', 'group-hover', 'hover', 'focus'],
+    display: ['responsive', 'group-hover', 'hover', 'focus'],
   },
 }

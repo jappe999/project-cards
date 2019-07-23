@@ -43,9 +43,10 @@ export class Form<TForm> {
    */
   data(): TForm {
     const keys = this.keys()
-    return keys.reduce((data, key) => ({ ...data, [key]: this[key] }), <
-      TForm
-    >{})
+    return keys.reduce(
+      (data, key) => ({ ...data, [key]: this[key] }),
+      {} as TForm,
+    )
   }
 
   /**

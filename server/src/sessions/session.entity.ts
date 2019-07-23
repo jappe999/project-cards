@@ -4,23 +4,30 @@ import {
   Column,
   JoinColumn,
   OneToOne,
-} from 'typeorm';
-import { Game } from '../games/game.entity';
-import { Card } from '../cards/card.entity';
+  OneToMany,
+  JoinTable,
+} from 'typeorm'
+import { Game } from '../games/game.entity'
+import { Card } from '../cards/card.entity'
+import { PlayerInSession } from '../player-session/player-session.entity'
 
 @Entity()
 export class Session {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id!: string
 
   @Column()
-  room!: string;
+  room!: string
 
-  @OneToOne(type => Game)
+  @OneToOne(() => Game)
   @JoinColumn()
-  game!: Game;
+  game!: Game
 
-  @OneToOne(type => Card)
+  @OneToOne(() => Card)
   @JoinColumn()
-  currentCard!: Card;
+  currentCard!: Card
+
+  @OneToMany(() => PlayerInSession, playerInSession => playerInSession.session)
+  @JoinTable()
+  public playerInSession!: PlayerInSession[]
 }

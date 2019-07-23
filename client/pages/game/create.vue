@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full flex flex-col items-center">
+  <div class="w-96 flex flex-col items-center">
     <app-card class="w-full">
       <app-card-content>
         <h2 class="text-2xl font-bold">
@@ -14,7 +14,9 @@
             label="Room name"
             required
           />
-          <label class="flex items-center text-black">
+
+          <!-- The following option is not available yet -->
+          <label v-if="false" class="flex items-center text-black">
             <input v-model="game.private" type="checkbox" class="mr-2" />
             <small>Private game?</small>
           </label>
@@ -26,7 +28,7 @@
       </app-card-content>
     </app-card>
 
-    <app-link class="mt-4" to="/game/join">Or join game</app-link>
+    <app-link class="mt-4" to="/game">Or join game</app-link>
   </div>
 </template>
 
