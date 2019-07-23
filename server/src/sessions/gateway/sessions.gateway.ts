@@ -67,4 +67,24 @@ export class SessionsGateway implements OnGatewayDisconnect {
   ): Observable<WsResponse<PlayerInSession>> {
     return this.sessionsService.playCards(client, payload)
   }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('session-choose-card-combination')
+  chooseCardCombination(
+    client: Socket,
+    payload: { user: User; session: Session; cards: CardViewDto[] },
+  ): Observable<
+    WsResponse<{ user: User; session: Session; cards: CardViewDto[] }>
+  > {
+    return this.sessionsService.chooseCardCombination(client, payload)
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('session-next-round')
+  nextRound(
+    client: Socket,
+    payload: { user: User; session: Session },
+  ): Observable<WsResponse<Session>> {
+    return this.sessionsService.nextRound(client, payload)
+  }
 }

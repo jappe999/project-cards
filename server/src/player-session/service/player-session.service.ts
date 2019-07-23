@@ -47,10 +47,12 @@ export class PlayerSessionService {
     user,
     cards,
     session,
+    round,
   }: {
     user: User
     cards: Card[]
     session: Session
+    round: number
   }) {
     const playerSession = await this.playerInSessionRepository.save({
       player: user,
@@ -58,7 +60,7 @@ export class PlayerSessionService {
     })
 
     await this.playerInCardRepository.save({
-      round: 0,
+      round,
       playerSession,
       cards,
     })

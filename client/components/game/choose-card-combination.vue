@@ -1,8 +1,6 @@
 <template>
-  <div class="h-full w-full flex flex-col sm:flex-row overflow-auto">
-    <div
-      class="min-w-64 sticky top-0 flex flex-col items-center p-4 sm:p-8 sm:border-r border-gray-400 bg-gray-200 shadow sm:shadow-none"
-    >
+  <app-game-view>
+    <template slot="side">
       <app-playcard
         color="black"
         class="sm:h-96 w-full sm:w-64 mb-4"
@@ -10,20 +8,26 @@
       >
         {{ blackCard.text }}
       </app-playcard>
-    </div>
+      <app-button
+        class="w-full"
+        :disabled="canSelectCard"
+        @click.native="playCards"
+      >
+        Play Card
+      </app-button>
+    </template>
 
-    <div class="w-full flex flex-wrap -mt-2 mb-auto py-8 px-2 sm:px-6">
+    <template slot="main">
       <div
         v-for="_cards in cards"
         :key="_cards.id"
-        class="h-full md:w-1/2 lg:w-1/3 xl:w-1/4 2xl:w-1/5 relative mb-2 group"
+        class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 2xl:w-1/5 relative flex flex-wrap flex-grow mb-2 group"
         @click="toggleChoice(_cards)"
       >
         <div
           v-for="(card, index) in _cards"
           :key="card.id"
-          class="w-full p-2"
-          @click="playCards"
+          class="flex-grow w-full p-2"
         >
           <app-playcard
             class="h-full cursor-pointer"
@@ -35,12 +39,12 @@
         </div>
 
         <div
-          v-if="cards.length > 1"
+          v-if="_cards.length > 1 && canSelectCard"
           class="w-full absolute inset-0 group-hover:bg-gray-800 opacity-25 cursor-pointer"
         />
       </div>
-    </div>
-  </div>
+    </template>
+  </app-game-view>
 </template>
 
 <script lang="ts">
@@ -51,12 +55,14 @@ import { CardView } from '~/models/Card'
   components: {
     AppButton: () => import('~/components/button/button.vue'),
     AppPlaycard: () => import('~/components/game/playcard.vue'),
+    AppGameView: () => import('~/components/game/game-view.vue'),
   },
 })
 export default class AppChooseCardCombination extends Vue {
   /** @var $socket - The socket connection to the server. */
   $socket!: SocketIOClient.Socket
 
+  @Prop({ default: 0, type: Number }) round!: number
   @Prop({ default: () => ({}), type: Object }) blackCard!: CardView
   @Prop({ default: () => [], type: Array }) cards!: CardView[]
   @Prop({ default: () => [], type: Array }) selectedCards!: CardView[]
@@ -78,12 +84,10 @@ export default class AppChooseCardCombination extends Vue {
 
   @Emit('submit')
   playCards() {
-    const c = console
-    c.log(this.selectedCards)
-
     this.$socket.emit('session-choose-card-combination', {
       session: this.session,
       cards: this.selectedCards,
+      round: this.round,
     })
   }
 }
