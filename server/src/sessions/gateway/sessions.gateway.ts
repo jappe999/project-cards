@@ -63,7 +63,12 @@ export class SessionsGateway implements OnGatewayDisconnect {
   @SubscribeMessage('session-play-card')
   playCards(
     client: Socket,
-    payload: { user: User; session: Session; cards: CardViewDto[] },
+    payload: {
+      user: User
+      session: Session
+      cards: CardViewDto[]
+      round: number
+    },
   ): Observable<WsResponse<PlayerInSession>> {
     return this.sessionsService.playCards(client, payload)
   }
@@ -72,9 +77,19 @@ export class SessionsGateway implements OnGatewayDisconnect {
   @SubscribeMessage('session-choose-card-combination')
   chooseCardCombination(
     client: Socket,
-    payload: { user: User; session: Session; cards: CardViewDto[] },
+    payload: {
+      user: User
+      session: Session
+      cards: CardViewDto[]
+      round: number
+    },
   ): Observable<
-    WsResponse<{ user: User; session: Session; cards: CardViewDto[] }>
+    WsResponse<{
+      user: User
+      session: Session
+      cards: CardViewDto[]
+      round: number
+    }>
   > {
     return this.sessionsService.chooseCardCombination(client, payload)
   }
