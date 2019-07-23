@@ -76,8 +76,7 @@ export default class SignIn extends Vue {
       await this.$auth.loginWith('local', { data: this.user.data() })
     } catch ({ response }) {
       if (response.status === 401) {
-        const message = 'Username already in use or password is incorrect.'
-        this.user.errors.set('password', message)
+        this.user.errors.set('password', response.data.message)
       }
     } finally {
       this.user.finishProcessing()

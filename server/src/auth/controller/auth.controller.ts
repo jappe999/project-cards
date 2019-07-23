@@ -8,19 +8,19 @@ export class AuthController {
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  async login(@Request() { user }: { user: any }) {
+  login(@Request() { user }: { user: any }) {
     return this.authService.login(user)
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Post('logout')
-  async logout(@Request() { user }: { user: any }) {
+  logout(@Request() { user }: { user: any }) {
     return this.authService.logout(user)
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
-  getProfile(@Request() req: { user: any }) {
-    return req.user
+  getProfile(@Request() { user }: { user: any }) {
+    return this.authService.profile(user)
   }
 }
