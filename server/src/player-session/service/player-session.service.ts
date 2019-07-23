@@ -32,8 +32,15 @@ export class PlayerSessionService {
   }
 
   async remove(where: { [key: string]: any }) {
-    await this.playerInCardRepository.delete(where)
-    return this.playerInSessionRepository.delete(where)
+    const playerSessions = await this.playerInSessionRepository.find(where)
+
+    playerSessions.forEach(async playerSession => {
+      await this.playerInCardRepository.delete({
+        playerSession,
+      })
+
+      await this.playerInSessionRepository.delete(playerSession.id)
+    })
   }
 
   async playCards({
@@ -51,7 +58,7 @@ export class PlayerSessionService {
     })
 
     await this.playerInCardRepository.save({
-      round: 1,
+      round: 0,
       playerSession,
       cards,
     })

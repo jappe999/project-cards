@@ -14,13 +14,13 @@
 
     <div class="w-full flex flex-wrap -mt-2 mb-auto py-8 px-2 sm:px-6">
       <div
-        v-for="cards in cards[0]"
-        :key="cards[0].id"
+        v-for="_cards in cards"
+        :key="_cards.id"
         class="h-full md:w-1/2 lg:w-1/3 xl:w-1/4 2xl:w-1/5 relative mb-2 group"
-        @click="toggleChoice(cards)"
+        @click="toggleChoice(_cards)"
       >
         <div
-          v-for="(card, index) in cards"
+          v-for="(card, index) in _cards"
           :key="card.id"
           class="w-full p-2"
           @click="playCards"

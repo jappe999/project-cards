@@ -126,7 +126,7 @@ export class SessionsService {
     }
 
     await this.addPlayerToSession(user, session)
-    return this.getSession({ room })
+    return this.getSession({ id: session.id })
   }
 
   async exitRoom(client: Socket, user: User, room: string) {
@@ -134,7 +134,7 @@ export class SessionsService {
 
     const session = await this.sessionRepository.findOne({ where: { room } })
 
-    this.playerInSessionsService.remove({
+    await this.playerInSessionsService.remove({
       playerId: user.id,
       sessionId: session.id,
     })
