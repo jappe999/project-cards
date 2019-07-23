@@ -43,7 +43,7 @@
         <app-choose-card-combination
           v-if="state === 'choose-card-combination'"
           :selected-cards="selectedCards"
-          :cards="playedCards"
+          :cards="playedCards[round]"
           :black-card="blackCard"
           :session="session"
           @select="selectCards"
@@ -134,25 +134,23 @@ export default class PlayGame extends Vue {
   }
 
   onSessionJoin(session) {
-    const c = console
-    c.log(session)
-    session.playerInSession.forEach(playerSession => {
-      playerSession.playerCards.forEach(playerCard => {
-        const alreadyPlayed = this.playedCards[playerCard.round - 1] || []
-        this.playedCards[playerCard.round - 1] = [
-          ...alreadyPlayed,
-          playerCard.cards,
-        ]
-      })
-    })
+    this.updatePlayedCards(session)
     this.session = session
     this.blackCards = [...this.blackCards, session.currentCard]
   }
 
-  onSessionExit({ user, session }) {
-    // this.playedCards[this.round]
-    const c = console
-    c.log(user, session)
+  /**
+   * Invoked when a player has left the game.
+   * This updates the list of chosen cards.
+   * @param payload - The payload sent by the server.
+   * @param payload.session - The session of the current game.
+   * @param payload.user - The user that has left the game.
+   */
+  onSessionExit({ session, user }) {
+    session.playerInSession = session.playerInSession.filter(
+      ({ playerId }) => playerId !== user.id,
+    )
+    this.updatePlayedCards(session)
   }
 
   onSessionNextRound(data) {
@@ -162,8 +160,24 @@ export default class PlayGame extends Vue {
 
   onSessionPlayCard(data) {
     const cards = data.playerCards[this.round].cards
-    const alreadyPlayed = this.playedCards[this.round] || []
-    this.playedCards[this.round] = [...alreadyPlayed, cards]
+    const playedCards = this.playedCards[this.round] || []
+    this.playedCards[this.round] = [...playedCards, cards]
+
+    this.playedCards = [...this.playedCards]
+  }
+
+  updatePlayedCards({ playerInSession }) {
+    const cardsByActivePlayers = playerInSession
+      // Get the cards played by the user.
+      .map(({ playerCards }) => {
+        const round = playerCards.find(({ round }) => round === this.round)
+        return (round || {}).cards
+      })
+      // Filter items that are falsy.
+      .filter(item => !!item)
+
+    this.playedCards[this.round] = cardsByActivePlayers
+
     this.playedCards = [...this.playedCards]
   }
 

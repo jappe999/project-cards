@@ -1,5 +1,6 @@
 module.exports = {
   type: 'postgres',
+  keepConnectionAlive: true,
   ssl:
     process.env.NODE_ENV === 'production'
       ? { rejectUnauthorized: false }
