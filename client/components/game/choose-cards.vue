@@ -32,7 +32,7 @@
       <div
         v-for="card in cards"
         :key="card.id"
-        class="w-full md:w-1/2 lg:w-auto p-2"
+        class="w-full md:w-1/2 lg:w-auto -mt-2 p-2"
       >
         <app-playcard
           class="h-full lg:h-96 w-full lg:w-64"
