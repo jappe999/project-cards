@@ -29,8 +29,8 @@
       </h1>
     </div>
 
-    <main class="h-full w-full overflow-auto">
-      <transition name="page">
+    <main class="h-full w-full relative overflow-x-hidden overflow-y-auto">
+      <transition name="game-state">
         <app-choose-cards
           v-if="state === 'choose-cards'"
           :selected-cards="selectedCards"

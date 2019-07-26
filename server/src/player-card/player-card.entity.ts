@@ -6,7 +6,7 @@ import {
   Column,
   JoinTable,
 } from 'typeorm'
-import { PlayerInSession } from './player-session.entity'
+import { PlayerInSession } from '../player-session/player-session.entity'
 import { Card } from '../cards/card.entity'
 
 @Entity()

@@ -124,7 +124,7 @@ export class SessionsService {
   }
 
   addPlayerToSession(user: User, session: Session) {
-    return this.playerInSessionsService.create({
+    return this.playerInSessionsService.createOrUpdate({
       playerId: user.id,
       sessionId: session.id,
     })

@@ -8,7 +8,7 @@ import {
 } from 'typeorm'
 import { User } from '../users/user.entity'
 import { Session } from '../sessions/session.entity'
-import { PlayerInCard } from './player-card.entity'
+import { PlayerInCard } from '../player-card/player-card.entity'
 
 @Entity()
 export class PlayerInSession {
