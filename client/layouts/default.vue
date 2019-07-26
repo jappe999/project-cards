@@ -37,7 +37,7 @@
     </div>
 
     <div
-      class="w-full flex flex-col items-center"
+      class="w-full relative flex flex-col items-center overflow-x-hidden"
       :class="{ 'max-w-sm mx-auto md:mx-0 p-4 md:p-0': !$auth.loggedIn }"
     >
       <transition name="page">

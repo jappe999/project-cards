@@ -17,9 +17,3 @@
 <script>
 export default {}
 </script>
-
-<style scoped>
-.card-view {
-  height: calc(100%-56px);
-}
-</style>
