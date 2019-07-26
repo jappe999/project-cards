@@ -13,7 +13,7 @@
         :disabled="canSelectCard"
         @click.native="playCards"
       >
-        Play Card
+        Choose combination
       </app-button>
     </template>
 
@@ -21,16 +21,19 @@
       <div
         v-for="_cards in cards"
         :key="_cards.id"
-        class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 2xl:w-1/5 relative flex flex-wrap flex-grow mb-2 group"
+        class="relative flex flex-wrap -mt-2 mb-auto group"
         @click="toggleChoice(_cards)"
       >
         <div
           v-for="(card, index) in _cards"
           :key="card.id"
-          class="flex-grow w-full p-2"
+          class="w-full lg:w-auto p-2"
+          :class="{
+            'md:w-1/2': _cards.length > 1,
+          }"
         >
           <app-playcard
-            class="h-full cursor-pointer"
+            class="h-full lg:h-96 w-full lg:w-64"
             :disabled="!canSelectCard"
             :step="index + 1"
           >
@@ -39,8 +42,9 @@
         </div>
 
         <div
-          v-if="_cards.length > 1 && canSelectCard"
-          class="w-full absolute inset-0 group-hover:bg-gray-800 opacity-25 cursor-pointer"
+          v-if="(_cards.length > 1 && canSelectCard) || selectedCards == _cards"
+          class="h-full w-full absolute inset-0 group-hover:bg-gray-800 opacity-25 cursor-pointer rounded"
+          :class="{ 'bg-gray-800': selectedCards == _cards }"
         />
       </div>
     </template>

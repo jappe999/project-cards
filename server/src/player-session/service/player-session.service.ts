@@ -5,26 +5,30 @@ import { PlayerInSession } from '../player-session.entity'
 import { Card } from '../../cards/card.entity'
 import { User } from '../../users/user.entity'
 import { Session } from '../../sessions/session.entity'
-import { PlayerInCard } from '../player-card.entity'
+import { PlayerCardService } from '../../player-card/service/player-card.service'
+import { PlayerInSessionCreateDto } from '../player-session.dto'
 
 @Injectable()
 export class PlayerSessionService {
   constructor(
     @InjectRepository(PlayerInSession)
     private readonly playerInSessionRepository: Repository<PlayerInSession>,
-    @InjectRepository(PlayerInCard)
-    private readonly playerInCardRepository: Repository<PlayerInCard>,
+    private readonly playerCardsService: PlayerCardService,
   ) {}
 
-  async create(
+  findOne(options?: FindOneOptions): Promise<PlayerInSession> {
+    return this.playerInSessionRepository.findOne(options)
+  }
+
+  create(playerInSession: PlayerInSessionCreateDto) {
+    return this.playerInSessionRepository.save(playerInSession)
+  }
+
+  async createOrUpdate(
     playerInSession: Partial<PlayerInSession>,
   ): Promise<PlayerInSession> {
     const row = (await this.findOne({ where: playerInSession })) || {}
     return this.playerInSessionRepository.save({ ...row, ...playerInSession })
-  }
-
-  findOne(options?: FindOneOptions): Promise<PlayerInSession> {
-    return this.playerInSessionRepository.findOne(options)
   }
 
   update(where: { [key: string]: any }, update: { [key: string]: any }) {
@@ -35,10 +39,7 @@ export class PlayerSessionService {
     const playerSessions = await this.playerInSessionRepository.find(where)
 
     playerSessions.forEach(async playerSession => {
-      await this.playerInCardRepository.delete({
-        playerSession,
-      })
-
+      await this.playerCardsService.remove({ playerSession })
       await this.playerInSessionRepository.delete(playerSession.id)
     })
   }
@@ -54,12 +55,12 @@ export class PlayerSessionService {
     session: Session
     round: number
   }) {
-    const playerSession = await this.playerInSessionRepository.save({
+    const playerSession = await this.create({
       player: user,
       session,
     })
 
-    await this.playerInCardRepository.save({
+    await this.playerCardsService.create({
       round,
       playerSession,
       cards,
