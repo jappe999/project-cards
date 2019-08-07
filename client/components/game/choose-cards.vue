@@ -58,6 +58,14 @@ import { CardView } from '~/models/Card'
     AppPlaycard: () => import('~/components/game/playcard.vue'),
     AppGameView: () => import('~/components/game/game-view.vue'),
   },
+
+  watch: {
+    blackCard(_, { numAnswers }: CardView) {
+      if (numAnswers) {
+        this.fetchNewCards(numAnswers)
+      }
+    },
+  },
 })
 export default class AppChooseCards extends Vue {
   /** @var $socket - The socket connection to the server. */
@@ -83,6 +91,19 @@ export default class AppChooseCards extends Vue {
 
   get canSelectCard() {
     return this.selectedCards.length < this.blackCard.numAnswers
+  }
+
+  @Emit('select')
+  async fetchNewCards(amount: number = 1) {
+    const newCards = await this.fetchCards({
+      type: 'A',
+      take: amount,
+    })
+
+    this.cards = this.cards.filter(card => !this.selectedCards.includes(card))
+    this.cards = [...this.cards, ...newCards]
+
+    return []
   }
 
   /**

@@ -2,11 +2,9 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository, FindOneOptions } from 'typeorm'
 import { PlayerInSession } from '../player-session.entity'
-import { Card } from '../../cards/card.entity'
-import { User } from '../../users/user.entity'
-import { Session } from '../../sessions/session.entity'
 import { PlayerCardService } from '../../player-card/service/player-card.service'
 import { PlayerInSessionCreateDto } from '../player-session.dto'
+import { SessionData } from 'server/src/sessions/session.types'
 
 @Injectable()
 export class PlayerSessionService {
@@ -27,7 +25,8 @@ export class PlayerSessionService {
   async createOrUpdate(
     playerInSession: Partial<PlayerInSession>,
   ): Promise<PlayerInSession> {
-    const row = (await this.findOne({ where: playerInSession })) || {}
+    const { playerId, sessionId } = playerInSession
+    const row = (await this.findOne({ where: { playerId, sessionId } })) || {}
     return this.playerInSessionRepository.save({ ...row, ...playerInSession })
   }
 
@@ -44,21 +43,8 @@ export class PlayerSessionService {
     })
   }
 
-  async playCards({
-    user,
-    cards,
-    session,
-    round,
-  }: {
-    user: User
-    cards: Card[]
-    session: Session
-    round: number
-  }) {
-    const playerSession = await this.create({
-      player: user,
-      session,
-    })
+  async playCards({ user: player, cards, session, round }: SessionData) {
+    const playerSession = await this.create({ player, session })
 
     await this.playerCardsService.create({
       round,

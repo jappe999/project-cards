@@ -5,7 +5,7 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets'
 import { Socket } from 'socket.io'
-import { Observable, from } from 'rxjs'
+import { Observable } from 'rxjs'
 import { Game } from '../../games/game.entity'
 import { SessionsService } from '../service/sessions.service'
 import { Session } from '../session.entity'
@@ -16,6 +16,7 @@ import { User } from '../../users/user.entity'
 import { PlayerInSession } from '../../player-session/player-session.entity'
 import { UsersService } from '../../users/service/users.service'
 import { AuthService } from '../../auth/service/auth.service'
+import { SessionData } from '../session.types'
 
 @WebSocketGateway()
 export class SessionsGateway implements OnGatewayDisconnect {
@@ -63,12 +64,7 @@ export class SessionsGateway implements OnGatewayDisconnect {
   @SubscribeMessage('session-play-card')
   playCards(
     client: Socket,
-    payload: {
-      user: User
-      session: Session
-      cards: CardViewDto[]
-      round: number
-    },
+    payload: SessionData,
   ): Observable<WsResponse<PlayerInSession>> {
     return this.sessionsService.playCards(client, payload)
   }
@@ -77,12 +73,7 @@ export class SessionsGateway implements OnGatewayDisconnect {
   @SubscribeMessage('session-choose-card-combination')
   chooseCardCombination(
     client: Socket,
-    payload: {
-      user: User
-      session: Session
-      cards: CardViewDto[]
-      round: number
-    },
+    payload: SessionData,
   ): Observable<
     WsResponse<{
       user: User

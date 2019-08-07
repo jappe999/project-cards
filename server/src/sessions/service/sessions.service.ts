@@ -3,22 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Session } from '../session.entity'
 import { Repository } from 'typeorm'
 import { Socket } from 'socket.io'
-import { from, Observable, throwError } from 'rxjs'
-import { map, tap, catchError } from 'rxjs/operators'
+import { from, Observable } from 'rxjs'
+import { map, tap } from 'rxjs/operators'
 import { WsResponse } from '@nestjs/websockets'
 import { GameJoinDto } from '../../games/game.dto'
 import { CardsService } from '../../cards/service/cards.service'
 import { User } from '../../users/user.entity'
 import { PlayerSessionService } from '../../player-session/service/player-session.service'
 import { PlayerInSession } from '../../player-session/player-session.entity'
-import { CardViewDto } from 'server/src/cards/card.dto'
-
-type CardData = {
-  user: User
-  session: Session
-  cards: CardViewDto[]
-  round: number
-}
+import { SessionData } from '../session.types'
 
 @Injectable()
 export class SessionsService {
@@ -74,7 +67,7 @@ export class SessionsService {
 
   playCards(
     client: Socket,
-    data: CardData,
+    data: SessionData,
   ): Observable<WsResponse<PlayerInSession>> {
     const playerInSession = this.playerInSessionsService.playCards(data)
 
@@ -88,8 +81,8 @@ export class SessionsService {
 
   chooseCardCombination(
     client: Socket,
-    data: CardData,
-  ): Observable<WsResponse<CardData>> {
+    data: SessionData,
+  ): Observable<WsResponse<SessionData>> {
     return from([data]).pipe(
       tap(item => {
         client.broadcast
@@ -116,22 +109,22 @@ export class SessionsService {
 
   async setupSessionForNextRound(session: Session): Promise<Session> {
     await this.setupSession(session)
-    return this.getSession({ id: session.id })
+    return this.getSession(session.id)
   }
 
   private getRoomName(game: GameJoinDto) {
     return `${game.id}-${game.name.replace(' ', '-')}`
   }
 
-  addPlayerToSession(user: User, session: Session) {
+  async addPlayerToSession(user: User, session: Session) {
     return this.playerInSessionsService.createOrUpdate({
       playerId: user.id,
       sessionId: session.id,
     })
   }
 
-  getSession(where: { [key: string]: any }): Promise<Session> {
-    return this.sessionRepository.findOne({
+  getSession(id: string): Promise<Session> {
+    return this.sessionRepository.findOne(id, {
       relations: [
         'game',
         'currentCard',
@@ -139,7 +132,6 @@ export class SessionsService {
         'playerInSession.playerCards',
         'playerInSession.playerCards.cards',
       ],
-      where,
     })
   }
 
@@ -178,7 +170,7 @@ export class SessionsService {
     }
 
     await this.addPlayerToSession(user, session)
-    return this.getSession({ id: session.id })
+    return this.getSession(session.id)
   }
 
   async exitRoom(client: Socket, user: User, room: string) {
@@ -191,6 +183,6 @@ export class SessionsService {
       sessionId: session.id,
     })
 
-    return this.getSession({ id: session.id })
+    return this.getSession(session.id)
   }
 }
