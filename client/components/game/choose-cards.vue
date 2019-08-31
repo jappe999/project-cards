@@ -85,10 +85,16 @@ export default class AppChooseCards extends Vue {
     this.cards = await this.fetchCards({ type: 'A' })
   }
 
+  /**
+   * The number that will appaer on the card that is selected next.
+   */
   cardNumber(card: CardView): number {
     return this.selectedCards.findIndex(c => c.id === card.id) + 1
   }
 
+  /**
+   * If the user can select a card.
+   */
   get canSelectCard() {
     return this.selectedCards.length < this.blackCard.numAnswers
   }
@@ -100,9 +106,13 @@ export default class AppChooseCards extends Vue {
       take: amount,
     })
 
-    this.cards = this.cards.filter(card => !this.selectedCards.includes(card))
-    this.cards = [...this.cards, ...newCards]
+    // Filter out the cards that have been selected.
+    const cardsWithoutOld = this.cards.filter(
+      card => !this.selectedCards.includes(card),
+    )
+    this.cards = cardsWithoutOld.concat(newCards)
 
+    // Reset the selected cards with an empty array.
     return []
   }
 

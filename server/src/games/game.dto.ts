@@ -1,22 +1,23 @@
-import { IsNotEmpty, IsNumber, IsBoolean, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsBoolean, MaxLength } from 'class-validator'
+import { Game } from './game.entity'
 
-export class GameCreateDto {
+export class GameCreateDto extends Game {
   @IsNotEmpty()
   @MaxLength(128)
-  name!: string;
+  name!: string
 
   @IsNumber()
-  userLimit?: number;
+  userLimit?: number
 
   @IsBoolean()
-  private!: boolean;
+  private!: boolean
 }
 
-export class GameJoinDto {
+export class GameJoinDto extends Game {
   @IsNotEmpty()
-  id!: string;
+  id!: string
 
   @IsNotEmpty()
   @MaxLength(128)
-  name!: string;
+  name!: string
 }

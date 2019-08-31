@@ -13,4 +13,11 @@ export class Game {
 
   @Column()
   private!: boolean
+
+  /**
+   * Generate the unique name of the given game.
+   */
+  get roomName(): string {
+    return `${this.id}-${this.name.replace(' ', '-')}`
+  }
 }

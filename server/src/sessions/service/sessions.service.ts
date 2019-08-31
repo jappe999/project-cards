@@ -32,16 +32,16 @@ export class SessionsService {
     client: Socket,
     { user, game }: { user: User; game: GameJoinDto },
   ): Observable<WsResponse<Session>> {
-    const room = this.getRoomName(game)
+    const room = game.roomName
+    const session = this.createSession(user, game, room)
 
     client.join(room)
-
-    const session = this.createSession(user, game, room)
 
     return from(session).pipe(map(data => ({ event: 'session-join', data })))
   }
 
   /**
+   * Remove the user from the game session and notify other players.
    *
    * @param client - The socket client of the connected user.
    * @param payload - The payload sent with the socket request.
@@ -52,7 +52,7 @@ export class SessionsService {
     client: Socket,
     { user, game }: { user: User; game: GameJoinDto },
   ): Observable<WsResponse<{ user: User; session: Session }>> {
-    const room = this.getRoomName(game)
+    const room = game.roomName
     const session = this.exitRoom(client, user, room)
 
     return from(session).pipe(
@@ -65,34 +65,54 @@ export class SessionsService {
     )
   }
 
+  /**
+   * Play the cards for this round for the connected user.
+   *
+   * @param client - The socket client of the connected user.
+   * @param payload - The payload sent with the socket request.
+   */
   playCards(
     client: Socket,
-    data: SessionData,
+    payload: SessionData,
   ): Observable<WsResponse<PlayerInSession>> {
-    const playerInSession = this.playerInSessionsService.playCards(data)
+    const playerInSession = this.playerInSessionsService.playCards(payload)
 
     return from(playerInSession).pipe(
       tap(item => {
-        client.broadcast.to(data.session.room).emit('session-play-card', item)
+        client.broadcast
+          .to(payload.session.room)
+          .emit('session-play-card', item)
       }),
       map(item => ({ event: 'session-play-card', data: item })),
     )
   }
 
+  /**
+   * Choose the cards that are the best combination.
+   *
+   * @param client - The socket client of the connected user.
+   * @param payload - The payload sent with the socket request.
+   */
   chooseCardCombination(
     client: Socket,
-    data: SessionData,
+    payload: SessionData,
   ): Observable<WsResponse<SessionData>> {
-    return from([data]).pipe(
+    return from([payload]).pipe(
       tap(item => {
         client.broadcast
-          .to(data.session.room)
+          .to(payload.session.room)
           .emit('session-choose-card-combination', item)
       }),
       map(data => ({ event: 'session-choose-card-combination', data })),
     )
   }
 
+  /**
+   * Start the next round of the game.
+   *
+   * @param client - The socket client of the connected user.
+   * @param payload - The payload with session sent with the socket request.
+   */
   nextRound(
     client: Socket,
     { session }: { session: Session },
@@ -107,22 +127,34 @@ export class SessionsService {
     )
   }
 
+  /**
+   * Setup the session for the next round of the game.
+   *
+   * @param session - The current session of the game.
+   */
   async setupSessionForNextRound(session: Session): Promise<Session> {
     await this.setupSession(session)
     return this.getSession(session.id)
   }
 
-  private getRoomName(game: GameJoinDto) {
-    return `${game.id}-${game.name.replace(' ', '-')}`
-  }
-
-  async addPlayerToSession(user: User, session: Session) {
+  /**
+   * Add a new player to the session.
+   *
+   * @param user - The user to add to the session.
+   * @param session - The session to add the user to.
+   */
+  addPlayerToSession(user: User, session: Session): Promise<PlayerInSession> {
     return this.playerInSessionsService.createOrUpdate({
       playerId: user.id,
       sessionId: session.id,
     })
   }
 
+  /**
+   * Get a full session object.
+   *
+   * @param id - The id of the session.
+   */
   getSession(id: string): Promise<Session> {
     return this.sessionRepository.findOne(id, {
       relations: [
@@ -135,6 +167,14 @@ export class SessionsService {
     })
   }
 
+  /**
+   * Setup a new session or update an existing one.
+   *
+   * @param payload - The payload needed to setup the session.
+   * @param payload.id - The id of the session.
+   * @param payload.game - The game of the session.
+   * @param payload.room - The roomname of the game.
+   */
   async setupSession({
     id,
     game,
