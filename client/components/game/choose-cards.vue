@@ -101,7 +101,6 @@ export default class AppChooseCards extends Vue {
 
   /**
    * Replace the previously chosen cards with new ones.
-   * 
    * @param amount - The amount of cards to fetch.
    */
   @Emit('select')
