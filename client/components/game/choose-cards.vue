@@ -58,6 +58,14 @@ import { CardView } from '~/models/Card'
     AppPlaycard: () => import('~/components/game/playcard.vue'),
     AppGameView: () => import('~/components/game/game-view.vue'),
   },
+
+  watch: {
+    blackCard(_, { numAnswers }: CardView) {
+      if (numAnswers) {
+        this.fetchNewCards(numAnswers)
+      }
+    },
+  },
 })
 export default class AppChooseCards extends Vue {
   /** @var $socket - The socket connection to the server. */
@@ -77,12 +85,39 @@ export default class AppChooseCards extends Vue {
     this.cards = await this.fetchCards({ type: 'A' })
   }
 
+  /**
+   * The number that will appaer on the card that is selected next.
+   */
   cardNumber(card: CardView): number {
     return this.selectedCards.findIndex(c => c.id === card.id) + 1
   }
 
+  /**
+   * If the user can select a card.
+   */
   get canSelectCard() {
     return this.selectedCards.length < this.blackCard.numAnswers
+  }
+
+  /**
+   * Replace the previously chosen cards with new ones.
+   * @param amount - The amount of cards to fetch.
+   */
+  @Emit('select')
+  async fetchNewCards(amount: number = 1) {
+    const newCards = await this.fetchCards({
+      type: 'A',
+      take: amount,
+    })
+
+    // Filter out the cards that have been selected.
+    const cardsWithoutOld = this.cards.filter(
+      card => !this.selectedCards.includes(card),
+    )
+    this.cards = cardsWithoutOld.concat(newCards)
+
+    // Reset the selected cards with an empty array.
+    return []
   }
 
   /**

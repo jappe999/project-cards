@@ -42,7 +42,7 @@ import { CardView } from '~/models/Card'
     AppGameView: () => import('~/components/game/game-view.vue'),
   },
 })
-export default class AppChooseCardCombination extends Vue {
+export default class AppShowBestCombination extends Vue {
   /** @var $socket - The socket connection to the server. */
   $socket!: SocketIOClient.Socket
 

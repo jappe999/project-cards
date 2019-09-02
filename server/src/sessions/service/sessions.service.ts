@@ -3,22 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Session } from '../session.entity'
 import { Repository } from 'typeorm'
 import { Socket } from 'socket.io'
-import { from, Observable, throwError } from 'rxjs'
-import { map, tap, catchError } from 'rxjs/operators'
+import { from, Observable } from 'rxjs'
+import { map, tap } from 'rxjs/operators'
 import { WsResponse } from '@nestjs/websockets'
 import { GameJoinDto } from '../../games/game.dto'
 import { CardsService } from '../../cards/service/cards.service'
 import { User } from '../../users/user.entity'
 import { PlayerSessionService } from '../../player-session/service/player-session.service'
 import { PlayerInSession } from '../../player-session/player-session.entity'
-import { CardViewDto } from 'server/src/cards/card.dto'
-
-type CardData = {
-  user: User
-  session: Session
-  cards: CardViewDto[]
-  round: number
-}
+import { SessionData } from '../session.types'
 
 @Injectable()
 export class SessionsService {
@@ -39,16 +32,16 @@ export class SessionsService {
     client: Socket,
     { user, game }: { user: User; game: GameJoinDto },
   ): Observable<WsResponse<Session>> {
-    const room = this.getRoomName(game)
+    const room = game.roomName
+    const session = this.createSession(user, game, room)
 
     client.join(room)
-
-    const session = this.createSession(user, game, room)
 
     return from(session).pipe(map(data => ({ event: 'session-join', data })))
   }
 
   /**
+   * Remove the user from the game session and notify other players.
    *
    * @param client - The socket client of the connected user.
    * @param payload - The payload sent with the socket request.
@@ -59,7 +52,7 @@ export class SessionsService {
     client: Socket,
     { user, game }: { user: User; game: GameJoinDto },
   ): Observable<WsResponse<{ user: User; session: Session }>> {
-    const room = this.getRoomName(game)
+    const room = game.roomName
     const session = this.exitRoom(client, user, room)
 
     return from(session).pipe(
@@ -72,34 +65,54 @@ export class SessionsService {
     )
   }
 
+  /**
+   * Play the cards for this round for the connected user.
+   *
+   * @param client - The socket client of the connected user.
+   * @param payload - The payload sent with the socket request.
+   */
   playCards(
     client: Socket,
-    data: CardData,
+    payload: SessionData,
   ): Observable<WsResponse<PlayerInSession>> {
-    const playerInSession = this.playerInSessionsService.playCards(data)
+    const playerInSession = this.playerInSessionsService.playCards(payload)
 
     return from(playerInSession).pipe(
       tap(item => {
-        client.broadcast.to(data.session.room).emit('session-play-card', item)
+        client.broadcast
+          .to(payload.session.room)
+          .emit('session-play-card', item)
       }),
       map(item => ({ event: 'session-play-card', data: item })),
     )
   }
 
+  /**
+   * Choose the cards that are the best combination.
+   *
+   * @param client - The socket client of the connected user.
+   * @param payload - The payload sent with the socket request.
+   */
   chooseCardCombination(
     client: Socket,
-    data: CardData,
-  ): Observable<WsResponse<CardData>> {
-    return from([data]).pipe(
+    payload: SessionData,
+  ): Observable<WsResponse<SessionData>> {
+    return from([payload]).pipe(
       tap(item => {
         client.broadcast
-          .to(data.session.room)
+          .to(payload.session.room)
           .emit('session-choose-card-combination', item)
       }),
       map(data => ({ event: 'session-choose-card-combination', data })),
     )
   }
 
+  /**
+   * Start the next round of the game.
+   *
+   * @param client - The socket client of the connected user.
+   * @param payload - The payload with session sent with the socket request.
+   */
   nextRound(
     client: Socket,
     { session }: { session: Session },
@@ -114,24 +127,36 @@ export class SessionsService {
     )
   }
 
+  /**
+   * Setup the session for the next round of the game.
+   *
+   * @param session - The current session of the game.
+   */
   async setupSessionForNextRound(session: Session): Promise<Session> {
     await this.setupSession(session)
-    return this.getSession({ id: session.id })
+    return this.getSession(session.id)
   }
 
-  private getRoomName(game: GameJoinDto) {
-    return `${game.id}-${game.name.replace(' ', '-')}`
-  }
-
-  addPlayerToSession(user: User, session: Session) {
+  /**
+   * Add a new player to the session.
+   *
+   * @param user - The user to add to the session.
+   * @param session - The session to add the user to.
+   */
+  addPlayerToSession(user: User, session: Session): Promise<PlayerInSession> {
     return this.playerInSessionsService.createOrUpdate({
       playerId: user.id,
       sessionId: session.id,
     })
   }
 
-  getSession(where: { [key: string]: any }): Promise<Session> {
-    return this.sessionRepository.findOne({
+  /**
+   * Get a full session object.
+   *
+   * @param id - The id of the session.
+   */
+  getSession(id: string): Promise<Session> {
+    return this.sessionRepository.findOne(id, {
       relations: [
         'game',
         'currentCard',
@@ -139,10 +164,17 @@ export class SessionsService {
         'playerInSession.playerCards',
         'playerInSession.playerCards.cards',
       ],
-      where,
     })
   }
 
+  /**
+   * Setup a new session or update an existing one.
+   *
+   * @param payload - The payload needed to setup the session.
+   * @param payload.id - The id of the session.
+   * @param payload.game - The game of the session.
+   * @param payload.room - The roomname of the game.
+   */
   async setupSession({
     id,
     game,
@@ -166,6 +198,13 @@ export class SessionsService {
     })
   }
 
+  /**
+   * Create or update a session and add the user to it.
+   *
+   * @param user - The authenticated user.
+   * @param game - The game to create the session for.
+   * @param room - The name of the room.
+   */
   async createSession(
     user: User,
     game: GameJoinDto,
@@ -178,9 +217,16 @@ export class SessionsService {
     }
 
     await this.addPlayerToSession(user, session)
-    return this.getSession({ id: session.id })
+    return this.getSession(session.id)
   }
 
+  /**
+   * Remove the user from session.
+   *
+   * @param client - The socket client.
+   * @param user - The authenticated user.
+   * @param room - The name of the game room.
+   */
   async exitRoom(client: Socket, user: User, room: string) {
     client.leave(room)
 
@@ -191,6 +237,6 @@ export class SessionsService {
       sessionId: session.id,
     })
 
-    return this.getSession({ id: session.id })
+    return this.getSession(session.id)
   }
 }
