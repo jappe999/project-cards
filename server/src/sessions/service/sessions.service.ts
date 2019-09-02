@@ -198,6 +198,13 @@ export class SessionsService {
     })
   }
 
+  /**
+   * Create or update a session and add the user to it.
+   *
+   * @param user - The authenticated user.
+   * @param game - The game to create the session for.
+   * @param room - The name of the room.
+   */
   async createSession(
     user: User,
     game: GameJoinDto,
@@ -213,6 +220,13 @@ export class SessionsService {
     return this.getSession(session.id)
   }
 
+  /**
+   * Remove the user from session.
+   *
+   * @param client - The socket client.
+   * @param user - The authenticated user.
+   * @param room - The name of the game room.
+   */
   async exitRoom(client: Socket, user: User, room: string) {
     client.leave(room)
 

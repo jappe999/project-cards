@@ -99,6 +99,11 @@ export default class AppChooseCards extends Vue {
     return this.selectedCards.length < this.blackCard.numAnswers
   }
 
+  /**
+   * Replace the previously chosen cards with new ones.
+   * 
+   * @param amount - The amount of cards to fetch.
+   */
   @Emit('select')
   async fetchNewCards(amount: number = 1) {
     const newCards = await this.fetchCards({

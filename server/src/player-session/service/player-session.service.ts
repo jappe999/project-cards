@@ -14,14 +14,26 @@ export class PlayerSessionService {
     private readonly playerCardsService: PlayerCardService,
   ) {}
 
+  /**
+   * Find a specific player session.
+   * @param options - The query for finding the player session.
+   */
   findOne(options?: FindOneOptions): Promise<PlayerInSession> {
     return this.playerInSessionRepository.findOne(options)
   }
 
+  /**
+   * Create a new player session.
+   * @param playerInSession - The player session to create.
+   */
   create(playerInSession: PlayerInSessionCreateDto) {
     return this.playerInSessionRepository.save(playerInSession)
   }
 
+  /**
+   * Upsert (create or update) a player session.
+   * @param playerInSession - The player session object to upsert.
+   */
   async createOrUpdate(
     playerInSession: Partial<PlayerInSession>,
   ): Promise<PlayerInSession> {
@@ -30,10 +42,19 @@ export class PlayerSessionService {
     return this.playerInSessionRepository.save({ ...row, ...playerInSession })
   }
 
+  /**
+   * Update specific player sessions.
+   * @param where - The query for replacing specific player sessions.
+   * @param update - The new data for the queried player sessions.
+   */
   update(where: { [key: string]: any }, update: { [key: string]: any }) {
     return this.playerInSessionRepository.update(where, update)
   }
 
+  /**
+   * Remove a player session.
+   * @param where - The query to what to remove from the player sessions.
+   */
   async remove(where: { [key: string]: any }) {
     const playerSessions = await this.playerInSessionRepository.find(where)
 
@@ -43,6 +64,13 @@ export class PlayerSessionService {
     })
   }
 
+  /**
+   * Save the given cards as the cards played by the user in this round.
+   * @param payload
+   * @param payload.user - The user who played the cards.
+   * @param payload.cards - The cards that are played.
+   * @param payload.round - The round that the cards are played in.
+   */
   async playCards({ user: player, cards, session, round }: SessionData) {
     const playerSession = await this.create({ player, session })
 
