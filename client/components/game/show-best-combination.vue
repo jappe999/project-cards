@@ -43,12 +43,15 @@ import { CardView } from '~/models/Card'
   },
 })
 export default class AppShowBestCombination extends Vue {
-  /** @var $socket - The socket connection to the server. */
-  $socket!: SocketIOClient.Socket
-
   @Prop({ default: () => ({}), type: Object }) blackCard!: CardView
   @Prop({ default: () => [], type: Array }) cards!: CardView[]
   @Prop({ default: () => ({}), type: Object }) session!: any
+
+  /** @var $socket - The socket connection to the server. */
+  get $socket(): SocketIOClient.Socket {
+    const name = '$socket'
+    return window[name]
+  }
 
   nextRound() {
     this.$socket.emit('session-next-round', {

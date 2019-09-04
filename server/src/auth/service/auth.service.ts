@@ -15,9 +15,13 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  getTokenFromWsClient(client: Socket) {
+  getTokenFromWsClient(client: Socket): { sub: string } {
     const token = client.handshake.headers.authorization.split(' ').pop()
-    return <{ sub: string }>verify(token, process.env.JWT_SECRET)
+    try {
+      return <{ sub: string }>verify(token, process.env.JWT_SECRET)
+    } catch (e) {
+      return { sub: null }
+    }
   }
 
   async validateUser(

@@ -105,6 +105,7 @@ import { GameView } from '../../models/Game'
     AppCardContent: () => import('~/components/card/card-content.vue'),
     AppButtonLink: () => import('~/components/button/button-link.vue'),
   },
+
   asyncData(context: Context) {
     return context.store.dispatch('games/fetchGames')
   },

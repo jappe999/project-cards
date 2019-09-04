@@ -63,14 +63,17 @@ import { CardView } from '~/models/Card'
   },
 })
 export default class AppChooseCardCombination extends Vue {
-  /** @var $socket - The socket connection to the server. */
-  $socket!: SocketIOClient.Socket
-
   @Prop({ default: 0, type: Number }) round!: number
   @Prop({ default: () => ({}), type: Object }) blackCard!: CardView
   @Prop({ default: () => [], type: Array }) cards!: CardView[]
   @Prop({ default: () => [], type: Array }) selectedCards!: CardView[]
   @Prop({ default: () => ({}), type: Object }) session!: any
+
+  /** @var $socket - The socket connection to the server. */
+  get $socket(): SocketIOClient.Socket {
+    const name = '$socket'
+    return window[name]
+  }
 
   get canSelectCard() {
     return this.selectedCards.length < 1

@@ -8,6 +8,11 @@ export class WsJwtGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const client = context.switchToWs().getClient()
     const { sub: id } = this.authService.getTokenFromWsClient(client)
+
+    if (id === null) {
+      return false
+    }
+
     const user = await this.authService.profile({ id })
 
     context.switchToWs().getData().user = user

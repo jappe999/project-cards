@@ -68,9 +68,6 @@ import { CardView } from '~/models/Card'
   },
 })
 export default class AppChooseCards extends Vue {
-  /** @var $socket - The socket connection to the server. */
-  $socket!: SocketIOClient.Socket
-
   /** @var cards - The cards in the hand of the player. */
   cards: CardView[] = []
 
@@ -80,6 +77,12 @@ export default class AppChooseCards extends Vue {
   @Prop({ default: {}, type: Object }) session!: any
 
   @Action('cards/fetchCards') fetchCards
+
+  /** @var $socket - The socket connection to the server. */
+  get $socket(): SocketIOClient.Socket {
+    const name = '$socket'
+    return window[name]
+  }
 
   async mounted() {
     this.cards = await this.fetchCards({ type: 'A' })

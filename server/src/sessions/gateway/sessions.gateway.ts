@@ -28,6 +28,11 @@ export class SessionsGateway implements OnGatewayDisconnect {
 
   async handleDisconnect(client: Socket) {
     const { sub: id } = this.authService.getTokenFromWsClient(client)
+
+    if (id === null) {
+      return null
+    }
+
     const { playerInSession, ...user } = await this.usersService.activeSessions(
       { id },
     )
