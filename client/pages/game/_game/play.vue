@@ -69,8 +69,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/vue-app'
 import { Vue, Component } from 'vue-property-decorator'
-import { Action } from 'vuex-class'
-import { Game } from '~/models/Game'
+import { GameView } from '~/models/Game'
 import { CardView } from '~/models/Card'
 
 @Component({
@@ -95,11 +94,8 @@ import { CardView } from '~/models/Card'
   },
 })
 export default class PlayGame extends Vue {
-  /** @var $socket - The socket connection to the server. */
-  $socket!: SocketIOClient.Socket
-
   /** @var game - The game that is currently being played. */
-  game!: Game
+  game!: GameView
 
   /** @var round - The number of the current round. */
   round: number = 0
@@ -124,11 +120,11 @@ export default class PlayGame extends Vue {
   /** @var selectedCardCombination - The cards that the player has selected this round. */
   selectedCardCombination: CardView[] = []
 
-  /** Vuex action to join a game session. */
-  @Action('sessions/join') joinSession
-
-  /** Vuex action to exit a game session. */
-  @Action('sessions/exit') exitSession
+  /** @var $socket - The socket connection to the server. */
+  get $socket(): SocketIOClient.Socket {
+    const name = '$socket'
+    return window[name]
+  }
 
   /** The black card for the current round. */
   get blackCard(): CardView {
@@ -155,6 +151,20 @@ export default class PlayGame extends Vue {
   destroy() {
     window.onbeforeunload = null
     this.exitSession(this.game)
+  }
+
+  /**
+   * Emit a message to join a game session.
+   */
+  joinSession(game: GameView) {
+    this.$socket.emit('session-join', { game })
+  }
+
+  /**
+   * Emit a message to exit a game session.
+   */
+  exitSession(game: GameView) {
+    this.$socket.emit('session-exit', { game })
   }
 
   onSessionJoin(session) {
