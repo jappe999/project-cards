@@ -179,7 +179,6 @@ export default class PlayGame extends Vue {
 
   onSessionNextRound(session) {
     this.round++
-    window.navigator.vibrate(100)
     this.onSessionJoin(session)
     this.state = 'choose-cards'
   }
