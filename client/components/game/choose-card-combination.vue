@@ -9,8 +9,9 @@
         {{ blackCard.text }}
       </app-playcard>
       <app-button
+        v-if="isCzar"
         class="w-full"
-        :disabled="canSelectCard"
+        :disabled="canSelectCard || !isCzar"
         @click.native="playCards"
       >
         Choose combination
@@ -34,7 +35,7 @@
         >
           <app-playcard
             class="h-full lg:h-96 w-full lg:w-64"
-            :disabled="!canSelectCard"
+            :disabled="!canSelectCard || !isCzar"
             :step="index + 1"
           >
             {{ card.text }}
@@ -42,7 +43,10 @@
         </div>
 
         <div
-          v-if="(_cards.length > 1 && canSelectCard) || selectedCards == _cards"
+          v-if="
+            (_cards.length > 1 && canSelectCard && isCzar) ||
+              selectedCards == _cards
+          "
           class="h-full w-full absolute inset-0 group-hover:bg-gray-800 opacity-25 cursor-pointer rounded"
           :class="{ 'bg-gray-800': selectedCards == _cards }"
         />
@@ -63,6 +67,7 @@ import { CardView } from '~/models/Card'
   },
 })
 export default class AppChooseCardCombination extends Vue {
+  @Prop({ default: false, type: Boolean }) isCzar!: boolean
   @Prop({ default: 0, type: Number }) round!: number
   @Prop({ default: () => ({}), type: Object }) blackCard!: CardView
   @Prop({ default: () => [], type: Array }) cards!: CardView[]
@@ -86,7 +91,11 @@ export default class AppChooseCardCombination extends Vue {
    */
   @Emit('select')
   toggleChoice(cards: CardView[]) {
-    return cards
+    if (this.isCzar) {
+      return cards
+    } else {
+      return []
+    }
   }
 
   @Emit('submit')
