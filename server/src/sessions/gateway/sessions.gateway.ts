@@ -36,9 +36,8 @@ export class SessionsGateway implements OnGatewayDisconnect {
       id = decoded.sub
     }
 
-    const { playerInSession, ...user } = await this.usersService.activeSessions(
-      { id },
-    )
+    const { playerInSession = [], ...user } =
+      (await this.usersService.activeSessions({ id })) || {}
 
     return playerInSession.forEach(({ session: { game } }) => {
       this.sessionsService
