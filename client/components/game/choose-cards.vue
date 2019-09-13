@@ -68,8 +68,12 @@ import { CardView } from '~/models/Card'
   },
 
   watch: {
+    isCzar(_: boolean, oldValue: boolean) {
+      this.isPreviousCzar = oldValue
+    },
+
     blackCard(_, { numAnswers }: CardView) {
-      if (numAnswers) {
+      if (numAnswers && !this.isPreviousCzar) {
         this.fetchNewCards(numAnswers)
       }
     },
@@ -78,6 +82,8 @@ import { CardView } from '~/models/Card'
 export default class AppChooseCards extends Vue {
   /** @var cards - The cards in the hand of the player. */
   cards: CardView[] = []
+
+  isPreviousCzar: boolean = true
 
   @Prop({ default: false, type: Boolean }) isCzar!: boolean
   @Prop({ default: 0, type: Number }) round!: number
@@ -98,7 +104,7 @@ export default class AppChooseCards extends Vue {
   }
 
   /**
-   * The number that will appaer on the card that is selected next.
+   * The number that will appear on the card that is selected next.
    */
   cardNumber(card: CardView): number {
     return this.selectedCards.findIndex(c => c.id === card.id) + 1

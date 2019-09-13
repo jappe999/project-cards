@@ -113,7 +113,7 @@ export default class PlayGame extends Vue {
   /** @var blackCards - The black cards that have been or are being used for a round. */
   blackCards: CardView[] = []
 
-  /** @var playedCards - Cards played in a round. */
+  /** @var playedCards - Cards played in each round. */
   playedCards: CardView[][] = [[]]
 
   /** @var bestCards - The best cards from each round. */
@@ -232,7 +232,7 @@ export default class PlayGame extends Vue {
     this.state = 'show-best-combination'
   }
 
-  updatePlayedCards({ playerInSession }) {
+  updatePlayedCards({ playerInSession, currentCzarId }) {
     const cardsByActivePlayers = playerInSession
       // Get the cards played by the user.
       .map(({ playerCards }) => {
@@ -240,7 +240,10 @@ export default class PlayGame extends Vue {
         return (round || {}).cards
       })
       // Filter items that are falsy.
-      .filter(item => !!item)
+      .filter(
+        playerSession =>
+          !!playerSession && playerSession.playerId !== currentCzarId,
+      )
 
     this.playedCards[this.round] = cardsByActivePlayers
     this.playedCards = [...this.playedCards]
