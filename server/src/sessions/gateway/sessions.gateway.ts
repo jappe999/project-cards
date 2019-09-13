@@ -1,3 +1,4 @@
+import { UseGuards, UsePipes } from '@nestjs/common'
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -6,10 +7,10 @@ import {
 } from '@nestjs/websockets'
 import { Socket } from 'socket.io'
 import { Observable } from 'rxjs'
+import { decode } from 'jsonwebtoken'
 import { Game } from '../../games/game.entity'
 import { SessionsService } from '../service/sessions.service'
 import { Session } from '../session.entity'
-import { UseGuards, UsePipes } from '@nestjs/common'
 import { WsJwtGuard } from '../../auth/guard/ws-jwt.guard'
 import { User } from '../../users/user.entity'
 import { PlayerInSession } from '../../player-session/player-session.entity'
@@ -27,15 +28,16 @@ export class SessionsGateway implements OnGatewayDisconnect {
   ) {}
 
   async handleDisconnect(client: Socket) {
-    const { sub: id } = this.authService.getTokenFromWsClient(client)
+    let { sub: id } = this.authService.getTokenFromWsClient(client)
 
     if (id === null) {
-      return null
+      const token = client.handshake.headers.authorization.split(' ').pop()
+      const decoded = decode(token)
+      id = decoded.sub
     }
 
-    const { playerInSession, ...user } = await this.usersService.activeSessions(
-      { id },
-    )
+    const { playerInSession = [], ...user } =
+      (await this.usersService.activeSessions({ id })) || {}
 
     return playerInSession.forEach(({ session: { game } }) => {
       this.sessionsService
