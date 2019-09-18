@@ -120,9 +120,6 @@ export default class AppChooseCards extends Vue {
       take: amount,
     })
 
-    const c = console
-    c.log(newCards)
-
     // Filter out the cards that have been selected.
     const cardsWithoutOld = this.cards.filter(
       card => !this.selectedCards.includes(card),
