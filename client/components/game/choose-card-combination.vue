@@ -5,9 +5,8 @@
         color="black"
         class="sm:h-96 w-full sm:w-64 mb-4"
         :disabled="true"
-      >
-        {{ blackCard.text }}
-      </app-playcard>
+        :text="blackCard.text"
+      />
       <app-button
         class="w-full"
         :disabled="canSelectCard"
@@ -36,9 +35,8 @@
             class="h-full lg:h-96 w-full lg:w-64"
             :disabled="!canSelectCard"
             :step="index + 1"
-          >
-            {{ card.text }}
-          </app-playcard>
+            :text="card.text"
+          />
         </div>
 
         <div

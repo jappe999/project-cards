@@ -6,7 +6,9 @@
   >
     <app-card-content class="h-full">
       <p>
-        <slot></slot>
+        <slot>
+          {{ encodedText }}
+        </slot>
       </p>
     </app-card-content>
 
@@ -36,6 +38,7 @@ import { Component, Vue, Prop, Emit } from 'vue-property-decorator'
 })
 export default class AppPlaycard extends Vue {
   @Prop({ default: 'white', type: String }) color!: 'black' | 'white'
+  @Prop({ default: '', type: String, required: false }) text?: string
   @Prop({ default: null, type: [String, Number] }) step!: number
   @Prop({ default: false, type: [Boolean] }) disabled!: boolean
 
@@ -53,6 +56,12 @@ export default class AppPlaycard extends Vue {
       'bg-white text-black': this.color === 'black',
       'bg-black text-white': this.color === 'white',
     }
+  }
+
+  get encodedText() {
+    const element = document.createElement('div')
+    element.innerHTML = this.text
+    return element.textContent
   }
 
   @Emit('toggle')
