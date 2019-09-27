@@ -138,16 +138,21 @@ export class SessionsService {
   }
 
   /**
-   * Add a new player to the session.
+   * Add a new player to the session and remove it's old sessions.
    *
    * @param user - The user to add to the session.
    * @param session - The session to add the user to.
    */
-  addPlayerToSession(user: User, session: Session): Promise<PlayerInSession> {
-    return this.playerInSessionsService.createOrUpdate({
+  async addPlayerToSession(
+    user: User,
+    session: Session,
+  ): Promise<PlayerInSession> {
+    const playerSession = {
       playerId: user.id,
       sessionId: session.id,
-    })
+    }
+    await this.playerInSessionsService.remove(playerSession)
+    return this.playerInSessionsService.create(playerSession)
   }
 
   /**

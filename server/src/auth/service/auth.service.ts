@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { verify } from 'jsonwebtoken'
+import { verify, decode } from 'jsonwebtoken'
 import { UsersService } from '../../users/service/users.service'
 import { UserViewDto } from '../../users/user.dto'
 import { Socket } from 'socket.io'
@@ -15,12 +15,21 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
+  /**
+   * Try to decode the token. Return an empty sub otherwise.
+   * @param client - The connected socket
+   */
   getTokenFromWsClient(client: Socket): { sub: string } {
     const token = client.handshake.headers.authorization.split(' ').pop()
+
     try {
       return <{ sub: string }>verify(token, process.env.JWT_SECRET)
-    } catch (e) {
-      return { sub: null }
+    } catch (x) {
+      try {
+        return <{ sub: string }>decode(token)
+      } catch (y) {
+        return { sub: null }
+      }
     }
   }
 
