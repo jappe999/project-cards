@@ -52,20 +52,26 @@
           <app-card class="h-full flex">
             <app-card-content class="w-full">
               <h4>{{ game.name }}</h4>
-              <ul class="mt-1 text-xs">
+              <ul class="mt-1 text-xs flex">
                 <template
                   v-if="game.session && game.session.playerInSession.length"
                 >
-                  <li class="font-bold">Players:</li>
+                  <li class="font-bold mr-1">Players:</li>
                   <li
-                    v-for="{ player } in game.session.playerInSession"
+                    v-for="({ player }, index) in game.session.playerInSession"
                     :key="player.id"
+                    class="mr-1"
                   >
                     {{ player.username }}
+                    <template
+                      v-if="index < game.session.playerInSession.length - 1"
+                    >
+                      &middot;
+                    </template>
                   </li>
                 </template>
                 <template v-else>
-                  No players
+                  <li>No players</li>
                 </template>
               </ul>
             </app-card-content>
