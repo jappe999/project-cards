@@ -1,9 +1,9 @@
 <template>
-  <div class="card-view h-full w-full flex flex-col sm:flex-row">
+  <div class="min-h-full w-full flex flex-col sm:flex-row">
     <div
       class="min-w-64 sticky top-0 sm:border-r border-gray-400 bg-gray-200 shadow sm:shadow-none"
     >
-      <div class="sm:h-full sticky top-0 flex flex-col">
+      <div class="card-side-view sticky top-0 flex flex-col">
         <div class="flex flex-col items-center p-4 sm:p-8">
           <slot name="side"></slot>
         </div>
@@ -67,3 +67,11 @@ export default class AppGameView extends Vue {
   @Prop({ default: () => ({}), type: Object }) session!: any
 }
 </script>
+
+<style scoped>
+@media screen and (min-width: 640px) {
+  .card-side-view {
+    min-height: calc(100vh - 56px);
+  }
+}
+</style>
