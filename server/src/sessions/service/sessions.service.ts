@@ -37,7 +37,12 @@ export class SessionsService {
 
     client.join(room)
 
-    return from(session).pipe(map(data => ({ event: 'session-join', data })))
+    return from(session).pipe(
+      tap(session => {
+        client.broadcast.to(session.room).emit('session-join', session)
+      }),
+      map(data => ({ event: 'session-join', data })),
+    )
   }
 
   /**
@@ -205,6 +210,7 @@ export class SessionsService {
         'game',
         'currentCard',
         'playerInSession',
+        'playerInSession.player',
         'playerInSession.playerCards',
         'playerInSession.playerCards.cards',
       ],

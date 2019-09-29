@@ -1,5 +1,5 @@
 <template>
-  <app-game-view>
+  <app-game-view :session="session">
     <template slot="side">
       <app-playcard
         color="black"
