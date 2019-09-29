@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, FindOneOptions } from 'typeorm'
+import { Repository, FindOneOptions, FindManyOptions } from 'typeorm'
 import { PlayerInSession } from '../player-session.entity'
 import { PlayerCardService } from '../../player-card/service/player-card.service'
 import { PlayerInSessionCreateDto } from '../player-session.dto'
@@ -23,6 +23,14 @@ export class PlayerSessionService {
   }
 
   /**
+   * Find a specific player session.
+   * @param options - The query for finding the player session.
+   */
+  find(options?: FindManyOptions): Promise<PlayerInSession[]> {
+    return this.playerInSessionRepository.find(options)
+  }
+
+  /**
    * Create a new player session.
    * @param playerInSession - The player session to create.
    */
@@ -31,15 +39,26 @@ export class PlayerSessionService {
   }
 
   /**
-   * Upsert (create or update) a player session.
-   * @param playerInSession - The player session object to upsert.
+   * Find or create a player session.
+   * @param playerInSession - The player session object to find.
    */
-  async createOrUpdate(
+  async findOrCreate(
     playerInSession: Partial<PlayerInSession>,
   ): Promise<PlayerInSession> {
-    const { playerId, sessionId } = playerInSession
-    const row = (await this.findOne({ where: { playerId, sessionId } })) || {}
-    return this.playerInSessionRepository.save({ ...row, ...playerInSession })
+    const { player, session } = playerInSession
+    let previousPlayerSession: PlayerInSession
+
+    if (player && session) {
+      previousPlayerSession = await this.findOne({
+        where: { playerId: player.id, sessionId: session.id },
+      })
+    }
+
+    if (previousPlayerSession) {
+      return previousPlayerSession
+    } else {
+      return this.playerInSessionRepository.save(playerInSession)
+    }
   }
 
   /**
@@ -72,7 +91,7 @@ export class PlayerSessionService {
    * @param payload.round - The round that the cards are played in.
    */
   async playCards({ user: player, cards, session, round }: SessionData) {
-    const playerSession = await this.create({ player, session })
+    const playerSession = await this.findOrCreate({ player, session })
 
     await this.playerCardsService.create({
       round,
