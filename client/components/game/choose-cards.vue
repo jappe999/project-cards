@@ -69,7 +69,7 @@ import { CardView } from '~/models/Card'
 
   watch: {
     isCzar(_: boolean, oldValue: boolean) {
-      this.isPreviousCzar = oldValue
+      this.isPreviousCzar = !oldValue
     },
 
     blackCard(_, { numAnswers }: CardView) {
@@ -83,7 +83,7 @@ export default class AppChooseCards extends Vue {
   /** @var cards - The cards in the hand of the player. */
   cards: CardView[] = []
 
-  isPreviousCzar: boolean = true
+  isPreviousCzar: boolean = false
 
   @Prop({ default: false, type: Boolean }) isCzar!: boolean
   @Prop({ default: 0, type: Number }) round!: number
