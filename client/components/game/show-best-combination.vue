@@ -43,6 +43,7 @@ import { CardView } from '~/models/Card'
   },
 })
 export default class AppShowBestCombination extends Vue {
+  @Prop({ default: false, type: Boolean }) isCzar!: boolean
   @Prop({ default: () => ({}), type: Object }) blackCard!: CardView
   @Prop({ default: () => [], type: Array }) cards!: CardView[]
   @Prop({ default: () => ({}), type: Object }) session!: any

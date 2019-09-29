@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Session } from '../session.entity'
 import { Repository } from 'typeorm'
-import { Socket } from 'socket.io'
+import { Socket, Server } from 'socket.io'
 import { from, Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { WsResponse } from '@nestjs/websockets'
@@ -134,6 +134,7 @@ export class SessionsService {
    */
   async setupSessionForNextRound(session: Session): Promise<Session> {
     await this.setupSession(session)
+    await this.chooseCzar(session)
     return this.getSession(session.id)
   }
 
@@ -144,10 +145,48 @@ export class SessionsService {
    * @param session - The session to add the user to.
    */
   addPlayerToSession(user: User, session: Session): Promise<PlayerInSession> {
-    return this.playerInSessionsService.createOrUpdate({
+    return this.playerInSessionsService.findOrCreate({
       playerId: user.id,
       sessionId: session.id,
     })
+  }
+
+  /**
+   * Choose a (new) czar for this session.
+   * @param session - The session to choose the Czar for.
+   */
+  async chooseCzar(session: Session): Promise<void> {
+    const playersInSession = await this.playerInSessionsService.find({
+      where: { session },
+    })
+
+    const nextCzarId = this.getNextCzarId(session, playersInSession)
+
+    if (nextCzarId !== session.currentCzarId) {
+      this.sessionRepository.update(session.id, {
+        currentCzarId: nextCzarId,
+      })
+    }
+  }
+
+  private getNextCzarId(
+    { currentCzarId }: Session,
+    playersInSession: PlayerInSession[],
+  ) {
+    let currentCzarIndex: number = -1
+
+    if (currentCzarId) {
+      currentCzarIndex = playersInSession.findIndex(
+        ({ playerId: id }) => currentCzarId === id,
+      )
+      if (currentCzarIndex + 1 === playersInSession.length) {
+        currentCzarIndex = -1
+      }
+    }
+
+    const nextCzar = playersInSession[currentCzarIndex + 1]
+
+    return nextCzar ? nextCzar.playerId : null
   }
 
   /**
@@ -217,6 +256,10 @@ export class SessionsService {
     }
 
     await this.addPlayerToSession(user, session)
+    if (!session.currentCzarId) {
+      await this.chooseCzar(session)
+    }
+
     return this.getSession(session.id)
   }
 
@@ -231,6 +274,10 @@ export class SessionsService {
     client.leave(room)
 
     const session = await this.sessionRepository.findOne({ where: { room } })
+
+    if (session.currentCzarId === user.id) {
+      await this.chooseCzar(session)
+    }
 
     await this.playerInSessionsService.remove({
       playerId: user.id,

@@ -20,6 +20,7 @@
         </template>
       </app-playcard>
       <app-button
+        v-if="!isCzar"
         class="w-full"
         :disabled="canSelectCard"
         @click.native="playCards"
@@ -29,20 +30,26 @@
     </template>
 
     <template slot="main">
-      <div
-        v-for="card in cards"
-        :key="card.id"
-        class="w-full md:w-1/2 lg:w-auto -mt-2 p-2"
-      >
-        <app-playcard
-          class="h-full lg:h-96 w-full lg:w-64"
-          :step="cardNumber(card)"
-          :disabled="!(canSelectCard || cardNumber(card) > 0)"
-          @toggle="toggleCard(card)"
+      <template v-if="!isCzar">
+        <div
+          v-for="card in cards"
+          :key="card.id"
+          class="w-full md:w-1/2 lg:w-auto -mt-2 p-2"
         >
-          {{ card.text }}
-        </app-playcard>
-      </div>
+          <app-playcard
+            class="h-full lg:h-96 w-full lg:w-64"
+            :step="cardNumber(card)"
+            :disabled="!(canSelectCard || cardNumber(card) > 0)"
+            @toggle="toggleCard(card)"
+          >
+            {{ card.text }}
+          </app-playcard>
+        </div>
+      </template>
+
+      <template v-else>
+        <app-czar />
+      </template>
     </template>
   </app-game-view>
 </template>
@@ -57,6 +64,7 @@ import { CardView } from '~/models/Card'
     AppButton: () => import('~/components/button/button.vue'),
     AppPlaycard: () => import('~/components/game/playcard.vue'),
     AppGameView: () => import('~/components/game/game-view.vue'),
+    AppCzar: () => import('~/components/game/czar.vue'),
   },
 
   watch: {
@@ -65,7 +73,7 @@ import { CardView } from '~/models/Card'
     },
 
     blackCard(_, { numAnswers }: CardView) {
-      if (numAnswers) {
+      if (numAnswers && !this.isPreviousCzar) {
         this.fetchNewCards(numAnswers)
       }
     },
@@ -96,7 +104,7 @@ export default class AppChooseCards extends Vue {
   }
 
   /**
-   * The number that will appaer on the card that is selected next.
+   * The number that will appear on the card that is selected next.
    */
   cardNumber(card: CardView): number {
     return this.selectedCards.findIndex(c => c.id === card.id) + 1

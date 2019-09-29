@@ -34,6 +34,7 @@
         <app-choose-cards
           v-show="state === 'choose-cards'"
           key="choose-cards"
+          :is-czar="isCzar"
           :selected-cards="selectedCards"
           :black-card="blackCard"
           :session="session"
@@ -45,6 +46,7 @@
         <app-choose-card-combination
           v-show="state === 'choose-card-combination'"
           key="choose-card-combination"
+          :is-czar="isCzar"
           :selected-cards="selectedCardCombination"
           :cards="playedCards[round]"
           :black-card="blackCard"
@@ -56,6 +58,7 @@
         <app-show-best-combination
           v-show="state === 'show-best-combination'"
           key="show-best-combination"
+          :is-czar="isCzar"
           :cards="bestCards[round]"
           :black-card="blackCard"
           :session="session"
@@ -94,6 +97,8 @@ import { CardView } from '~/models/Card'
   },
 })
 export default class PlayGame extends Vue {
+  $auth!: any
+
   /** @var game - The game that is currently being played. */
   game!: GameView
 
@@ -103,13 +108,13 @@ export default class PlayGame extends Vue {
   /** @var session - The session the user is currently in. */
   session: any = {}
 
-  state: string = 'choose-cards'
+  state: string = ''
 
   /** @var blackCards - The black cards that have been or are being used for a round. */
   blackCards: CardView[] = []
 
-  /** @var playedCards - Cards played in a round. */
-  playedCards: CardView[][] = []
+  /** @var playedCards - Cards played in each round. */
+  playedCards: CardView[][] = [[]]
 
   /** @var bestCards - The best cards from each round. */
   bestCards: CardView[][] = []
@@ -131,6 +136,11 @@ export default class PlayGame extends Vue {
     return this.session.currentCard || <CardView>{}
   }
 
+  /** Determine if the current user is the card czar */
+  get isCzar(): boolean {
+    return this.session.currentCzarId === this.$auth.user.id
+  }
+
   beforeMount() {
     this.$socket.on('session-join', this.onSessionJoin.bind(this))
     this.$socket.on('session-exit', this.onSessionExit.bind(this))
@@ -146,6 +156,10 @@ export default class PlayGame extends Vue {
     window.onbeforeunload = () => {
       this.exitSession(this.game)
     }
+  }
+
+  mounted() {
+    this.state = 'choose-cards'
   }
 
   destroy() {
@@ -184,6 +198,8 @@ export default class PlayGame extends Vue {
     session.playerInSession = session.playerInSession.filter(
       ({ playerId }) => playerId !== user.id,
     )
+
+    this.session = { ...this.session, ...session }
     this.updatePlayedCards(session)
   }
 
@@ -193,12 +209,21 @@ export default class PlayGame extends Vue {
     this.state = 'choose-cards'
   }
 
-  onSessionPlayCard(data) {
-    const cards = data.playerCards[0].cards
+  onSessionPlayCard(playerSession) {
+    const latestIndex = playerSession.playerCards.length - 1
+    const cards = playerSession.playerCards[latestIndex].cards
     const playedCards = this.playedCards[this.round] || []
 
     this.playedCards[this.round] = [...playedCards, cards]
     this.playedCards = [...this.playedCards]
+
+    const allPlayersPlayedCards =
+      this.playedCards[this.round].length >=
+      this.session.playerInSession.length - 1
+
+    if (allPlayersPlayedCards) {
+      this.state = 'choose-card-combination'
+    }
   }
 
   onSessionChooseCardCombination({ cards }) {
@@ -207,7 +232,7 @@ export default class PlayGame extends Vue {
     this.state = 'show-best-combination'
   }
 
-  updatePlayedCards({ playerInSession }) {
+  updatePlayedCards({ playerInSession, currentCzarId }) {
     const cardsByActivePlayers = playerInSession
       // Get the cards played by the user.
       .map(({ playerCards }) => {
@@ -215,7 +240,10 @@ export default class PlayGame extends Vue {
         return (round || {}).cards
       })
       // Filter items that are falsy.
-      .filter(item => !!item)
+      .filter(
+        playerSession =>
+          !!playerSession && playerSession.playerId !== currentCzarId,
+      )
 
     this.playedCards[this.round] = cardsByActivePlayers
     this.playedCards = [...this.playedCards]
