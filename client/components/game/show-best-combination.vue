@@ -5,9 +5,8 @@
         color="black"
         class="sm:h-96 w-full sm:w-64 mb-4"
         :disabled="true"
-      >
-        {{ blackCard.text }}
-      </app-playcard>
+        :text="blackCard.text"
+      />
       <app-button class="w-full" @click.native="nextRound">
         Next round
       </app-button>
@@ -23,9 +22,8 @@
           class="lg:h-96 w-full lg:w-64"
           :step="index + 1"
           :disabled="true"
-        >
-          {{ card.text }}
-        </app-playcard>
+          :text="card.text"
+        />
       </div>
     </template>
   </app-game-view>

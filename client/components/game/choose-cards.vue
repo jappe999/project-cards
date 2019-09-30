@@ -40,10 +40,9 @@
             class="h-full lg:h-96 w-full lg:w-64"
             :step="cardNumber(card)"
             :disabled="!(canSelectCard || cardNumber(card) > 0)"
+            :text="card.text"
             @toggle="toggleCard(card)"
-          >
-            {{ card.text }}
-          </app-playcard>
+          />
         </div>
       </template>
 
