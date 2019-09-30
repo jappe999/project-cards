@@ -34,7 +34,7 @@ export class PlayerSessionService {
    * Create a new player session.
    * @param playerInSession - The player session to create.
    */
-  create(playerInSession: PlayerInSessionCreateDto) {
+  create(playerInSession: Partial<PlayerInSession>) {
     return this.playerInSessionRepository.save(playerInSession)
   }
 

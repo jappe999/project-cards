@@ -52,24 +52,31 @@
           <app-card class="h-full flex">
             <app-card-content class="w-full">
               <h4>{{ game.name }}</h4>
-              <small>By Jasper</small>
-            </app-card-content>
-            <div class="flex justify-end items-center border-l border-gray-200">
-              <app-card-content class="flex items-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
+              <ul class="mt-1 text-xs flex">
+                <template
+                  v-if="game.session && game.session.playerInSession.length"
                 >
-                  <path
-                    d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm1-8.41l2.54 2.53a1 1 0 0 1-1.42 1.42L11.3 12.7A1 1 0 0 1 11 12V8a1 1 0 0 1 2 0v3.59z"
-                  />
-                </svg>
-                <span class="w-4 text-right">
-                  {{ Math.round(Math.random() * 5) }}
-                </span>
-              </app-card-content>
+                  <li class="font-bold mr-1">Players:</li>
+                  <li
+                    v-for="({ player }, index) in game.session.playerInSession"
+                    :key="player.id"
+                    class="mr-1"
+                  >
+                    {{ player.username }}
+                    <template
+                      v-if="index < game.session.playerInSession.length - 1"
+                    >
+                      &middot;
+                    </template>
+                  </li>
+                </template>
+                <template v-else>
+                  <li>No players</li>
+                </template>
+              </ul>
+            </app-card-content>
+
+            <div class="flex justify-end items-center border-l border-gray-200">
               <app-card-content class="flex items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -82,7 +89,7 @@
                   />
                 </svg>
                 <span class="w-4 text-right">
-                  {{ game.participants || Math.round(Math.random() * 10) }}
+                  {{ numberOfPlayers(game) }}
                 </span>
               </app-card-content>
             </div>
@@ -112,5 +119,10 @@ import { GameView } from '../../models/Game'
 })
 export default class Home extends Vue {
   @Getter('games/games') games!: GameView[]
+
+  numberOfPlayers(game): number {
+    if (!game.session) return 0
+    return game.session.playerInSession.length
+  }
 }
 </script>

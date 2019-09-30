@@ -37,7 +37,12 @@ export class SessionsService {
 
     client.join(room)
 
-    return from(session).pipe(map(data => ({ event: 'session-join', data })))
+    return from(session).pipe(
+      tap(session => {
+        client.broadcast.to(session.room).emit('session-join', session)
+      }),
+      map(data => ({ event: 'session-join', data })),
+    )
   }
 
   /**
@@ -139,16 +144,21 @@ export class SessionsService {
   }
 
   /**
-   * Add a new player to the session.
+   * Add a new player to the session and remove it's old sessions.
    *
    * @param user - The user to add to the session.
    * @param session - The session to add the user to.
    */
-  addPlayerToSession(user: User, session: Session): Promise<PlayerInSession> {
-    return this.playerInSessionsService.findOrCreate({
+  async addPlayerToSession(
+    user: User,
+    session: Session,
+  ): Promise<PlayerInSession> {
+    const playerSession = {
       playerId: user.id,
       sessionId: session.id,
-    })
+    }
+    await this.playerInSessionsService.remove(playerSession)
+    return this.playerInSessionsService.create(playerSession)
   }
 
   /**
@@ -200,6 +210,7 @@ export class SessionsService {
         'game',
         'currentCard',
         'playerInSession',
+        'playerInSession.player',
         'playerInSession.playerCards',
         'playerInSession.playerCards.cards',
       ],

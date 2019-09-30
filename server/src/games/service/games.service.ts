@@ -16,7 +16,13 @@ export class GamesService {
   }
 
   findAll(): Promise<Game[]> {
-    return this.gameRepository.find()
+    return this.gameRepository.find({
+      relations: [
+        'session',
+        'session.playerInSession',
+        'session.playerInSession.player',
+      ],
+    })
   }
 
   findOne(options?: FindOneOptions): Promise<Game> {

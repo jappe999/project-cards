@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm'
+import { Session } from '../sessions/session.entity'
+import { User } from '../users/user.entity'
 
 @Entity()
 export class Game {
@@ -13,6 +22,13 @@ export class Game {
 
   @Column()
   private!: boolean
+
+  @OneToOne(() => Session, session => session.game)
+  session!: Session
+
+  @ManyToOne(() => User)
+  @JoinColumn()
+  creator!: User
 
   /**
    * Generate the unique name of the given game.
