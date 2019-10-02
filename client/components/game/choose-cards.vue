@@ -5,9 +5,8 @@
         color="black"
         class="sm:h-96 w-full sm:w-64 mb-4"
         :disabled="true"
+        :text="blackCard.text"
       >
-        {{ blackCard.text }}
-
         <template slot="footer">
           <small class="flex items-center">
             Choose
