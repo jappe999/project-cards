@@ -102,9 +102,6 @@ export default class PlayGame extends Vue {
   /** @var game - The game that is currently being played. */
   game!: GameView
 
-  /** @var round - The number of the current round. */
-  round: number = 0
-
   /** @var session - The session the user is currently in. */
   session: any = {}
 
@@ -139,6 +136,11 @@ export default class PlayGame extends Vue {
   /** Determine if the current user is the card czar */
   get isCzar(): boolean {
     return this.session.currentCzarId === this.$auth.user.id
+  }
+
+  /** @var round - The number of the current round. */
+  get round(): number {
+    return this.session.currentRound || 0
   }
 
   beforeMount() {
@@ -182,9 +184,9 @@ export default class PlayGame extends Vue {
   }
 
   onSessionJoin(session) {
-    this.updatePlayedCards(session)
-    this.session = session
+    this.session = { ...this.session, ...session }
     this.blackCards = [...this.blackCards, session.currentCard]
+    this.updatePlayedCards(session)
   }
 
   /**
@@ -204,7 +206,6 @@ export default class PlayGame extends Vue {
   }
 
   onSessionNextRound(session) {
-    this.round++
     this.onSessionJoin(session)
     this.state = 'choose-cards'
   }
@@ -232,7 +233,7 @@ export default class PlayGame extends Vue {
     this.state = 'show-best-combination'
   }
 
-  updatePlayedCards({ playerInSession, currentCzarId }) {
+  updatePlayedCards({ playerInSession }) {
     const cardsByActivePlayers = playerInSession
       // Get the cards played by the user.
       .map(({ playerCards }) => {
@@ -240,10 +241,7 @@ export default class PlayGame extends Vue {
         return (round || {}).cards
       })
       // Filter items that are falsy.
-      .filter(
-        playerSession =>
-          !!playerSession && playerSession.playerId !== currentCzarId,
-      )
+      .filter(card => !!card)
 
     this.playedCards[this.round] = cardsByActivePlayers
     this.playedCards = [...this.playedCards]

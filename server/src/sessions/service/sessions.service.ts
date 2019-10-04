@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Session } from '../session.entity'
 import { Repository } from 'typeorm'
-import { Socket, Server } from 'socket.io'
+import { Socket } from 'socket.io'
 import { from, Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { WsResponse } from '@nestjs/websockets'
@@ -138,6 +138,7 @@ export class SessionsService {
    * @param session - The current session of the game.
    */
   async setupSessionForNextRound(session: Session): Promise<Session> {
+    session.currentRound++
     await this.setupSession(session)
     await this.chooseCzar(session)
     return this.getSession(session.id)
@@ -229,10 +230,12 @@ export class SessionsService {
     id,
     game,
     room,
+    currentRound = 0,
   }: {
     id?: string
     game: GameJoinDto
     room: string
+    currentRound?: number
   }) {
     const [currentCard] = await this.cardsService.findAll({
       skip: 0,
@@ -245,6 +248,7 @@ export class SessionsService {
       game,
       room,
       currentCard,
+      currentRound,
     })
   }
 
