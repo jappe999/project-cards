@@ -168,12 +168,12 @@ export class SessionsService {
    * Choose a (new) czar for this session.
    * @param session - The session to choose the Czar for.
    */
-  async chooseCzar(session: Session): Promise<void> {
+  async chooseCzar(session: Session, isExit?: boolean): Promise<void> {
     const playersInSession = await this.playerInSessionsService.find({
       where: { session },
     })
 
-    const nextCzarId = this.getNextCzarId(session, playersInSession)
+    const nextCzarId = this.getNextCzarId(session, playersInSession, isExit)
 
     if (nextCzarId !== session.currentCzarId) {
       this.sessionRepository.update(session.id, {
@@ -185,8 +185,9 @@ export class SessionsService {
   private getNextCzarId(
     { currentCzarId }: Session,
     playersInSession: PlayerInSession[],
+    isExit = false,
   ) {
-    if (playersInSession.length === 0) {
+    if (playersInSession.length === 1 && isExit) {
       return null
     }
 
@@ -297,7 +298,7 @@ export class SessionsService {
     const session = await this.sessionRepository.findOne({ where: { room } })
 
     if (session.currentCzarId === user.id) {
-      await this.chooseCzar(session)
+      await this.chooseCzar(session, true)
     }
 
     await this.playerInSessionsService.remove({
