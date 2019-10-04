@@ -12,6 +12,7 @@ import { User } from '../../users/user.entity'
 import { PlayerSessionService } from '../../player-session/service/player-session.service'
 import { PlayerInSession } from '../../player-session/player-session.entity'
 import { SessionData } from '../session.types'
+import { GamesService } from '../../games/service/games.service'
 
 @Injectable()
 export class SessionsService {
@@ -19,6 +20,7 @@ export class SessionsService {
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
     private readonly cardsService: CardsService,
+    private readonly gamesService: GamesService,
     private readonly playerInSessionsService: PlayerSessionService,
   ) {}
 
@@ -183,6 +185,10 @@ export class SessionsService {
     { currentCzarId }: Session,
     playersInSession: PlayerInSession[],
   ) {
+    if (playersInSession.length === 0) {
+      return null
+    }
+
     let currentCzarIndex: number = -1
 
     if (currentCzarId) {

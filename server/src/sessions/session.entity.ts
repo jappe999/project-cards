@@ -20,6 +20,9 @@ export class Session {
   @Column()
   room!: string
 
+  @Column()
+  gameId: string
+
   @OneToOne(() => Game)
   @JoinColumn()
   game!: Game
