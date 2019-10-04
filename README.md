@@ -14,6 +14,9 @@
 # install dependencies
 yarn
 
+# copy environment file and fill in
+cp .env.example .env
+
 # serve with hot reload at localhost:3100
 yarn start:dev
 

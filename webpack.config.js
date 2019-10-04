@@ -1,6 +1,7 @@
 const webpack = require('webpack')
 const nodeExternals = require('webpack-node-externals')
 const WebpackShellPlugin = require('webpack-shell-plugin')
+require('dotenv').config()
 
 module.exports = {
   entry: ['webpack/hot/poll?1000', './server/src/main.ts'],
