@@ -70,8 +70,11 @@ import { CardView } from '~/models/Card'
       this.isPreviousCzar = !oldValue
     },
 
-    blackCard(_, { numAnswers }: CardView) {
-      if (numAnswers && !this.isPreviousCzar) {
+    blackCard(
+      { id: newCard }: CardView,
+      { id: oldCard, numAnswers }: CardView,
+    ) {
+      if (newCard !== oldCard && numAnswers && !this.isPreviousCzar) {
         this.fetchNewCards(numAnswers)
       }
     },
@@ -130,7 +133,11 @@ export default class AppChooseCards extends Vue {
     const cardsWithoutOld = this.cards.filter(
       card => !this.selectedCards.includes(card),
     )
-    this.cards = cardsWithoutOld.concat(newCards)
+
+    // Force the use of exactly 10 cards.
+    if (cardsWithoutOld.length !== 10) {
+      this.cards = cardsWithoutOld.concat(newCards)
+    }
 
     // Reset the selected cards with an empty array.
     return []

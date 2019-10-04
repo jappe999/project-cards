@@ -23,6 +23,9 @@ export class Session {
   @Column()
   gameId: string
 
+  @Column({ type: 'int', nullable: true })
+  currentRound: number = 0
+
   @OneToOne(() => Game)
   @JoinColumn()
   game!: Game
