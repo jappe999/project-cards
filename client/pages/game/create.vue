@@ -37,7 +37,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import { mapMutations } from 'vuex'
 import { Action, Mutation } from 'vuex-class'
 import { Form } from '~/plugins'
-import { Game, GameView } from '~/models/Game'
+import { GameCreate, GameView } from '~/models/Game'
 import * as types from '~/store/mutation-types'
 
 @Component({
@@ -51,7 +51,7 @@ import * as types from '~/store/mutation-types'
 })
 export default class CreateGame extends Vue {
   playerInputVisible = true
-  game: Form<Game> = new Form<Game>({
+  game: Form<GameCreate> = new Form<GameCreate>({
     name: '',
     private: false,
   })
