@@ -20,6 +20,9 @@ export class Session {
   @Column()
   room!: string
 
+  @Column()
+  gameId: string
+
   @Column({ type: 'int', nullable: true })
   currentRound: number = 0
 

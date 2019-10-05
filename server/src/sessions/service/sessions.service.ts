@@ -12,6 +12,7 @@ import { User } from '../../users/user.entity'
 import { PlayerSessionService } from '../../player-session/service/player-session.service'
 import { PlayerInSession } from '../../player-session/player-session.entity'
 import { SessionData } from '../session.types'
+import { GamesService } from '../../games/service/games.service'
 
 @Injectable()
 export class SessionsService {
@@ -19,6 +20,7 @@ export class SessionsService {
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
     private readonly cardsService: CardsService,
+    private readonly gamesService: GamesService,
     private readonly playerInSessionsService: PlayerSessionService,
   ) {}
 
@@ -166,12 +168,12 @@ export class SessionsService {
    * Choose a (new) czar for this session.
    * @param session - The session to choose the Czar for.
    */
-  async chooseCzar(session: Session): Promise<void> {
+  async chooseCzar(session: Session, isExit?: boolean): Promise<void> {
     const playersInSession = await this.playerInSessionsService.find({
       where: { session },
     })
 
-    const nextCzarId = this.getNextCzarId(session, playersInSession)
+    const nextCzarId = this.getNextCzarId(session, playersInSession, isExit)
 
     if (nextCzarId !== session.currentCzarId) {
       this.sessionRepository.update(session.id, {
@@ -183,7 +185,12 @@ export class SessionsService {
   private getNextCzarId(
     { currentCzarId }: Session,
     playersInSession: PlayerInSession[],
+    isExit = false,
   ) {
+    if (playersInSession.length === 1 && isExit) {
+      return null
+    }
+
     let currentCzarIndex: number = -1
 
     if (currentCzarId) {
@@ -291,7 +298,7 @@ export class SessionsService {
     const session = await this.sessionRepository.findOne({ where: { room } })
 
     if (session.currentCzarId === user.id) {
-      await this.chooseCzar(session)
+      await this.chooseCzar(session, true)
     }
 
     await this.playerInSessionsService.remove({
