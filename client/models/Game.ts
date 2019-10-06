@@ -22,3 +22,8 @@ export class GameView extends Game {
 export class GameJoin extends Model {
   name: string = ''
 }
+
+export class GameCreate extends Model implements IGame {
+  name: string = ''
+  private: boolean = false
+}
