@@ -23,7 +23,11 @@
             class="px-0 pb-px text-red-700 hover:text-black focus:text-black border-b border-transparent hover:border-black focus:border-black"
             >GNU GENERAL PUBLIC LICENSE</a
           >. Bug reports and contributions are welcome on
-          <a href="https://github.com/jappe999/project-cards">GitHub</a>.
+          <a
+            href="https://github.com/jappe999/project-cards"
+            class="px-0 pb-px text-red-700 hover:text-black focus:text-black border-b border-transparent hover:border-black focus:border-black"
+            >GitHub</a
+          >.
         </p>
 
         <p class="mb-2">
