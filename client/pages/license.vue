@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-sm flex flex-col items-center">
-    <app-card class="w-full">
+    <app-card class="w-full mb-1">
       <app-card-content>
         <h2 class="text-2xl font-bold">License</h2>
 
