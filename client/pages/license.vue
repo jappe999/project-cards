@@ -31,7 +31,8 @@
         </p>
 
         <p class="mb-2">
-          The game concept and official card decks are used under a
+          The game concept and official card decks, created by Cards Against
+          Humanity, are used under a
           <a
             href="https://creativecommons.org/licenses/by-nc-sa/2.0/"
             class="px-0 pb-px text-red-700 hover:text-black focus:text-black border-b border-transparent hover:border-black focus:border-black"
