@@ -24,3 +24,11 @@ yarn start:dev
 yarn build
 yarn start
 ```
+
+## License
+
+Project Cards is an online game based on, but not affiliated to, [Cards Against Humanity](https://cardsagainshumanity.com/).
+
+The source of this game is licensed under the [GNU GENERAL PUBLIC LICENSE](https://github.com/jappe999/project-cards/blob/develop/LICENSE). Bug reports and contributions are welcome.
+
+The game concept and official card decks are used under a [Creative Commons BY-NC-SA 2.0](https://creativecommons.org/licenses/by-nc-sa/2.0/) license.

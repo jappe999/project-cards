@@ -9,7 +9,7 @@
         <p class="mb-2">
           Project Cards is an online game based on, but not affiliated to,
           <a
-            href="https://cardsagainshumanity.com"
+            href="https://cardsagainshumanity.com/"
             class="px-0 pb-px text-red-700 hover:text-black focus:text-black border-b border-transparent hover:border-black focus:border-black"
           >
             Cards Against Humanity</a
@@ -24,7 +24,7 @@
             >GNU GENERAL PUBLIC LICENSE</a
           >. Bug reports and contributions are welcome on
           <a
-            href="https://github.com/jappe999/project-cards"
+            href="https://github.com/jappe999/project-cards/"
             class="px-0 pb-px text-red-700 hover:text-black focus:text-black border-b border-transparent hover:border-black focus:border-black"
             >GitHub</a
           >.
