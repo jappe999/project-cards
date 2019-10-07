@@ -24,14 +24,18 @@
         <app-button v-if="$auth.loggedIn" class="w-full" @click.native="logout">
           Logout
         </app-button>
-        <p class="text-sm">
+        <p class="mt-4 text-sm">
           Created with love by
           <a
-            class="px-0 py-1 text-red-700 hover:text-black focus:text-black border-b border-transparent hover:border-black focus:border-black"
+            class="px-0 pb-px text-red-700 hover:text-black focus:text-black border-b border-transparent hover:border-black focus:border-black"
             href="https://jappe999.github.io"
           >
             Jasper
           </a>
+        </p>
+
+        <p class="mt-4 text-sm">
+          <app-link class="mt-4" to="/license">License</app-link>
         </p>
       </div>
     </div>
@@ -53,6 +57,7 @@ import { Vue, Component } from 'vue-property-decorator'
 @Component({
   components: {
     AppButton: () => import('~/components/button/button.vue'),
+    AppLink: () => import('~/components/link.vue'),
   },
 })
 export default class DefaultLayout extends Vue {
