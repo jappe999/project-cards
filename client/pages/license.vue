@@ -10,6 +10,7 @@
           Project Cards is an online game based on, but not affiliated to,
           <a
             href="https://cardsagainshumanity.com/"
+            target="_blank"
             class="px-0 pb-px text-red-700 hover:text-black focus:text-black border-b border-transparent hover:border-black focus:border-black"
           >
             Cards Against Humanity</a
@@ -20,11 +21,13 @@
           The source of this game is licensed under the
           <a
             href="https://github.com/jappe999/project-cards/blob/develop/LICENSE"
+            target="_blank"
             class="px-0 pb-px text-red-700 hover:text-black focus:text-black border-b border-transparent hover:border-black focus:border-black"
             >GNU GENERAL PUBLIC LICENSE</a
           >. Bug reports and contributions are welcome on
           <a
             href="https://github.com/jappe999/project-cards/"
+            target="_blank"
             class="px-0 pb-px text-red-700 hover:text-black focus:text-black border-b border-transparent hover:border-black focus:border-black"
             >GitHub</a
           >.
@@ -35,6 +38,7 @@
           Humanity, are used under a
           <a
             href="https://creativecommons.org/licenses/by-nc-sa/2.0/"
+            target="_blank"
             class="px-0 pb-px text-red-700 hover:text-black focus:text-black border-b border-transparent hover:border-black focus:border-black"
             >Creative Commons BY-NC-SA 2.0</a
           >
