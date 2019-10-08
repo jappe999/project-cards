@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { verify, decode } from 'jsonwebtoken'
 import { UsersService } from '../../users/service/users.service'
-import { UserViewDto } from '../../users/user.dto'
+import { UserViewDto, UserCreateDto } from '../../users/user.dto'
 import { Socket } from 'socket.io'
 
 @Injectable()
@@ -52,11 +52,7 @@ export class AuthService {
         return result
       }
     } else {
-      const { password, ...result } = await this.usersService.create({
-        username,
-        password: pass,
-      })
-      return result
+      return this.register({ username, password: pass })
     }
 
     return AuthService.ERROR_LOGIN_INCORRECT
@@ -64,6 +60,11 @@ export class AuthService {
 
   profile({ id }) {
     return this.usersService.findOne({ where: { id } })
+  }
+
+  async register(user: UserCreateDto): Promise<UserViewDto> {
+    const { password, ...result } = await this.usersService.create(user)
+    return result
   }
 
   async login({ id, username }: any) {
