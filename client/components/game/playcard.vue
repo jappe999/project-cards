@@ -60,7 +60,8 @@ export default class AppPlaycard extends Vue {
 
   get encodedText() {
     const element = document.createElement('div')
-    element.innerHTML = this.text
+    element.innerHTML =
+      this.color === 'white' ? this.text : this.text.replace('_', '__________')
     return element.textContent
   }
 
