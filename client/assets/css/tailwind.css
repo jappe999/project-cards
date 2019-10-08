@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: Roboto-Medium;
-  src: url('../fonts/Roboto/Roboto-Medium.ttf');
+  font-family: OpenSans-Bold;
+  src: url('../fonts/Open_Sans/OpenSans-Bold.ttf');
 }
 
 @variants hover,
