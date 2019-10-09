@@ -6,6 +6,7 @@ module.exports = {
         '2xl': '1440px',
       },
       spacing: {
+        '80': '20rem',
         '96': '22rem',
       },
       maxWidth: {

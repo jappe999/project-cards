@@ -1,11 +1,9 @@
 <template>
   <div class="h-screen w-full overflow-hidden flex flex-col items-center">
-    <div
-      class="w-full flex justify-between py-4 px-4 sm:px-8 text-white bg-gray-900 shadow"
-    >
-      <nav>
+    <div class="w-full flex sm:px-4 text-white bg-gray-900 shadow">
+      <div class="md:w-80 -ml-4 pl-4">
         <nuxt-link
-          class="flex -ml-2 px-2"
+          class="flex p-4"
           to="/game"
           @click.native="exitSession(game)"
         >
@@ -20,13 +18,25 @@
               d="M5.41 11H21a1 1 0 0 1 0 2H5.41l5.3 5.3a1 1 0 0 1-1.42 1.4l-7-7a1 1 0 0 1 0-1.4l7-7a1 1 0 0 1 1.42 1.4L5.4 11z"
             />
           </svg>
-          <span class="pl-2">Back to all games</span>
+          <span class="hidden sm:block pl-2">Back to all games</span>
         </nuxt-link>
-      </nav>
-      <h1>
+      </div>
+
+      <h1 class="mx-auto md:mx-0 py-4 px-2">
         Game:
-        <b v-select-on-focus contenteditable>{{ game.name }}</b>
+        <span v-select-on-focus contenteditable class="font-bold">
+          {{ game.name }}
+        </span>
       </h1>
+
+      <div class="md:ml-auto flex items-center justify-end">
+        <app-share
+          class="p-5"
+          subject="Let's play a game!"
+          text="Join me in this game for horrible people."
+          :url="shareURL"
+        />
+      </div>
     </div>
 
     <main class="h-full w-full relative overflow-x-hidden overflow-y-auto">
@@ -88,6 +98,7 @@ import { CardView } from '~/models/Card'
   },
 
   components: {
+    AppShare: () => import('~/components/share.vue'),
     AppPlaycard: () => import('~/components/game/playcard.vue'),
     AppChooseCards: () => import('~/components/game/choose-cards.vue'),
     AppChooseCardCombination: () =>
@@ -141,6 +152,11 @@ export default class PlayGame extends Vue {
   /** @var round - The number of the current round. */
   get round(): number {
     return this.session.currentRound || 0
+  }
+
+  get shareURL() {
+    const { origin, pathname } = window.location
+    return origin + pathname
   }
 
   beforeMount() {
