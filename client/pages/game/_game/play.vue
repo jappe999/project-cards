@@ -1,21 +1,19 @@
 <template>
   <div class="h-screen w-full overflow-hidden flex flex-col items-center">
     <div class="w-full flex sm:px-4 text-white bg-gray-900 shadow">
-      <div class="md:w-80 -ml-4 pl-4">
+      <div class="md:w-80 flex -ml-4 pl-4">
         <nuxt-link
-          class="flex p-4"
+          class="flex items-center p-4"
           to="/game"
           @click.native="exitSession(game)"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-            class="fill-current"
+            viewBox="0 0 20 20"
+            class="h-5 fill-current"
           >
             <path
-              d="M5.41 11H21a1 1 0 0 1 0 2H5.41l5.3 5.3a1 1 0 0 1-1.42 1.4l-7-7a1 1 0 0 1 0-1.4l7-7a1 1 0 0 1 1.42 1.4L5.4 11z"
+              d="M3.828 9l6.071-6.071-1.414-1.414L0 10l.707.707 7.778 7.778 1.414-1.414L3.828 11H20V9H3.828z"
             />
           </svg>
           <span class="hidden sm:block pl-2">Back to all games</span>
@@ -24,7 +22,7 @@
 
       <h1 class="mx-auto md:mx-0 py-4 px-2">
         Game:
-        <span v-select-on-focus contenteditable class="font-bold">
+        <span class="font-bold">
           {{ game.name }}
         </span>
       </h1>

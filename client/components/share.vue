@@ -1,5 +1,5 @@
 <template>
-  <button @click="share()">
+  <button @click="share">
     <slot>
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -15,28 +15,39 @@
 </template>
 
 <script lang="ts">
-import { Vue, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 
+@Component
 export default class AppShare extends Vue {
-  @Prop({ type: String }) subject?: string
-  @Prop({ type: String }) text?: string
-  @Prop({ type: String }) url?: string
+  @Prop({ type: String, default: '' }) subject?: string
+  @Prop({ type: String, default: '' }) text?: string
+  @Prop({ type: String, default: '' }) url?: string
 
-  @Prop({ type: Number }) size: number = 4
-  @Prop({ type: String }) color: string = 'white'
+  @Prop({ type: Number, default: 4 }) size: number
+  @Prop({ type: String, default: 'white' }) color: string
 
-  get hasAPI() {
+  get hasShareAPI() {
     return 'share' in window.navigator
   }
 
-  share() {
-    if (this.hasAPI) {
-      // @ts-ignore
-      window.navigator.share({
-        title: this.subject,
-        text: this.text,
-        url: this.url,
-      })
+  get hasClipboardAPI() {
+    return 'clipboard' in window.navigator
+  }
+
+  async share() {
+    const { subject: title, text, url } = this
+
+    try {
+      if (this.hasShareAPI) {
+        // @ts-ignore
+        await window.navigator.share({ title, text, url })
+      } else if (this.hasClipboardAPI) {
+        await window.navigator.clipboard.writeText(
+          `${title}\n\n${text}\n\n${url}`,
+        )
+      }
+    } catch (e) {
+      //
     }
   }
 }
