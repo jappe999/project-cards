@@ -15,7 +15,6 @@ module.exports = {
         '96': '22rem',
       },
       fontFamily: {
-        roboto: ['Roboto-Medium'],
         opensans: ['OpenSans-Bold'],
       },
     },
