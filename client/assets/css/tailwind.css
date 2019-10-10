@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: OpenSans-Bold;
+  src: url('../fonts/Open_Sans/OpenSans-Bold.ttf');
+}
+
 @variants hover,
 focus {
   .transition {
@@ -23,11 +28,10 @@ focus {
   opacity: 0;
 }
 
-
 .game-state-enter-active,
 .game-state-leave-active {
   position: absolute;
-  transition: all .5s;
+  transition: all 0.5s;
 }
 
 .game-state-enter,

@@ -5,7 +5,7 @@
     @click="!disabled && selectCard()"
   >
     <app-card-content class="h-full">
-      <p>
+      <p class="font-opensans text-xl">
         <slot>
           {{ encodedText }}
         </slot>

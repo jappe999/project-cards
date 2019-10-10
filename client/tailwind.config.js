@@ -14,6 +14,9 @@ module.exports = {
       maxHeight: {
         '96': '22rem',
       },
+      fontFamily: {
+        opensans: ['OpenSans-Bold'],
+      },
     },
   },
   variants: {
