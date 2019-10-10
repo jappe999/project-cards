@@ -20,8 +20,8 @@
         </nuxt-link>
       </div>
 
-      <div class="md:ml-auto flex items-center justify-end">
-        <h1 class="mx-auto md:mx-0 px-2 font-bold">
+      <div class="w-full sm:w-auto md:ml-auto flex items-center justify-end">
+        <h1 class="mx-auto md:mr-0 px-2 font-bold">
           {{ game.name }}
         </h1>
 
