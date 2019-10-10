@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { verify } from 'jsonwebtoken'
+import { verify, decode } from 'jsonwebtoken'
 import { UsersService } from '../../users/service/users.service'
-import { UserViewDto } from '../../users/user.dto'
+import { UserViewDto, UserCreateDto } from '../../users/user.dto'
 import { Socket } from 'socket.io'
+import bcrypt from 'bcrypt'
 
 @Injectable()
 export class AuthService {
+  private static readonly SALT_ROUNDS = 10
+
+  private static readonly ERROR_USER_REGISTRATION = 'Cannot register user.'
   private static readonly ERROR_USER_LOGGED_IN = 'User already logged in.'
   private static readonly ERROR_LOGIN_INCORRECT = 'User or password incorrect.'
 
@@ -15,9 +19,22 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  getTokenFromWsClient(client: Socket) {
+  /**
+   * Try to decode the token. Return an empty sub otherwise.
+   * @param client - The connected socket
+   */
+  getTokenFromWsClient(client: Socket): { sub: string } {
     const token = client.handshake.headers.authorization.split(' ').pop()
-    return <{ sub: string }>verify(token, process.env.JWT_SECRET)
+
+    try {
+      return <{ sub: string }>verify(token, process.env.JWT_SECRET)
+    } catch (x) {
+      try {
+        return <{ sub: string }>decode(token)
+      } catch (y) {
+        return { sub: null }
+      }
+    }
   }
 
   async validateUser(
@@ -34,16 +51,12 @@ export class AuthService {
         return AuthService.ERROR_USER_LOGGED_IN
       }
 
-      if (user.password === pass) {
+      if (await this.validatePassword(user, pass)) {
         const { password, ...result } = user
         return result
       }
     } else {
-      const { password, ...result } = await this.usersService.create({
-        username,
-        password: pass,
-      })
-      return result
+      return this.register({ username, password: pass })
     }
 
     return AuthService.ERROR_LOGIN_INCORRECT
@@ -51,6 +64,26 @@ export class AuthService {
 
   profile({ id }) {
     return this.usersService.findOne({ where: { id } })
+  }
+
+  async register(user: UserCreateDto): Promise<UserViewDto | string> {
+    try {
+      user.password = await bcrypt.hash(user.password, AuthService.SALT_ROUNDS)
+      const { password, ...result } = await this.usersService.create(user)
+      return result
+    } catch (error) {
+      return AuthService.ERROR_USER_REGISTRATION
+    }
+  }
+
+  async validatePassword(
+    user: UserCreateDto,
+    password: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(
+      password, // Unhashed password
+      user.password, // Hashed password
+    )
   }
 
   async login({ id, username }: any) {

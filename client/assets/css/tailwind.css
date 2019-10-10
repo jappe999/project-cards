@@ -2,10 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-@variants hover, focus {
+@font-face {
+  font-family: OpenSans-Bold;
+  src: url('../fonts/Open_Sans/OpenSans-Bold.ttf');
+}
+
+@variants hover,
+focus {
   .transition {
     transition: all 0.1s ease-in-out;
   }
+
   .transition-slow {
     transition: all 0.3s ease-in-out;
   }
@@ -13,9 +20,29 @@
 
 .page-enter-active,
 .page-leave-active {
-  transition: opacity 0.2s;
+  transition: opacity 0.3s;
 }
+
 .page-enter,
 .page-leave-active {
   opacity: 0;
+}
+
+.game-state-enter-active,
+.game-state-leave-active {
+  position: absolute;
+  transition: all 0.5s;
+}
+
+.game-state-enter,
+.game-state-leave-active {
+  opacity: 0;
+}
+
+.game-state-enter {
+  transform: translateX(30px);
+}
+
+.game-state-leave-active {
+  transform: translateX(-30px);
 }

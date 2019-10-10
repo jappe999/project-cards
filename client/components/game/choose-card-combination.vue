@@ -1,19 +1,19 @@
 <template>
-  <app-game-view>
+  <app-game-view :session="session">
     <template slot="side">
       <app-playcard
         color="black"
         class="sm:h-96 w-full sm:w-64 mb-4"
         :disabled="true"
-      >
-        {{ blackCard.text }}
-      </app-playcard>
+        :text="blackCard.text"
+      />
       <app-button
+        v-if="isCzar"
         class="w-full"
-        :disabled="canSelectCard"
+        :disabled="canSelectCard || !isCzar"
         @click.native="playCards"
       >
-        Play Card
+        Choose combination
       </app-button>
     </template>
 
@@ -21,26 +21,32 @@
       <div
         v-for="_cards in cards"
         :key="_cards.id"
-        class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 2xl:w-1/5 relative flex flex-wrap flex-grow mb-2 group"
+        class="relative flex flex-wrap -mt-2 mb-auto group"
         @click="toggleChoice(_cards)"
       >
         <div
           v-for="(card, index) in _cards"
           :key="card.id"
-          class="flex-grow w-full p-2"
+          class="w-full lg:w-auto p-2"
+          :class="{
+            'md:w-1/2': _cards.length > 1,
+          }"
         >
           <app-playcard
-            class="h-full cursor-pointer"
-            :disabled="!canSelectCard"
+            class="h-full lg:h-96 w-full lg:w-64"
+            :disabled="!canSelectCard || !isCzar"
             :step="index + 1"
-          >
-            {{ card.text }}
-          </app-playcard>
+            :text="card.text"
+          />
         </div>
 
         <div
-          v-if="_cards.length > 1 && canSelectCard"
-          class="w-full absolute inset-0 group-hover:bg-gray-800 opacity-25 cursor-pointer"
+          v-if="
+            (_cards.length > 1 && canSelectCard && isCzar) ||
+              selectedCards == _cards
+          "
+          class="h-full w-full absolute inset-0 group-hover:bg-gray-800 opacity-25 cursor-pointer rounded"
+          :class="{ 'bg-gray-800': selectedCards == _cards }"
         />
       </div>
     </template>
@@ -59,14 +65,18 @@ import { CardView } from '~/models/Card'
   },
 })
 export default class AppChooseCardCombination extends Vue {
-  /** @var $socket - The socket connection to the server. */
-  $socket!: SocketIOClient.Socket
-
+  @Prop({ default: false, type: Boolean }) isCzar!: boolean
   @Prop({ default: 0, type: Number }) round!: number
   @Prop({ default: () => ({}), type: Object }) blackCard!: CardView
   @Prop({ default: () => [], type: Array }) cards!: CardView[]
   @Prop({ default: () => [], type: Array }) selectedCards!: CardView[]
   @Prop({ default: () => ({}), type: Object }) session!: any
+
+  /** @var $socket - The socket connection to the server. */
+  get $socket(): SocketIOClient.Socket {
+    const name = '$socket'
+    return window[name]
+  }
 
   get canSelectCard() {
     return this.selectedCards.length < 1
@@ -79,7 +89,11 @@ export default class AppChooseCardCombination extends Vue {
    */
   @Emit('select')
   toggleChoice(cards: CardView[]) {
-    return cards
+    if (this.isCzar) {
+      return cards
+    } else {
+      return []
+    }
   }
 
   @Emit('submit')

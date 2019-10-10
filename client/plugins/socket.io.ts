@@ -1,15 +1,27 @@
 import io from 'socket.io-client'
-import { Context } from '@nuxt/vue-app'
 
-export default (ctx: Context, inject: Function) => {
+export default () => {
+  checkForToken()
+  window.addEventListener('connect', () => checkForToken())
+}
+
+const checkForToken = () => {
+  const token = localStorage.getItem('auth._token.local')
+
+  if (token !== 'false' && token) {
+    connect(token)
+  }
+}
+
+const connect = (token: string) => {
   const socket = io({
     transportOptions: {
       polling: {
         extraHeaders: {
-          Authorization: localStorage.getItem('auth._token.local'),
+          Authorization: token,
         },
       },
     },
   })
-  inject('socket', socket)
+  window['$socket'] = socket
 }

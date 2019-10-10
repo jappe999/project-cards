@@ -7,6 +7,7 @@ import {
   OneToMany,
   JoinTable,
 } from 'typeorm'
+import { User } from '../users/user.entity'
 import { Game } from '../games/game.entity'
 import { Card } from '../cards/card.entity'
 import { PlayerInSession } from '../player-session/player-session.entity'
@@ -19,6 +20,12 @@ export class Session {
   @Column()
   room!: string
 
+  @Column()
+  gameId: string
+
+  @Column({ type: 'int', nullable: true })
+  currentRound: number = 0
+
   @OneToOne(() => Game)
   @JoinColumn()
   game!: Game
@@ -26,6 +33,13 @@ export class Session {
   @OneToOne(() => Card)
   @JoinColumn()
   currentCard!: Card
+
+  @Column({ nullable: true })
+  currentCzarId?: string
+
+  @OneToOne(() => User)
+  @JoinColumn()
+  currentCzar?: User
 
   @OneToMany(() => PlayerInSession, playerInSession => playerInSession.session)
   @JoinTable()

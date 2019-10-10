@@ -1,13 +1,12 @@
 <template>
-  <app-game-view>
+  <app-game-view :session="session">
     <template slot="side">
       <app-playcard
         color="black"
         class="sm:h-96 w-full sm:w-64 mb-4"
         :disabled="true"
-      >
-        {{ blackCard.text }}
-      </app-playcard>
+        :text="blackCard.text"
+      />
       <app-button class="w-full" @click.native="nextRound">
         Next round
       </app-button>
@@ -23,9 +22,8 @@
           class="lg:h-96 w-full lg:w-64"
           :step="index + 1"
           :disabled="true"
-        >
-          {{ card.text }}
-        </app-playcard>
+          :text="card.text"
+        />
       </div>
     </template>
   </app-game-view>
@@ -42,13 +40,17 @@ import { CardView } from '~/models/Card'
     AppGameView: () => import('~/components/game/game-view.vue'),
   },
 })
-export default class AppChooseCardCombination extends Vue {
-  /** @var $socket - The socket connection to the server. */
-  $socket!: SocketIOClient.Socket
-
+export default class AppShowBestCombination extends Vue {
+  @Prop({ default: false, type: Boolean }) isCzar!: boolean
   @Prop({ default: () => ({}), type: Object }) blackCard!: CardView
   @Prop({ default: () => [], type: Array }) cards!: CardView[]
   @Prop({ default: () => ({}), type: Object }) session!: any
+
+  /** @var $socket - The socket connection to the server. */
+  get $socket(): SocketIOClient.Socket {
+    const name = '$socket'
+    return window[name]
+  }
 
   nextRound() {
     this.$socket.emit('session-next-round', {

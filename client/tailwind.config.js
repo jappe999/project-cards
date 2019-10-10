@@ -6,10 +6,17 @@ module.exports = {
         '2xl': '1440px',
       },
       spacing: {
+        '80': '20rem',
         '96': '22rem',
       },
       maxWidth: {
         '0': '0rem',
+      },
+      maxHeight: {
+        '96': '22rem',
+      },
+      fontFamily: {
+        opensans: ['OpenSans-Bold'],
       },
     },
   },

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository, InsertResult, FindOneOptions } from 'typeorm'
+import { Repository, FindOneOptions, FindConditions } from 'typeorm'
 import { Game } from '../game.entity'
 import { GameCreateDto } from '../game.dto'
 
@@ -15,8 +15,18 @@ export class GamesService {
     return this.gameRepository.save(game)
   }
 
+  remove(options: FindConditions<Game>) {
+    return this.gameRepository.delete(options)
+  }
+
   findAll(): Promise<Game[]> {
-    return this.gameRepository.find()
+    return this.gameRepository.find({
+      relations: [
+        'session',
+        'session.playerInSession',
+        'session.playerInSession.player',
+      ],
+    })
   }
 
   findOne(options?: FindOneOptions): Promise<Game> {

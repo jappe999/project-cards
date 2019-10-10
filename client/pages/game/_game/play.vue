@@ -1,38 +1,45 @@
 <template>
   <div class="h-screen w-full overflow-hidden flex flex-col items-center">
-    <div
-      class="w-full flex justify-between py-4 px-4 sm:px-8 text-white bg-gray-900 shadow"
-    >
-      <nav>
+    <div class="w-full flex sm:px-4 text-white bg-gray-900 shadow">
+      <div class="md:w-80 flex -ml-4 pl-4">
         <nuxt-link
-          class="flex -ml-2 px-2"
+          class="flex items-center p-4"
           to="/game"
           @click.native="exitSession(game)"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-            class="fill-current"
+            viewBox="0 0 20 20"
+            class="h-5 fill-current"
           >
             <path
-              d="M5.41 11H21a1 1 0 0 1 0 2H5.41l5.3 5.3a1 1 0 0 1-1.42 1.4l-7-7a1 1 0 0 1 0-1.4l7-7a1 1 0 0 1 1.42 1.4L5.4 11z"
+              d="M3.828 9l6.071-6.071-1.414-1.414L0 10l.707.707 7.778 7.778 1.414-1.414L3.828 11H20V9H3.828z"
             />
           </svg>
-          <span class="pl-2">Back to all games</span>
+          <span class="hidden sm:block pl-2">Back to all games</span>
         </nuxt-link>
-      </nav>
-      <h1>
-        Game:
-        <b v-select-on-focus contenteditable>{{ game.name }}</b>
-      </h1>
+      </div>
+
+      <div class="md:ml-auto flex items-center justify-end">
+        <h1 class="mx-auto md:mx-0 px-2 font-bold">
+          {{ game.name }}
+        </h1>
+
+        <app-share
+          button-class="p-5"
+          subject="Let's play a game of cards!"
+          text="Join me in this game for horrible people."
+          :url="shareURL"
+        />
+      </div>
     </div>
 
-    <main class="h-full w-full overflow-auto">
-      <transition name="page">
+    <main class="h-full w-full relative overflow-x-hidden overflow-y-auto">
+      <transition-group name="game-state">
         <app-choose-cards
-          v-if="state === 'choose-cards'"
+          v-show="state === 'choose-cards'"
+          key="choose-cards"
+          :is-czar="isCzar"
           :selected-cards="selectedCards"
           :black-card="blackCard"
           :session="session"
@@ -42,23 +49,27 @@
         />
 
         <app-choose-card-combination
-          v-if="state === 'choose-card-combination'"
-          :selected-cards="selectedCards"
+          v-show="state === 'choose-card-combination'"
+          key="choose-card-combination"
+          :is-czar="isCzar"
+          :selected-cards="selectedCardCombination"
           :cards="playedCards[round]"
           :black-card="blackCard"
           :session="session"
           :round="round"
-          @select="selectCards"
+          @select="selectCardCombination"
         />
 
         <app-show-best-combination
-          v-if="state === 'show-best-combination'"
+          v-show="state === 'show-best-combination'"
+          key="show-best-combination"
+          :is-czar="isCzar"
           :cards="bestCards[round]"
           :black-card="blackCard"
           :session="session"
           :round="round"
         />
-      </transition>
+      </transition-group>
     </main>
   </div>
 </template>
@@ -66,8 +77,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/vue-app'
 import { Vue, Component } from 'vue-property-decorator'
-import { Action } from 'vuex-class'
-import { Game } from '~/models/Game'
+import { GameView } from '~/models/Game'
 import { CardView } from '~/models/Card'
 
 @Component({
@@ -83,6 +93,7 @@ import { CardView } from '~/models/Card'
   },
 
   components: {
+    AppShare: () => import('~/components/share.vue'),
     AppPlaycard: () => import('~/components/game/playcard.vue'),
     AppChooseCards: () => import('~/components/game/choose-cards.vue'),
     AppChooseCardCombination: () =>
@@ -92,25 +103,21 @@ import { CardView } from '~/models/Card'
   },
 })
 export default class PlayGame extends Vue {
-  /** @var $socket - The socket connection to the server. */
-  $socket!: SocketIOClient.Socket
+  $auth!: any
 
   /** @var game - The game that is currently being played. */
-  game!: Game
-
-  /** @var round - The number of the current round. */
-  round: number = 0
+  game!: GameView
 
   /** @var session - The session the user is currently in. */
   session: any = {}
 
-  state: string = 'choose-cards'
+  state: string = ''
 
   /** @var blackCards - The black cards that have been or are being used for a round. */
   blackCards: CardView[] = []
 
-  /** @var playedCards - Cards played in a round. */
-  playedCards: CardView[][] = []
+  /** @var playedCards - Cards played in each round. */
+  playedCards: CardView[][] = [[]]
 
   /** @var bestCards - The best cards from each round. */
   bestCards: CardView[][] = []
@@ -118,15 +125,33 @@ export default class PlayGame extends Vue {
   /** @var selectedCards - The cards that the player has selected this round. */
   selectedCards: CardView[] = []
 
-  /** Vuex action to join a game session. */
-  @Action('sessions/join') joinSession
+  /** @var selectedCardCombination - The cards that the player has selected this round. */
+  selectedCardCombination: CardView[] = []
 
-  /** Vuex action to exit a game session. */
-  @Action('sessions/exit') exitSession
+  /** @var $socket - The socket connection to the server. */
+  get $socket(): SocketIOClient.Socket {
+    const name = '$socket'
+    return window[name]
+  }
 
   /** The black card for the current round. */
   get blackCard(): CardView {
     return this.session.currentCard || <CardView>{}
+  }
+
+  /** Determine if the current user is the card czar */
+  get isCzar(): boolean {
+    return this.session.currentCzarId === this.$auth.user.id
+  }
+
+  /** @var round - The number of the current round. */
+  get round(): number {
+    return this.session.currentRound || 0
+  }
+
+  get shareURL() {
+    const { origin, pathname } = window.location
+    return origin + pathname
   }
 
   beforeMount() {
@@ -146,15 +171,33 @@ export default class PlayGame extends Vue {
     }
   }
 
+  mounted() {
+    this.state = 'choose-cards'
+  }
+
   destroy() {
     window.onbeforeunload = null
     this.exitSession(this.game)
   }
 
+  /**
+   * Emit a message to join a game session.
+   */
+  joinSession(game: GameView) {
+    this.$socket.emit('session-join', { game })
+  }
+
+  /**
+   * Emit a message to exit a game session.
+   */
+  exitSession(game: GameView) {
+    this.$socket.emit('session-exit', { game })
+  }
+
   onSessionJoin(session) {
-    this.updatePlayedCards(session)
-    this.session = session
+    this.session = { ...this.session, ...session }
     this.blackCards = [...this.blackCards, session.currentCard]
+    this.updatePlayedCards(session)
   }
 
   /**
@@ -168,28 +211,36 @@ export default class PlayGame extends Vue {
     session.playerInSession = session.playerInSession.filter(
       ({ playerId }) => playerId !== user.id,
     )
+
+    this.session = { ...this.session, ...session }
     this.updatePlayedCards(session)
   }
 
   onSessionNextRound(session) {
-    this.round++
-    window.navigator.vibrate(100)
     this.onSessionJoin(session)
     this.state = 'choose-cards'
   }
 
-  onSessionPlayCard(data) {
-    const cards = data.playerCards[0].cards
+  onSessionPlayCard(playerSession) {
+    const latestIndex = playerSession.playerCards.length - 1
+    const cards = playerSession.playerCards[latestIndex].cards
     const playedCards = this.playedCards[this.round] || []
-    this.playedCards[this.round] = [...playedCards, cards]
 
+    this.playedCards[this.round] = [...playedCards, cards]
     this.playedCards = [...this.playedCards]
-    this.selectedCards = []
+
+    const allPlayersPlayedCards =
+      this.playedCards[this.round].length >=
+      this.session.playerInSession.length - 1
+
+    if (allPlayersPlayedCards) {
+      this.state = 'choose-card-combination'
+    }
   }
 
   onSessionChooseCardCombination({ cards }) {
     this.bestCards[this.round] = cards
-    this.selectedCards = []
+    this.selectedCardCombination = []
     this.state = 'show-best-combination'
   }
 
@@ -201,15 +252,18 @@ export default class PlayGame extends Vue {
         return (round || {}).cards
       })
       // Filter items that are falsy.
-      .filter(item => !!item)
+      .filter(card => !!card)
 
     this.playedCards[this.round] = cardsByActivePlayers
-
     this.playedCards = [...this.playedCards]
   }
 
   selectCards(cards: CardView[]) {
     this.selectedCards = cards
+  }
+
+  selectCardCombination(cards: CardView[]) {
+    this.selectedCardCombination = cards
   }
 
   playCards() {
