@@ -20,14 +20,11 @@
         </nuxt-link>
       </div>
 
-      <h1 class="mx-auto md:mx-0 py-4 px-2">
-        Game:
-        <span class="font-bold">
-          {{ game.name }}
-        </span>
-      </h1>
-
       <div class="md:ml-auto flex items-center justify-end">
+        <h1 class="mx-auto md:mx-0 px-2 font-bold">
+          {{ game.name }}
+        </h1>
+
         <app-share
           button-class="p-5"
           subject="Let's play a game of cards!"

@@ -14,7 +14,7 @@
       </slot>
     </button>
     <div
-      class="absolute p-2 rounded bg-gray-800 shadow z-20"
+      class="absolute p-2 rounded bg-gray-800 shadow z-20 text-sm"
       :class="{
         'hidden mt-0': !isCopied,
         'block mt-12': isCopied,
