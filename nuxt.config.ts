@@ -64,9 +64,17 @@ const config: NuxtConfiguration = {
     https: true,
     prefix: '/api/',
   },
-  meta: {
-    name: 'Project Cards',
-    theme_color: '#1a202c',
+  pwa: {
+    workbox: {
+      runtimeCaching: {
+        urlPattern: /ping\.gif/,
+        handler: 'networkOnly',
+      },
+    },
+    meta: {
+      name: 'Project Cards',
+      theme_color: '#1a202c',
+    },
   },
   auth: {
     redirect: {

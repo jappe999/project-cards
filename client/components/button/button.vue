@@ -7,7 +7,7 @@
   >
     <span
       v-if="loading"
-      :class="`h-3 w-3 mr-2 border-2 border-${color} rounded-full`"
+      :class="`loader h-3 w-3 mr-2 border-2 border-${color} rounded-full`"
       style="border-bottom-color:transparent"
     ></span>
     <slot></slot>
@@ -34,3 +34,18 @@ export default class AppButton extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.loader {
+  animation: loading 1s linear infinite;
+}
+
+@keyframes loading {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
