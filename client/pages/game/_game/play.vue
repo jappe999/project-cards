@@ -29,8 +29,8 @@
 
       <div class="md:ml-auto flex items-center justify-end">
         <app-share
-          class="p-5"
-          subject="Let's play a game!"
+          button-class="p-5"
+          subject="Let's play a game of cards!"
           text="Join me in this game for horrible people."
           :url="shareURL"
         />
