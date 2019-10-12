@@ -3,6 +3,7 @@
     class="min-h-screen w-full md:flex justify-center items-center bg-gray-200"
   >
     <app-splash-screen v-if="loading" @loaded="loaded" />
+
     <template v-else>
       <div
         v-if="!gameJoined"
