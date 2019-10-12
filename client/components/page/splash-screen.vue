@@ -7,7 +7,10 @@
     />
     <h1 class="my-4 text-2xl font-bold">Project Cards</h1>
     <small v-if="!offline">Loading game</small>
-    <b v-if="offline" class="text-red">Server offline</b>
+    <template v-if="offline">
+      <p class="font-bold text-red-600">Server offline</p>
+      <p>Please try again later</p>
+    </template>
   </div>
 </template>
 
@@ -19,26 +22,36 @@ export default class AppIndex extends Vue {
   offline: boolean = false
 
   created() {
-    this.waitForServer(`?${Math.random() * 10}`, 30000).then(() => {
-      setTimeout(() => {
-        this.$emit('loaded')
-      }, 1000)
-    })
-  }
+    const url = ''
+    const timeout = 30000
 
-  waitForServer(url: string, timeout: number) {
-    const controller = new AbortController()
-    const signal = controller.signal
-    return fetch(url, { mode: 'no-cors', signal })
-      .then(response => {
-        setTimeout(() => {
-          controller.abort()
-        }, timeout)
-        return response
-      })
+    // Try to load the page.
+    this.waitForServer(url, timeout)
+      .then(this.loaded)
+      .catch(() => this.waitForServer(url, timeout))
+      .then(this.loaded)
       .catch(() => {
         this.offline = true
       })
+  }
+
+  loaded() {
+    setTimeout(() => {
+      this.$emit('loaded')
+    }, 500)
+  }
+
+  async waitForServer(url: string, timeout: number) {
+    const uniqueUrl = `${url}?${Math.random() * 10}`
+    const controller = new AbortController()
+    const signal = controller.signal
+    const response = await fetch(uniqueUrl, { mode: 'no-cors', signal })
+
+    setTimeout(() => {
+      controller.abort()
+    }, timeout)
+
+    return response
   }
 }
 </script>
