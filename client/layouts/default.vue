@@ -79,7 +79,7 @@ export default class DefaultLayout extends Vue {
   }
 
   loaded() {
-    this.$router.push('/game')
+    this.$router.replace(this.$route.path)
     this.loading = false
   }
 
