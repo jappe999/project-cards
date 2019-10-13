@@ -39,7 +39,7 @@ export default class AppShare extends Vue {
   @Prop({ type: String }) text?: string
   @Prop({ type: String }) url?: string
 
-  @Prop({ type: Number, default: 4 }) buttonClass: string
+  @Prop({ type: String, default: 4 }) buttonClass: string
   @Prop({ type: Number, default: 4 }) size: number
   @Prop({ type: String, default: 'white' }) color: string
 
