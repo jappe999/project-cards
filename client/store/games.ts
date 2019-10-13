@@ -3,14 +3,17 @@ import * as types from './mutation-types'
 
 type state = {
   games: GameView[]
+  currentGame: GameView
 }
 
 export const state = (): state => ({
   games: [],
+  currentGame: null,
 })
 
 export const getters = {
   games: ({ games }: state) => games,
+  currentGame: ({ currentGame }) => currentGame,
 }
 
 export const mutations = {
@@ -56,9 +59,5 @@ export const actions: { [key: string]: any } = {
     } catch (error) {
       return <GameView>{}
     }
-  },
-
-  joinGame(state: state, game: GameView): Promise<GameView> {
-    return Promise.resolve(game)
   },
 }

@@ -1,99 +1,51 @@
 <template>
-  <div class="h-screen w-full overflow-hidden flex flex-col items-center">
-    <div class="w-full flex sm:px-4 text-white bg-gray-900 shadow">
-      <div class="md:w-80 flex -ml-4 pl-4">
-        <nuxt-link
-          class="flex items-center p-4"
-          to="/game"
-          @click.native="exitSession(game)"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            class="h-5 fill-current"
-          >
-            <path
-              d="M3.828 9l6.071-6.071-1.414-1.414L0 10l.707.707 7.778 7.778 1.414-1.414L3.828 11H20V9H3.828z"
-            />
-          </svg>
-          <span class="hidden sm:block pl-2">Back to all games</span>
-        </nuxt-link>
-      </div>
+  <transition-group name="game-state">
+    <app-choose-cards
+      v-show="state === 'choose-cards'"
+      key="choose-cards"
+      :is-czar="isCzar"
+      :selected-cards="selectedCards"
+      :black-card="blackCard"
+      :session="session"
+      :round="round"
+      @select="selectCards"
+      @submit="playCards"
+    />
 
-      <div class="w-full sm:w-auto md:ml-auto flex items-center justify-end">
-        <h1 class="mx-auto md:mr-0 px-2 font-bold">
-          {{ game.name }}
-        </h1>
+    <app-choose-card-combination
+      v-show="state === 'choose-card-combination'"
+      key="choose-card-combination"
+      :is-czar="isCzar"
+      :selected-cards="selectedCardCombination"
+      :cards="playedCards[round]"
+      :black-card="blackCard"
+      :session="session"
+      :round="round"
+      @select="selectCardCombination"
+    />
 
-        <app-share
-          button-class="p-5"
-          subject="Let's play a game of cards!"
-          text="Join me in this game for horrible people."
-          :url="shareURL"
-        />
-      </div>
-    </div>
-
-    <main class="h-full w-full relative overflow-x-hidden overflow-y-auto">
-      <transition-group name="game-state">
-        <app-choose-cards
-          v-show="state === 'choose-cards'"
-          key="choose-cards"
-          :is-czar="isCzar"
-          :selected-cards="selectedCards"
-          :black-card="blackCard"
-          :session="session"
-          :round="round"
-          @select="selectCards"
-          @submit="playCards"
-        />
-
-        <app-choose-card-combination
-          v-show="state === 'choose-card-combination'"
-          key="choose-card-combination"
-          :is-czar="isCzar"
-          :selected-cards="selectedCardCombination"
-          :cards="playedCards[round]"
-          :black-card="blackCard"
-          :session="session"
-          :round="round"
-          @select="selectCardCombination"
-        />
-
-        <app-show-best-combination
-          v-show="state === 'show-best-combination'"
-          key="show-best-combination"
-          :is-czar="isCzar"
-          :cards="bestCards[round]"
-          :black-card="blackCard"
-          :session="session"
-          :round="round"
-        />
-      </transition-group>
-    </main>
-  </div>
+    <app-show-best-combination
+      v-show="state === 'show-best-combination'"
+      key="show-best-combination"
+      :is-czar="isCzar"
+      :cards="bestCards[round]"
+      :black-card="blackCard"
+      :session="session"
+      :round="round"
+    />
+  </transition-group>
 </template>
 
 <script lang="ts">
-import { Context } from '@nuxt/vue-app'
 import { Vue, Component } from 'vue-property-decorator'
+import { Getter, Mutation } from 'vuex-class'
+import * as types from '~/store/mutation-types'
 import { GameView } from '~/models/Game'
+import { SessionView } from '~/models/Session'
 import { CardView } from '~/models/Card'
 
 @Component({
-  async asyncData(context: Context) {
-    const { game: name } = context.route.params
-    const gameId = name
-      .split('-')
-      .slice(0, 5)
-      .join('-')
-    const game = await context.store.dispatch('games/fetchGame', gameId)
-
-    return { game }
-  },
-
   components: {
-    AppShare: () => import('~/components/share.vue'),
     AppPlaycard: () => import('~/components/game/playcard.vue'),
     AppChooseCards: () => import('~/components/game/choose-cards.vue'),
     AppChooseCardCombination: () =>
@@ -105,16 +57,7 @@ import { CardView } from '~/models/Card'
 export default class PlayGame extends Vue {
   $auth!: any
 
-  /** @var game - The game that is currently being played. */
-  game!: GameView
-
-  /** @var session - The session the user is currently in. */
-  session: any = {}
-
   state: string = ''
-
-  /** @var blackCards - The black cards that have been or are being used for a round. */
-  blackCards: CardView[] = []
 
   /** @var playedCards - Cards played in each round. */
   playedCards: CardView[][] = [[]]
@@ -128,15 +71,19 @@ export default class PlayGame extends Vue {
   /** @var selectedCardCombination - The cards that the player has selected this round. */
   selectedCardCombination: CardView[] = []
 
+  /** @var game - The game that is currently being played. */
+  @Getter('games/currentGame') game: GameView
+
+  /** @var session - The session the user is currently in. */
+  @Getter('session/session') session: SessionView
+
+  /** @var round - The number of the current round. */
+  @Getter('session/round') round: number
+
   /** @var $socket - The socket connection to the server. */
   get $socket(): SocketIOClient.Socket {
     const name = '$socket'
     return window[name]
-  }
-
-  /** The black card for the current round. */
-  get blackCard(): CardView {
-    return this.session.currentCard || <CardView>{}
   }
 
   /** Determine if the current user is the card czar */
@@ -144,15 +91,9 @@ export default class PlayGame extends Vue {
     return this.session.currentCzarId === this.$auth.user.id
   }
 
-  /** @var round - The number of the current round. */
-  get round(): number {
-    return this.session.currentRound || 0
-  }
-
-  get shareURL() {
-    const { origin, pathname } = window.location
-    return origin + pathname
-  }
+  @Mutation(`session/${types.UPDATE_SESSION}`) updateSession: (
+    session: Partial<SessionView>,
+  ) => void
 
   beforeMount() {
     this.$socket.on('session-join', this.onSessionJoin.bind(this))
@@ -163,40 +104,14 @@ export default class PlayGame extends Vue {
       'session-choose-card-combination',
       this.onSessionChooseCardCombination.bind(this),
     )
-
-    this.joinSession(this.game)
-
-    window.onbeforeunload = () => {
-      this.exitSession(this.game)
-    }
   }
 
   mounted() {
     this.state = 'choose-cards'
   }
 
-  destroy() {
-    window.onbeforeunload = null
-    this.exitSession(this.game)
-  }
-
-  /**
-   * Emit a message to join a game session.
-   */
-  joinSession(game: GameView) {
-    this.$socket.emit('session-join', { game })
-  }
-
-  /**
-   * Emit a message to exit a game session.
-   */
-  exitSession(game: GameView) {
-    this.$socket.emit('session-exit', { game })
-  }
-
   onSessionJoin(session) {
-    this.session = { ...this.session, ...session }
-    this.blackCards = [...this.blackCards, session.currentCard]
+    this.updateSession(session)
     this.updatePlayedCards(session)
   }
 
