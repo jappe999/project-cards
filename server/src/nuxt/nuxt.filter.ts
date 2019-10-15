@@ -33,9 +33,9 @@ export class NuxtFilter implements ExceptionFilter {
     const status = exception.getStatus ? exception.getStatus() : 500
 
     if (status === 404) {
-      if (!res.headersSent) {
-        await this.nuxt.render(req, res)
-      }
+      // if (!res.headersSent) {
+      await this.nuxt.render(req, res)
+      // }
     } else {
       const response = this.getResponse(exception)
 
