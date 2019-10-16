@@ -101,6 +101,7 @@ const config: NuxtConfiguration = {
   router: {
     middleware: ['auth'],
   },
+  serverMiddleware: ['redirect-ssl'],
   /*
    ** Build configuration
    */

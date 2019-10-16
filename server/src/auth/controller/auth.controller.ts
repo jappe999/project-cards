@@ -5,7 +5,7 @@ import { CurrentUser } from '../../users/decorator/user.decorator'
 import { UserCreateDto, UserViewDto } from '../../users/user.dto'
 import { User } from '../../users/user.entity'
 
-@Controller('api/auth')
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

@@ -13,6 +13,8 @@ async function bootstrap() {
   const { port } = config.env
   const app = await NestFactory.create(AppModule, { cors: true })
 
+  app.setGlobalPrefix('api')
+
   if (process.env.NODE_ENV !== 'production') {
     const options = new DocumentBuilder()
       .setTitle('Project Cards')
