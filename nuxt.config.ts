@@ -66,10 +66,7 @@ const config: NuxtConfiguration = {
   },
   pwa: {
     workbox: {
-      runtimeCaching: {
-        urlPattern: /ping\.gif/,
-        handler: 'networkOnly',
-      },
+      offlineStrategy: 'CacheFirst',
     },
     meta: {
       name: 'Project Cards',
