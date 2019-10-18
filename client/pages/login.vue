@@ -75,6 +75,7 @@ export default class SignIn extends Vue {
     try {
       await this.$auth.loginWith('local', { data: this.user.data() })
       window.dispatchEvent(new CustomEvent('connect'))
+      this.$router.push('/game')
     } catch ({ response }) {
       if (response.status === 401) {
         this.user.errors.set('password', response.data.message)
