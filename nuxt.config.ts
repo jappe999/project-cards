@@ -68,7 +68,7 @@ const config: NuxtConfiguration = {
     offline: false,
     runtimeCaching: [
       {
-        urlPattern: '/.*',
+        urlPattern: '^(?!.*api.*$).*$',
         handler: 'staleWhileRevalidate',
         method: 'GET',
       },
