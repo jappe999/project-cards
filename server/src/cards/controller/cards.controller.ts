@@ -3,7 +3,7 @@ import { CardViewDto } from '../card.dto'
 import { CardsService } from '../service/cards.service'
 import { AuthGuard } from '@nestjs/passport'
 
-@Controller('api/cards')
+@Controller('cards')
 export class CardsController {
   constructor(private cardsService: CardsService) {}
 
