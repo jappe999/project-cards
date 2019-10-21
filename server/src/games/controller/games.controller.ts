@@ -6,7 +6,7 @@ import { AuthGuard } from '@nestjs/passport'
 import { User } from '../../users/user.entity'
 import { CurrentUser } from '../../users/decorator/user.decorator'
 
-@Controller('api/games')
+@Controller('games')
 export class GamesController {
   constructor(private gamesService: GamesService) {}
 

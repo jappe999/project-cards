@@ -64,17 +64,23 @@ const config: NuxtConfiguration = {
     https: true,
     prefix: '/api/',
   },
-  pwa: {
-    workbox: {
-      runtimeCaching: {
-        urlPattern: /ping\.gif/,
-        handler: 'networkOnly',
+  workbox: {
+    offline: false,
+    runtimeCaching: [
+      {
+        urlPattern: '^(?!.*api.*$).*$',
+        handler: 'staleWhileRevalidate',
+        method: 'GET',
       },
-    },
-    meta: {
-      name: 'Project Cards',
-      theme_color: '#1a202c',
-    },
+    ],
+  },
+  meta: {
+    name: 'Project Cards',
+    theme_color: '#1a202c',
+    mobileAppIOS: true,
+  },
+  manifest: {
+    name: 'Project Cards',
   },
   auth: {
     redirect: {
@@ -101,6 +107,7 @@ const config: NuxtConfiguration = {
   router: {
     middleware: ['auth'],
   },
+  // serverMiddleware: ['redirect-ssl'],
   /*
    ** Build configuration
    */

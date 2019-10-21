@@ -26,7 +26,7 @@ export class NuxtFilter implements ExceptionFilter {
     return error
   }
 
-  async catch(exception: HttpException, host: ArgumentsHost) {
+  catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
     const res = ctx.getResponse()
     const req = ctx.getRequest()
@@ -34,7 +34,7 @@ export class NuxtFilter implements ExceptionFilter {
 
     if (status === 404) {
       if (!res.headersSent) {
-        await this.nuxt.render(req, res)
+        this.nuxt.render(req, res)
       }
     } else {
       const response = this.getResponse(exception)

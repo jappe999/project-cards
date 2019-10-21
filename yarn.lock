@@ -10241,6 +10241,13 @@ realpath-native@^1.1.0:
   dependencies:
     util.promisify "^1.0.0"
 
+redirect-ssl@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/redirect-ssl/-/redirect-ssl-1.4.1.tgz#4d9a91ac4b4f2eb358272a8e4de3afaf44554ede"
+  integrity sha512-8Lg6swHUDPydPKRTV2faJMF2foKw8oUFE7cWoieRpoU57ZjM1cdFVp3YcBar1tM5L6GD9KMDNu6uc0qi/3zSHQ==
+  dependencies:
+    is-https "^1.0.0"
+
 reflect-metadata@^0.1.12, reflect-metadata@^0.1.13:
   version "0.1.13"
   resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.13.tgz#67ae3ca57c972a2aa1642b10fe363fe32d49dc08"
