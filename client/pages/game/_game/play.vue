@@ -1,39 +1,32 @@
 <template>
-  <transition-group name="game-state">
-    <app-choose-cards
-      v-show="state === 'choose-cards'"
-      key="choose-cards"
-      :is-czar="isCzar"
-      :selected-cards="selectedCards"
-      :black-card="blackCard"
-      :session="session"
-      :round="round"
-      @select="selectCards"
-      @submit="playCards"
-    />
+  <div>
+    <transition-group name="game-state">
+      <app-choose-cards
+        v-show="state === 'choose-cards'"
+        key="choose-cards"
+        :is-czar="isCzar"
+        :selected-cards="selectedCards"
+        @select="selectCards"
+        @submit="playCards"
+      />
 
-    <app-choose-card-combination
-      v-show="state === 'choose-card-combination'"
-      key="choose-card-combination"
-      :is-czar="isCzar"
-      :selected-cards="selectedCardCombination"
-      :cards="playedCards[round]"
-      :black-card="blackCard"
-      :session="session"
-      :round="round"
-      @select="selectCardCombination"
-    />
+      <app-choose-card-combination
+        v-show="state === 'choose-card-combination'"
+        key="choose-card-combination"
+        :is-czar="isCzar"
+        :selected-cards="selectedCardCombination"
+        :cards="playedCards[round]"
+        @select="selectCardCombination"
+      />
 
-    <app-show-best-combination
-      v-show="state === 'show-best-combination'"
-      key="show-best-combination"
-      :is-czar="isCzar"
-      :cards="bestCards[round]"
-      :black-card="blackCard"
-      :session="session"
-      :round="round"
-    />
-  </transition-group>
+      <app-show-best-combination
+        v-show="state === 'show-best-combination'"
+        key="show-best-combination"
+        :is-czar="isCzar"
+        :cards="bestCards[round]"
+      />
+    </transition-group>
+  </div>
 </template>
 
 <script lang="ts">

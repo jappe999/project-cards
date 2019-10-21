@@ -19,15 +19,15 @@ export const state = (): state => ({
 export const getters = {
   session: ({ session }): SessionView => session,
   cards: ({ cards }): CardView[] => cards,
-  blackCard: ({ session }): CardView => session.currentCard || {},
-  round: ({ session }): number => session.currentRound || 0,
+  blackCard: ({ session }): CardView => (session && session.currentCard) || {},
+  round: ({ session }): number => (session && session.currentRound) || 0,
 }
 
 export const mutations = {
   [types.UPDATE_SESSION](state: state, session: Partial<SessionView>): void {
-    this.session = {
-      ...this.session,
-      session,
+    state.session = {
+      ...state.session,
+      ...session,
     }
   },
 
@@ -49,7 +49,7 @@ export const actions = {
    * Emit a message to exit a game session.
    */
   exitGame({ commit }, game: GameView) {
-    this.$socket.emit('session-exit', { game })
+    socket.emit('session-exit', { game })
     commit(types.CLEAR_SESSION)
   },
 }

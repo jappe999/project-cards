@@ -78,7 +78,7 @@ export class AppGame extends Vue {
     }
   }
 
-  destroy() {
+  beforeDestroy() {
     window.onbeforeunload = null
     this.exitSession(this.game)
   }
