@@ -50,28 +50,27 @@ import { GameView } from '../../models/Game'
     AppShare: () => import('~/components/share.vue'),
   },
 })
-export class AppGame extends Vue {
+export default class AppGame extends Vue {
   /** @var game - The game that is currently being played. */
-  @Getter('games/currentGame') game!: GameView
+  @Getter('session/game') game!: GameView
 
   @Action('games/fetchGame') fetchGame: (id: string) => GameView
   @Action('session/joinSession') joinSession: (game: GameView) => void
-  @Action('session/joinSession') exitSession: (game: GameView) => void
+  @Action('session/exitSession') exitSession: (game: GameView) => void
 
   get shareURL() {
     const { origin, pathname } = window.location
     return origin + pathname
   }
 
-  async beforeMount() {
+  async mounted() {
     const { game: name } = this.$route.params
     const gameId = name
       .split('-')
       .slice(0, 5)
       .join('-')
-    await this.fetchGame(gameId)
-
-    this.joinSession(this.game)
+    const game = await this.fetchGame(gameId)
+    this.joinSession(game)
 
     window.onbeforeunload = () => {
       this.exitSession(this.game)

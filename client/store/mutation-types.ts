@@ -7,6 +7,7 @@ export const REMOVE_GAME = 'REMOVE_GAME'
 // Session
 export const UPDATE_SESSION = 'UPDATE_SESSION'
 export const CLEAR_SESSION = 'CLEAR_SESSION'
+export const UPDATE_GAME_STATE = 'UPDATE_GAME_STATE'
 
 // Cards
 export const FETCH_CARDS = 'FETCH_CARDS'

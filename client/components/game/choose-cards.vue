@@ -54,8 +54,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
-import { Action } from 'vuex-class'
+import { Action, Getter } from 'vuex-class'
 import { CardView } from '~/models/Card'
+import { SessionView } from '~/models/Session'
 
 @Component({
   components: {
@@ -86,11 +87,12 @@ export default class AppChooseCards extends Vue {
 
   isPreviousCzar: boolean = false
 
+  @Getter('session/blackCard') blackCard!: CardView
+  @Getter('session/round') round!: number
+  @Getter('session/session') session!: SessionView
+
   @Prop({ default: false, type: Boolean }) isCzar!: boolean
-  @Prop({ default: 0, type: Number }) round!: number
-  @Prop({ default: {}, type: Object }) blackCard!: CardView
   @Prop({ default: [], type: Array }) selectedCards!: CardView[]
-  @Prop({ default: {}, type: Object }) session!: any
 
   @Action('cards/fetchCards') fetchCards
 

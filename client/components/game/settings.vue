@@ -7,20 +7,20 @@
         </h2>
         <hr class="w-full mt-2 mb-2 border-b border-gray" />
       </app-card-content>
-
-      <nuxt-child />
     </app-card>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 
 @Component({
   components: {
-    AppCard: () => import('~/components/card/card'),
-    AppCardContent: () => import('~/components/card/card-content'),
+    AppCard: () => import('~/components/card/card.vue'),
+    AppCardContent: () => import('~/components/card/card-content.vue'),
   },
 })
-export default class AppGameSettings extends Vue {}
+export default class AppGameSettings extends Vue {
+  //
+}
 </script>

@@ -31,6 +31,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Action, Getter } from 'vuex-class'
 import { CardView } from '~/models/Card'
 
 @Component({
@@ -41,21 +42,11 @@ import { CardView } from '~/models/Card'
   },
 })
 export default class AppShowBestCombination extends Vue {
-  @Prop({ default: false, type: Boolean }) isCzar!: boolean
-  @Prop({ default: () => ({}), type: Object }) blackCard!: CardView
+  @Getter('session/blackCard') blackCard!: CardView
+  @Getter('session/session') session!: SessionView
+
   @Prop({ default: () => [], type: Array }) cards!: CardView[]
-  @Prop({ default: () => ({}), type: Object }) session!: any
 
-  /** @var $socket - The socket connection to the server. */
-  get $socket(): SocketIOClient.Socket {
-    const name = '$socket'
-    return window[name]
-  }
-
-  nextRound() {
-    this.$socket.emit('session-next-round', {
-      session: this.session,
-    })
-  }
+  @Action('session/nextRound') nextRound: () => void
 }
 </script>

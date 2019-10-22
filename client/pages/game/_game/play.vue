@@ -1,32 +1,30 @@
 <template>
-  <div>
-    <transition-group name="game-state">
-      <app-choose-cards
-        v-show="state === 'choose-cards'"
-        key="choose-cards"
-        :is-czar="isCzar"
-        :selected-cards="selectedCards"
-        @select="selectCards"
-        @submit="playCards"
-      />
+  <transition-group name="game-state">
+    <app-choose-cards
+      v-show="state === 'choose-cards'"
+      key="choose-cards"
+      :is-czar="isCzar"
+      :selected-cards="selectedCards"
+      @select="selectCards"
+      @submit="playCards"
+    />
 
-      <app-choose-card-combination
-        v-show="state === 'choose-card-combination'"
-        key="choose-card-combination"
-        :is-czar="isCzar"
-        :selected-cards="selectedCardCombination"
-        :cards="playedCards[round]"
-        @select="selectCardCombination"
-      />
+    <app-choose-card-combination
+      v-show="state === 'choose-card-combination'"
+      key="choose-card-combination"
+      :is-czar="isCzar"
+      :selected-cards="selectedCardCombination"
+      :cards="playedCards[round]"
+      @select="selectCardCombination"
+    />
 
-      <app-show-best-combination
-        v-show="state === 'show-best-combination'"
-        key="show-best-combination"
-        :is-czar="isCzar"
-        :cards="bestCards[round]"
-      />
-    </transition-group>
-  </div>
+    <app-show-best-combination
+      v-show="state === 'show-best-combination'"
+      key="show-best-combination"
+      :is-czar="isCzar"
+      :cards="bestCards[round]"
+    />
+  </transition-group>
 </template>
 
 <script lang="ts">
@@ -36,6 +34,7 @@ import * as types from '~/store/mutation-types'
 import { GameView } from '~/models/Game'
 import { SessionView } from '~/models/Session'
 import { CardView } from '~/models/Card'
+import { gameState } from '~/store/session'
 
 @Component({
   components: {
@@ -50,8 +49,6 @@ import { CardView } from '~/models/Card'
 export default class PlayGame extends Vue {
   $auth!: any
 
-  state: string = ''
-
   /** @var playedCards - Cards played in each round. */
   playedCards: CardView[][] = [[]]
 
@@ -65,13 +62,16 @@ export default class PlayGame extends Vue {
   selectedCardCombination: CardView[] = []
 
   /** @var game - The game that is currently being played. */
-  @Getter('games/currentGame') game: GameView
+  @Getter('session/game') game: GameView
 
   /** @var session - The session the user is currently in. */
   @Getter('session/session') session: SessionView
 
   /** @var round - The number of the current round. */
   @Getter('session/round') round: number
+
+  /** @var state - The current state of the game session. */
+  @Getter('session/gameState') state: gameState
 
   /** @var $socket - The socket connection to the server. */
   get $socket(): SocketIOClient.Socket {
@@ -88,6 +88,10 @@ export default class PlayGame extends Vue {
     session: Partial<SessionView>,
   ) => void
 
+  @Mutation(`session/${types.UPDATE_GAME_STATE}`) updateGameState: (
+    gameState: gameState,
+  ) => void
+
   beforeMount() {
     this.$socket.on('session-join', this.onSessionJoin.bind(this))
     this.$socket.on('session-exit', this.onSessionExit.bind(this))
@@ -97,10 +101,6 @@ export default class PlayGame extends Vue {
       'session-choose-card-combination',
       this.onSessionChooseCardCombination.bind(this),
     )
-  }
-
-  mounted() {
-    this.state = 'choose-cards'
   }
 
   onSessionJoin(session) {
@@ -120,13 +120,13 @@ export default class PlayGame extends Vue {
       ({ playerId }) => playerId !== user.id,
     )
 
-    this.session = { ...this.session, ...session }
+    this.updateSession(session)
     this.updatePlayedCards(session)
   }
 
   onSessionNextRound(session) {
     this.onSessionJoin(session)
-    this.state = 'choose-cards'
+    this.updateGameState('choose-cards')
   }
 
   onSessionPlayCard(playerSession) {
@@ -142,14 +142,14 @@ export default class PlayGame extends Vue {
       this.session.playerInSession.length - 1
 
     if (allPlayersPlayedCards) {
-      this.state = 'choose-card-combination'
+      this.updateGameState('choose-card-combination')
     }
   }
 
   onSessionChooseCardCombination({ cards }) {
     this.bestCards[this.round] = cards
     this.selectedCardCombination = []
-    this.state = 'show-best-combination'
+    this.updateGameState('show-best-combination')
   }
 
   updatePlayedCards({ playerInSession }) {
@@ -175,7 +175,7 @@ export default class PlayGame extends Vue {
   }
 
   playCards() {
-    this.state = 'choose-card-combination'
+    this.updateGameState('choose-card-combination')
   }
 }
 </script>

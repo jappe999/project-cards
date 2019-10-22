@@ -3,17 +3,14 @@ import * as types from './mutation-types'
 
 type state = {
   games: GameView[]
-  currentGame: GameView
 }
 
 export const state = (): state => ({
   games: [],
-  currentGame: null,
 })
 
 export const getters = {
   games: ({ games }: state) => games,
-  currentGame: ({ currentGame }) => currentGame,
 }
 
 export const mutations = {
