@@ -12,6 +12,9 @@ export const UPDATE_GAME_STATE = 'UPDATE_GAME_STATE'
 // Cards
 export const FETCH_CARDS = 'FETCH_CARDS'
 
+// Decks
+export const FETCH_DECKS = 'FETCH_DECKS'
+
 // Authentication
 export const SIGN_IN = 'SIGN_IN'
 export const SIGN_OUT = 'SIGN_OUT'

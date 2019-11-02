@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm'
+import { Deck } from '../decks/deck.entity'
 
 export type CardType = 'A' | 'Q'
 
@@ -16,6 +17,9 @@ export class Card {
   @Column()
   numAnswers!: number
 
-  @Column()
-  expansion!: string
+  @Column({ nullable: true })
+  deckId?: string
+
+  @ManyToOne(() => Deck, deck => deck.cards)
+  deck?: Deck
 }
