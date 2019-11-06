@@ -18,9 +18,8 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { Action, Mutation, Getter } from 'vuex-class'
+import { Action, Getter } from 'vuex-class'
 import { DeckView } from '~/models/Deck'
-import * as types from '~/store/mutation-types'
 
 @Component({
   components: {
@@ -38,16 +37,17 @@ export default class AppGameSettingsDecks extends Vue {
 
   decks: DeckView[] = []
 
-  @Getter('session/decks') sessionDecks!: DeckView[]
-
-  @Mutation(`decks/${types.FETCH_DECKS}`) mutateDecks!: Function
+  @Getter('games/gameDecks') gameDecks!: DeckView[]
 
   @Action('decks/fetchDecks') fetchDecks!: Function
 
   async beforeMount() {
     const decks = await this.fetchDecks({ take: 49 })
     this.decks = decks
-      .map(deck => ({ ...deck, checked: false }))
+      .map(deck => ({
+        ...deck,
+        checked: this.gameDecks.some(sd => sd.id === deck.id),
+      }))
       .sort((a, b) => {
         const nameA = a.name.toUpperCase()
         const nameB = b.name.toUpperCase()
@@ -59,6 +59,10 @@ export default class AppGameSettingsDecks extends Vue {
         }
         return 0
       })
+  }
+
+  selectedDecks() {
+    return this.decks.filter((deck: any) => deck.checked)
   }
 }
 </script>

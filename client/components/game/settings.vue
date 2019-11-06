@@ -39,6 +39,7 @@
             <app-settings-decks
               v-show="tab === 'choose-decks'"
               key="choose-decks"
+              ref="decks"
             />
           </transition-group>
         </app-card-content>
@@ -59,6 +60,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
+import { Action, Getter } from 'vuex-class'
+import { GameView } from '../../models/Game'
 
 @Component({
   components: {
@@ -76,6 +79,10 @@ export default class AppGameSettings extends Vue {
 
   @Prop({ default: false, type: Boolean }) show!: boolean
 
+  @Getter('games/currentGame') game!: GameView
+
+  @Action('games/updateGame') updateGame!: Function
+
   changeState(tab) {
     this.tab = tab
   }
@@ -85,10 +92,15 @@ export default class AppGameSettings extends Vue {
     return false
   }
 
-  save() {
+  async save() {
     this.isSaving = true
 
-    // await this.saveSessionSettings()
+    // @ts-ignore
+    const decks = this.$refs.decks.selectedDecks()
+    await this.updateGame({
+      ...this.game,
+      decks,
+    })
     this.close()
 
     this.isSaving = false

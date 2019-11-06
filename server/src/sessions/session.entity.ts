@@ -6,11 +6,14 @@ import {
   OneToOne,
   OneToMany,
   JoinTable,
+  ManyToOne,
+  ManyToMany,
 } from 'typeorm'
 import { User } from '../users/user.entity'
 import { Game } from '../games/game.entity'
 import { Card } from '../cards/card.entity'
 import { PlayerInSession } from '../player-session/player-session.entity'
+import { Deck } from '../decks/deck.entity'
 
 @Entity()
 export class Session {

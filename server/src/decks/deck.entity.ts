@@ -1,5 +1,6 @@
-import { Entity, Column, OneToMany, PrimaryColumn } from 'typeorm'
+import { Entity, Column, OneToMany, PrimaryColumn, JoinTable, ManyToOne, ManyToMany } from 'typeorm'
 import { Card } from '../cards/card.entity'
+import { Game } from '../games/game.entity'
 
 @Entity()
 export class Deck {
@@ -11,4 +12,8 @@ export class Deck {
 
   @OneToMany(() => Card, card => card.deck)
   cards!: Card[]
+
+  @ManyToMany(() => Game, game => game.decks)
+  @JoinTable()
+  games!: Game[]
 }

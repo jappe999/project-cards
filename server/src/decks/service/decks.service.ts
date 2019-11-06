@@ -18,7 +18,7 @@ export class DecksService {
     order = 'ASC',
   } = {}): { skip: number; take: number;[rest: string]: any } {
     skip = skip >= 0 ? skip : 0
-    take = take < 50 && take >= 0 ? take : 10
+    take = take <= 50 && take >= 0 ? take : 10
 
     return { skip, take, sort, order }
   }

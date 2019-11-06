@@ -1,4 +1,5 @@
 // Games
+export const SET_CURRENT_GAME_ID = 'SET_CURRENT_GAME_ID'
 export const FETCH_GAMES = 'FETCH_GAMES'
 export const FETCH_GAME = 'FETCH_GAME'
 export const UPDATE_GAME = 'UPDATE_GAME'

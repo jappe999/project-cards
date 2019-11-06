@@ -3,7 +3,6 @@ import { SessionView } from '~/models/Session'
 import { GameView } from '~/models/Game'
 import { PlayerView } from '~/models/Player'
 import { CardView } from '~/models/Card'
-import { DeckView } from '~/models/Deck'
 
 export type gameState =
   | 'choose-cards'
@@ -25,7 +24,6 @@ export const state = (): state => ({
 export const getters = {
   session: ({ session }): SessionView => session || {},
   game: ({ session }): GameView => (session && session.game) || {},
-  decks: ({ session }): DeckView => (session && session.decks) || [],
   blackCard: ({ session }): CardView => (session && session.currentCard) || {},
   round: ({ session }): number => (session && session.currentRound) || 0,
   gameState: ({ gameState }): gameState => gameState,

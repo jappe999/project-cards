@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsUUID, IsArray, IsString } from 'class-validator';
+import { IsNotEmpty, IsArray, IsString } from 'class-validator';
 import { CardViewDto } from '../cards/card.dto';
 
 export class DeckViewDto {

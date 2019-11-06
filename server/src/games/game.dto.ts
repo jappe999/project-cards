@@ -1,5 +1,6 @@
-import { IsNotEmpty, IsNumber, IsBoolean, MaxLength } from 'class-validator'
+import { IsNotEmpty, IsNumber, IsBoolean, MaxLength, IsArray } from 'class-validator'
 import { Game } from './game.entity'
+import { Deck } from '../decks/deck.entity'
 
 export class GameCreateDto extends Game {
   @IsNotEmpty()
@@ -11,6 +12,9 @@ export class GameCreateDto extends Game {
 
   @IsBoolean()
   private!: boolean
+
+  @IsArray()
+  decks!: Deck[]
 }
 
 export class GameJoinDto extends Game {

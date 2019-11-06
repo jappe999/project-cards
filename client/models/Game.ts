@@ -1,18 +1,22 @@
 import Model from './Model'
+import { DeckView } from './Deck'
+import { SessionView } from './Session'
 
 export interface IGame {
   id?: string
   name: string
   private: boolean
   creator?: {}
-  session?: {}
+  session?: SessionView
+  decks?: DeckView[]
 }
 
 export class Game extends Model implements IGame {
   name: string = ''
   private: boolean = false
   creator: {} = {}
-  session: {} = {}
+  session: SessionView = <SessionView>{}
+  decks: [] = []
 }
 
 export class GameView extends Game {

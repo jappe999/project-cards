@@ -3,17 +3,29 @@ import * as types from './mutation-types'
 
 type state = {
   games: GameView[]
+  currentGameId: string
 }
 
 export const state = (): state => ({
   games: [],
+  currentGameId: null,
 })
 
 export const getters = {
   games: ({ games }: state) => games,
+  currentGame: ({ games, currentGameId }: state) =>
+    games.find(({ id }) => id === currentGameId),
+  gameDecks: ({ games, currentGameId }: state) => {
+    const game = games.find(({ id }) => id === currentGameId)
+    return game && game.decks ? game.decks : []
+  }
 }
 
 export const mutations = {
+  [types.SET_CURRENT_GAME_ID](state: state, id: string) {
+    state.currentGameId = id
+  },
+
   [types.FETCH_GAMES](state: state, games: GameView[]) {
     state.games = [
       ...state.games,
@@ -33,7 +45,11 @@ export const mutations = {
   },
 
   [types.UPDATE_GAME](state: state, game: GameView) {
-    state.games = state.games.map(item => (item.id === game.id ? game : item))
+    state.games = state.games.map(item => (
+      item.id === game.id
+        ? { ...item, ...game }
+        : item
+    ))
   },
 
   [types.REMOVE_GAME](state: state, game: GameView) {
@@ -52,6 +68,19 @@ export const actions: { [key: string]: any } = {
     try {
       const { data }: { data: GameView } = await this.$axios.get(`games/${id}`)
       commit(types.FETCH_GAME, data)
+      return data
+    } catch (error) {
+      return <GameView>{}
+    }
+  },
+
+  async updateGame({ commit, getters }, game: GameView): Promise<GameView> {
+    try {
+      const { data }: { data: GameView } = await this.$axios.put('games', {
+        ...getters.currentGame,
+        ...game
+      })
+      commit(types.UPDATE_GAME, data)
       return data
     } catch (error) {
       return <GameView>{}

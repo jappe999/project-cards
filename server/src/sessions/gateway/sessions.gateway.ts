@@ -25,7 +25,7 @@ export class SessionsGateway implements OnGatewayDisconnect {
     private sessionsService: SessionsService,
     private usersService: UsersService,
     private authService: AuthService,
-  ) {}
+  ) { }
 
   async handleDisconnect(client: Socket) {
     let { sub: id } = this.authService.getTokenFromWsClient(client)

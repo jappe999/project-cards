@@ -88,6 +88,10 @@ export default class AppGame extends Vue {
     session: Partial<SessionView>,
   ) => void
 
+  @Mutation(`games/${types.SET_CURRENT_GAME_ID}`) setCurrentGameId: (
+    id: string,
+  ) => void
+
   @Action('games/fetchGame') fetchGame: (id: string) => GameView
   @Action('session/joinSession') joinSession: (game: GameView) => void
   @Action('session/exitSession') exitSession: (game: GameView) => void
@@ -104,7 +108,7 @@ export default class AppGame extends Vue {
   }
 
   beforeMount() {
-    this.$socket.on('session-join', this.updateSession.bind(this))
+    this.$socket.on('session-join', this.onSessionJoin.bind(this))
     this.$socket.on('session-exit', this.updateSession.bind(this))
   }
 
@@ -125,6 +129,11 @@ export default class AppGame extends Vue {
   beforeDestroy() {
     window.onbeforeunload = null
     this.exitSession(this.game)
+  }
+
+  onSessionJoin(session) {
+    this.setCurrentGameId(session.gameId)
+    this.updateSession(session)
   }
 
   toggleSettings(state = null, timeout = 0) {

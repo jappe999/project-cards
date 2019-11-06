@@ -5,9 +5,12 @@ import {
   OneToOne,
   ManyToOne,
   JoinColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm'
 import { Session } from '../sessions/session.entity'
 import { User } from '../users/user.entity'
+import { Deck } from '../decks/deck.entity'
 
 @Entity()
 export class Game {
@@ -29,6 +32,10 @@ export class Game {
   @ManyToOne(() => User)
   @JoinColumn()
   creator!: User
+
+  @ManyToMany(() => Deck, deck => deck.games)
+  @JoinTable()
+  public decks!: Deck[]
 
   /**
    * Generate the unique name of the given game.

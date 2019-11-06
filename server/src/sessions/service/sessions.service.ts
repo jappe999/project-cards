@@ -12,7 +12,6 @@ import { User } from '../../users/user.entity'
 import { PlayerSessionService } from '../../player-session/service/player-session.service'
 import { PlayerInSession } from '../../player-session/player-session.entity'
 import { SessionData } from '../session.types'
-import { GamesService } from '../../games/service/games.service'
 
 @Injectable()
 export class SessionsService {
@@ -20,9 +19,8 @@ export class SessionsService {
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
     private readonly cardsService: CardsService,
-    private readonly gamesService: GamesService,
     private readonly playerInSessionsService: PlayerSessionService,
-  ) {}
+  ) { }
 
   /**
    * Let a user join a particular game.
@@ -216,6 +214,7 @@ export class SessionsService {
     return this.sessionRepository.findOne(id, {
       relations: [
         'game',
+        'game.decks',
         'currentCard',
         'playerInSession',
         'playerInSession.player',
