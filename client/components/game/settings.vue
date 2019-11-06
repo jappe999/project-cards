@@ -40,6 +40,7 @@
               v-show="tab === 'choose-decks'"
               key="choose-decks"
               ref="decks"
+              :selected-decks="gameDecks"
             />
           </transition-group>
         </app-card-content>
@@ -62,6 +63,7 @@
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 import { GameView } from '../../models/Game'
+import { DeckView } from '../../models/Deck'
 
 @Component({
   components: {
@@ -80,6 +82,7 @@ export default class AppGameSettings extends Vue {
   @Prop({ default: false, type: Boolean }) show!: boolean
 
   @Getter('games/currentGame') game!: GameView
+  @Getter('games/gameDecks') gameDecks!: DeckView[]
 
   @Action('games/updateGame') updateGame!: Function
 
@@ -96,7 +99,7 @@ export default class AppGameSettings extends Vue {
     this.isSaving = true
 
     // @ts-ignore
-    const decks = this.$refs.decks.selectedDecks()
+    const decks = this.$refs.decks.getSelectedDecks()
     await this.updateGame({
       ...this.game,
       decks,

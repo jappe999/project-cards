@@ -6,6 +6,7 @@ const name = process.env.DB_NAME
 
 module.exports = {
   type: 'postgres',
+  logging: true,
   keepConnectionAlive: true,
   ssl:
     process.env.NODE_ENV === 'production'

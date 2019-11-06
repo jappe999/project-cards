@@ -1,7 +1,7 @@
 <template>
   <transition-group name="game-state">
     <app-choose-cards
-      v-show="state === 'choose-cards'"
+      v-if="state === 'choose-cards'"
       key="choose-cards"
       :is-czar="isCzar"
       :selected-cards="selectedCards"
@@ -10,7 +10,7 @@
     />
 
     <app-choose-card-combination
-      v-show="state === 'choose-card-combination'"
+      v-if="state === 'choose-card-combination'"
       key="choose-card-combination"
       :is-czar="isCzar"
       :selected-cards="selectedCardCombination"
@@ -19,7 +19,7 @@
     />
 
     <app-show-best-combination
-      v-show="state === 'show-best-combination'"
+      v-if="state === 'show-best-combination'"
       key="show-best-combination"
       :is-czar="isCzar"
       :cards="bestCards[round]"
@@ -104,6 +104,7 @@ export default class PlayGame extends Vue {
   }
 
   onSessionJoin(session) {
+    this.updateGameState('choose-cards')
     this.updatePlayedCards(session)
   }
 

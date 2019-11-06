@@ -1,5 +1,6 @@
 import * as types from './mutation-types'
 import { CardView } from '~/models/Card'
+import { DeckView } from '~/models/Deck'
 
 type state = {
   cards: CardView[]
@@ -10,6 +11,7 @@ interface IQueryOptions {
   take?: number
   order?: number
   type?: 'Q' | 'A'
+  decks?: DeckView[]
 }
 
 const getQuery = (options: IQueryOptions = {}): string => {

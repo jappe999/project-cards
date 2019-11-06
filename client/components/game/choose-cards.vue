@@ -57,6 +57,7 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 import { CardView } from '~/models/Card'
 import { SessionView } from '~/models/Session'
+import { GameView } from '~/models/Game'
 
 @Component({
   components: {
@@ -89,6 +90,7 @@ export default class AppChooseCards extends Vue {
 
   @Getter('session/blackCard') blackCard!: CardView
   @Getter('session/round') round!: number
+  @Getter('session/game') game!: GameView
   @Getter('session/session') session!: SessionView
 
   @Prop({ default: false, type: Boolean }) isCzar!: boolean
@@ -103,7 +105,10 @@ export default class AppChooseCards extends Vue {
   }
 
   async mounted() {
-    this.cards = await this.fetchCards({ type: 'A' })
+    this.cards = await this.fetchCards({
+      type: 'A',
+      gameId: this.game.id,
+    })
   }
 
   /**
@@ -128,6 +133,7 @@ export default class AppChooseCards extends Vue {
   async fetchNewCards(amount: number = 1) {
     const newCards = await this.fetchCards({
       type: 'A',
+      gameId: this.game.id,
       take: amount,
     })
 

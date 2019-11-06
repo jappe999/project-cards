@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 import { DeckView } from '~/models/Deck'
 
@@ -37,16 +37,22 @@ export default class AppGameSettingsDecks extends Vue {
 
   decks: DeckView[] = []
 
-  @Getter('games/gameDecks') gameDecks!: DeckView[]
+  @Prop({ default: () => [], type: Array }) selectedDecks!: DeckView[]
+
+  @Getter('decks/decks') fetchedDecks!: Function
 
   @Action('decks/fetchDecks') fetchDecks!: Function
 
   async beforeMount() {
-    const decks = await this.fetchDecks({ take: 49 })
+    const decks =
+      this.fetchedDecks.length === 0
+        ? await this.fetchDecks({ take: 49 })
+        : this.fetchedDecks
+
     this.decks = decks
       .map(deck => ({
         ...deck,
-        checked: this.gameDecks.some(sd => sd.id === deck.id),
+        checked: this.selectedDecks.some(sd => sd.id === deck.id),
       }))
       .sort((a, b) => {
         const nameA = a.name.toUpperCase()
@@ -61,7 +67,7 @@ export default class AppGameSettingsDecks extends Vue {
       })
   }
 
-  selectedDecks() {
+  getSelectedDecks() {
     return this.decks.filter((deck: any) => deck.checked)
   }
 }

@@ -5,6 +5,7 @@ import { PlayerView } from '~/models/Player'
 import { CardView } from '~/models/Card'
 
 export type gameState =
+  | ''
   | 'choose-cards'
   | 'choose-card-combination'
   | 'show-best-combination'
@@ -17,7 +18,7 @@ export type state = {
 
 export const state = (): state => ({
   session: null,
-  gameState: 'choose-cards',
+  gameState: '',
   players: [],
 })
 

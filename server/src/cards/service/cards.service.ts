@@ -9,14 +9,14 @@ export class CardsService {
   constructor(
     @InjectRepository(Card)
     private readonly cardRepository: Repository<Card>,
-  ) {}
+  ) { }
 
   paginateKeys({
     skip = 0,
     take = 10,
     sort = 'RANDOM()',
     order = 'ASC',
-  } = {}): { skip: number; take: number; [rest: string]: any } {
+  } = {}): { skip: number; take: number;[rest: string]: any } {
     skip = skip >= 0 ? skip : 0
     take = take < 50 && take >= 0 ? take : 10
 
