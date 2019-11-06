@@ -75,8 +75,8 @@ export default class PlayGame extends Vue {
 
   /** @var $socket - The socket connection to the server. */
   get $socket(): SocketIOClient.Socket {
-    const name = '$socket'
-    return window[name]
+    // @ts-ignore
+    return window.$socket
   }
 
   /** Determine if the current user is the card czar */
@@ -104,7 +104,6 @@ export default class PlayGame extends Vue {
   }
 
   onSessionJoin(session) {
-    this.updateSession(session)
     this.updatePlayedCards(session)
   }
 
@@ -116,11 +115,13 @@ export default class PlayGame extends Vue {
    * @param payload.user - The user that has left the game.
    */
   onSessionExit({ session, user }) {
-    session.playerInSession = session.playerInSession.filter(
-      ({ playerId }) => playerId !== user.id,
-    )
+    this.updateSession({
+      ...session,
+      playerInSession: session.playerInSession.filter(
+        ({ playerId }) => playerId !== user.id,
+      ),
+    })
 
-    this.updateSession(session)
     this.updatePlayedCards(session)
   }
 

@@ -32,7 +32,9 @@ export const getters = {
 
 export const mutations = {
     [types.FETCH_DECKS](state: state, decks: DeckView[]) {
+        let duplicates = {};
         state.decks = [...state.decks, ...decks]
+            .filter(obj => duplicates[obj.id] = !duplicates[obj.id])
     },
 }
 

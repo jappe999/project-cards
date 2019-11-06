@@ -42,6 +42,7 @@ const config: NuxtConfiguration = {
   plugins: [
     '~/plugins/Form',
     '~/plugins/SelectOnFocus',
+    '~/plugins/vue-click-outside',
     { src: '~/plugins/socket.io', ssr: false },
   ],
   /*
@@ -124,7 +125,7 @@ const config: NuxtConfiguration = {
     /*
      ** You can extend webpack config here
      */
-    extend(config, ctx) {},
+    extend(config, ctx) { },
   },
 }
 
