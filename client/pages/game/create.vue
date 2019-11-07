@@ -1,13 +1,16 @@
 <template>
-  <div class="w-96 flex flex-col items-center">
+  <div class="max-w-lg flex flex-col items-center p-4">
     <app-card class="w-full">
       <app-card-content>
         <h2 class="text-2xl font-bold">
           Create a new game
         </h2>
-        <hr class="w-full mt-2 mb-4 border-b border-gray" />
+      </app-card-content>
 
-        <form @submit.prevent="createGame">
+      <hr class="w-full mb-4 border-b border-gray" />
+
+      <form @submit.prevent="createGame">
+        <app-card-content>
           <app-input
             v-model="game.name"
             name="name"
@@ -20,12 +23,20 @@
             <input v-model="game.private" type="checkbox" class="mr-2" />
             <small>Private game?</small>
           </label>
+        </app-card-content>
 
+        <app-card-content>
+          <app-settings-decks ref="decks" />
+        </app-card-content>
+
+        <hr class="w-full border-b border-gray" />
+
+        <app-card-content>
           <div class="flex justify-end">
             <app-button type="submit">Create game</app-button>
           </div>
-        </form>
-      </app-card-content>
+        </app-card-content>
+      </form>
     </app-card>
 
     <app-link class="mt-4" to="/game">Or join game</app-link>
@@ -34,7 +45,6 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { mapMutations } from 'vuex'
 import { Action, Mutation } from 'vuex-class'
 import { Form } from '~/plugins'
 import { GameCreate, GameView } from '~/models/Game'
@@ -44,6 +54,7 @@ import * as types from '~/store/mutation-types'
   components: {
     AppCard: () => import('~/components/card/card.vue'),
     AppCardContent: () => import('~/components/card/card-content.vue'),
+    AppSettingsDecks: () => import('~/components/game/settings/decks.vue'),
     AppInput: () => import('~/components/form/input.vue'),
     AppButton: () => import('~/components/button/button.vue'),
     AppLink: () => import('~/components/link.vue'),
@@ -54,28 +65,21 @@ export default class CreateGame extends Vue {
   game: Form<GameCreate> = new Form<GameCreate>({
     name: '',
     private: false,
+    decks: [],
   })
 
-  constructor() {
-    super()
-
-    Object.assign(
-      this,
-      mapMutations({
-        [types.FETCH_GAME]: `games/${types.FETCH_GAME}`,
-      }),
-    )
-  }
-
   @Action('games/joinGame') joinGame
-  @Mutation(types.FETCH_GAME) FETCH_GAME
+  @Mutation(`games/${types.FETCH_GAME}`) fetchGame
 
   async createGame() {
     try {
-      const { data: game } = await this.game.post<GameView>(`games`)
-      this.FETCH_GAME(game)
+      // @ts-ignore
+      this.game.decks = this.$refs.decks.getSelectedDecks()
 
-      const lowerCaseName = game.name.replace(' ', '-').toLowerCase()
+      const { data: game } = await this.game.post<GameView>(`games`)
+      this.fetchGame(game)
+
+      const lowerCaseName = game.name.replace(/\s/g, '-').toLowerCase()
       this.$router.push(`/game/${game.id}-${lowerCaseName}/play`)
     } catch (e) {
       // TODO: Notify user

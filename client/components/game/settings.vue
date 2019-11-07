@@ -35,7 +35,8 @@
         <app-settings-tabs @change="changeState" />
 
         <app-card-content class="overflow-y-auto">
-          <transition-group name="page">
+          <transition-group name="tab">
+            <app-settings-misc v-show="tab === 'misc'" key="misc" />
             <app-settings-decks
               v-show="tab === 'choose-decks'"
               key="choose-decks"
@@ -71,11 +72,12 @@ import { DeckView } from '../../models/Deck'
     AppCard: () => import('~/components/card/card.vue'),
     AppCardContent: () => import('~/components/card/card-content.vue'),
     AppSettingsTabs: () => import('~/components/game/settings/tabs.vue'),
+    AppSettingsMisc: () => import('~/components/game/settings/misc.vue'),
     AppSettingsDecks: () => import('~/components/game/settings/decks.vue'),
   },
 })
 export default class AppGameSettings extends Vue {
-  tab: string = 'choose-decks'
+  tab: string = 'misc'
 
   isSaving: boolean = false
 

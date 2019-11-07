@@ -16,7 +16,7 @@ export class Game extends Model implements IGame {
   private: boolean = false
   creator: {} = {}
   session: SessionView = <SessionView>{}
-  decks: [] = []
+  decks: DeckView[] = []
 }
 
 export class GameView extends Game {
@@ -30,4 +30,5 @@ export class GameJoin extends Model {
 export class GameCreate extends Model implements IGame {
   name: string = ''
   private: boolean = false
+  decks: DeckView[] = []
 }

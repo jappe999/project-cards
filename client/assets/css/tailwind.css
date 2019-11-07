@@ -28,6 +28,17 @@ focus {
   opacity: 0;
 }
 
+.tab-enter-active,
+.tab-leave-active {
+  position: absolute;
+  transition: opacity 0.2s;
+}
+
+.tab-enter,
+.tab-leave-active {
+  opacity: 0;
+}
+
 .game-state-enter-active,
 .game-state-leave-active {
   position: absolute;
