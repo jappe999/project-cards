@@ -8,7 +8,7 @@ import { AuthModule } from '../auth/auth.module'
 import { PlayerSessionModule } from '../player-session/player-session.module'
 import { UsersModule } from '../users/users.module'
 import { GamesModule } from '../games/games.module'
-import { DecksModule } from '../decks/decks'
+import { DecksModule } from '../decks/decks.module'
 
 @Module({
   imports: [

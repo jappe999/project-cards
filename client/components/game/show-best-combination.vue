@@ -33,6 +33,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 import { CardView } from '~/models/Card'
+import { SessionView } from '~/models/Session'
 
 @Component({
   components: {

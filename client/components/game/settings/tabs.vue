@@ -4,20 +4,9 @@
       <button
         bg="white"
         color="gray-800"
-        class="pt-4 pb-3 px-4 border-b-2 shadow-none border-gray-800"
+        class="pt-4 pb-3 px-4 shadow-none"
         :class="{
-          'bg-gray-400': state === 'misc',
-        }"
-        @click="changeState('misc')"
-      >
-        Misc
-      </button>
-      <button
-        bg="white"
-        color="gray-800"
-        class="pt-4 pb-3 px-4 border-b-2 shadow-none border-gray-800"
-        :class="{
-          'bg-gray-400': state === 'choose-decks',
+          'bg-gray-400 border-b-2 border-gray-800': state === 'choose-decks',
         }"
         @click="changeState('choose-decks')"
       >

@@ -284,7 +284,7 @@ export class SessionsService {
     game: GameJoinDto,
     room: string,
   ): Promise<Session> {
-    let session = await this.sessionRepository.findOne({ where: { room } })
+    let session = await this.sessionRepository.findOne({ where: { game } })
 
     if (!session) {
       session = await this.setupSession({ game, room })

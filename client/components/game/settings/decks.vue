@@ -26,6 +26,7 @@ import { DeckView } from '~/models/Deck'
     AppLabelledCheckbox: () =>
       import('~/components/form/labelled-checkbox.vue'),
   },
+
   watch: {
     checkAll(checked) {
       this.decks = this.decks.map(deck => ({ ...deck, checked }))
@@ -34,7 +35,6 @@ import { DeckView } from '~/models/Deck'
 })
 export default class AppGameSettingsDecks extends Vue {
   checkAll: boolean = false
-
   decks: DeckView[] = []
 
   @Prop({ default: () => [], type: Array }) selectedDecks!: DeckView[]
@@ -55,15 +55,13 @@ export default class AppGameSettingsDecks extends Vue {
         checked: this.selectedDecks.some(sd => sd.id === deck.id),
       }))
       .sort((a, b) => {
-        const nameA = a.name.toUpperCase()
-        const nameB = b.name.toUpperCase()
-        if (nameA < nameB) {
+        if (a.id < b.id) {
           return -1
-        }
-        if (nameA > nameB) {
+        } else if (a.id > b.id) {
           return 1
+        } else {
+          return 0
         }
-        return 0
       })
   }
 

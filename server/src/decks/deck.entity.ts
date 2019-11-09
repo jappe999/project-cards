@@ -1,4 +1,4 @@
-import { Entity, Column, OneToMany, PrimaryColumn, JoinTable, ManyToOne, ManyToMany } from 'typeorm'
+import { Entity, Column, OneToMany, PrimaryColumn, JoinTable, ManyToMany } from 'typeorm'
 import { Card } from '../cards/card.entity'
 import { Game } from '../games/game.entity'
 
