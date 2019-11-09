@@ -6,9 +6,10 @@
         color="gray-800"
         class="pt-4 pb-3 px-4 shadow-none"
         :class="{
-          'bg-gray-400 border-b-2 border-gray-800': state === 'choose-decks',
+          'bg-gray-400 border-b-2 border-gray-800':
+            activeTab === 'choose-decks',
         }"
-        @click="changeState('choose-decks')"
+        @click="changeTab('choose-decks')"
       >
         Card decks
       </button>
@@ -16,7 +17,7 @@
   </ul>
 </template>
 
-<script>
+<script lang="ts">
 import { Vue, Component, Emit } from 'vue-property-decorator'
 
 @Component({
@@ -25,11 +26,18 @@ import { Vue, Component, Emit } from 'vue-property-decorator'
   },
 })
 export default class AppGameSettingsTabs extends Vue {
-  state = 'choose-decks'
+  /** @var activeTab - The name of the activate tab. */
+  activeTab = 'choose-decks'
 
+  /**
+   * Set the current active tab.
+   *
+   * @param tab - The name of the tab to activate.
+   * @returns The name of the active tab.
+   */
   @Emit('change')
-  changeState(name) {
-    return (this.state = name)
+  changeTab(tab: string): string {
+    return (this.activeTab = tab)
   }
 }
 </script>

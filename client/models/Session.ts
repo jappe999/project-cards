@@ -2,6 +2,7 @@ import Model from './Model'
 import { GameView } from './Game'
 import { CardView } from './Card'
 import { PlayerView } from './Player'
+import { PlayerSessionView } from './PlayerSession'
 
 export interface ISession {
   id?: string
@@ -12,10 +13,10 @@ export interface ISession {
   game: GameView
   currentCard: CardView
   currentCzar: PlayerView
-  playerInSession: []
+  playerInSession: PlayerSessionView[]
 }
 
-export class Session extends Model implements ISession {
+export class SessionView extends Model implements ISession {
   id: string = ''
   room: string
   currentRound: number = 0
@@ -24,10 +25,8 @@ export class Session extends Model implements ISession {
   game: GameView
   currentCard: CardView
   currentCzar: PlayerView
-  playerInSession: [] // Further refacotr
+  playerInSession: PlayerSessionView[]
 }
-
-export class SessionView extends Session {}
 
 export class SessionJoin extends Model {
   game: GameView
