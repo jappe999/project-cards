@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 import { DeckView } from '~/models/Deck'
 
@@ -28,8 +28,15 @@ import { DeckView } from '~/models/Deck'
   },
 
   watch: {
-    checkAll(checked) {
+    checkAll(checked: boolean) {
       this.decks = this.decks.map(deck => ({ ...deck, checked }))
+    },
+
+    decks: {
+      deep: true,
+      handler() {
+        this.emitSelectedDecks()
+      },
     },
   },
 })
@@ -49,6 +56,10 @@ export default class AppGameSettingsDecks extends Vue {
         ? await this.fetchDecks({ take: 49 })
         : this.fetchedDecks
 
+    this.setDecks(decks)
+  }
+
+  setDecks(decks: DeckView[]) {
     this.decks = decks
       .map(deck => ({
         ...deck,
@@ -65,8 +76,9 @@ export default class AppGameSettingsDecks extends Vue {
       })
   }
 
-  getSelectedDecks() {
-    return this.decks.filter((deck: any) => deck.checked)
+  @Emit('select-decks')
+  emitSelectedDecks() {
+    return this.decks.filter((deck: any) => deck.checked === true)
   }
 }
 </script>

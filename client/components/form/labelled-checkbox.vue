@@ -4,9 +4,9 @@
   >
     <input v-model="isChecked" type="checkbox" class="hidden" />
     <div
-      class="h-4 w-4 flex items-center justify-center ml-2 my-2 p-1"
+      class="h-4 w-4 flex items-center justify-center ml-2 my-2 p-1 text-white"
       :class="{
-        'bg-gray-700 text-white': isChecked,
+        'bg-gray-700': isChecked,
         'bg-gray-300': !isChecked,
       }"
     >

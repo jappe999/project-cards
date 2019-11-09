@@ -18,7 +18,7 @@ export class CardsController {
     @Query() query: { [key: string]: any },
   ): Promise<CardViewDto[]> {
     let game = null
-    if (query.game) {
+    if (query.gameId) {
       game = await this.gamesService.findOne({
         where: { id: query.gameId },
         relations: ['decks']
