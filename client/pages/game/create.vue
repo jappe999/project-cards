@@ -26,7 +26,7 @@
         </app-card-content>
 
         <app-card-content>
-          <app-settings-decks ref="decks" />
+          <app-settings-decks @select-decks="selectDecks" />
         </app-card-content>
 
         <hr class="w-full border-b border-gray" />
@@ -68,14 +68,19 @@ export default class CreateGame extends Vue {
     decks: [],
   })
 
-  @Action('games/joinGame') joinGame
   @Mutation(`games/${types.FETCH_GAME}`) fetchGame
+
+  @Action('games/joinGame') joinGame
+
+  selectDecks(decks) {
+    this.game.fill({
+      ...this.game.data(),
+      decks,
+    })
+  }
 
   async createGame() {
     try {
-      // @ts-ignore
-      this.game.decks = this.$refs.decks.getSelectedDecks()
-
       const { data: game } = await this.game.post<GameView>(`games`)
       this.fetchGame(game)
 

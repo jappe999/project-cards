@@ -55,11 +55,7 @@
         <nuxt-child />
       </keep-alive>
 
-      <app-game-settings
-        class="inset-y-0"
-        :show="settingsViewOpen"
-        @close="toggleSettings"
-      />
+      <app-game-settings :show="settingsViewOpen" @close="toggleSettings" />
     </main>
   </div>
 </template>

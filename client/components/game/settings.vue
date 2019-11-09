@@ -2,7 +2,7 @@
   <transition name="game-settings">
     <div
       v-if="show"
-      class="wrapper h-full max-h-full w-full fixed flex justify-end p-4"
+      class="wrapper h-full max-h-full w-full fixed inset-y-0 flex justify-end p-4"
     >
       <app-card
         v-if="show"
