@@ -1,9 +1,6 @@
+import { GetterTree, MutationTree, ActionTree } from 'vuex/types/index'
 import * as types from './mutation-types'
 import { DeckView } from '~/models/Deck'
-
-type state = {
-    decks: DeckView[]
-}
 
 interface IQueryOptions {
     skip?: number
@@ -22,15 +19,17 @@ const getQuery = (options: IQueryOptions = {}): string => {
     return params.toString() !== '' ? '?' + params.toString() : ''
 }
 
-export const state = (): state => ({
+export const state = () => ({
     decks: [],
 })
 
-export const getters = {
+export type state = ReturnType<typeof state>
+
+export const getters: GetterTree<state, state> = {
     decks: ({ decks }) => decks,
 }
 
-export const mutations = {
+export const mutations: MutationTree<state> = {
     [types.FETCH_DECKS](state: state, decks: DeckView[]) {
         let duplicates = {};
         state.decks = [...state.decks, ...decks]
@@ -38,7 +37,7 @@ export const mutations = {
     },
 }
 
-export const actions: { [key: string]: any } = {
+export const actions: ActionTree<state, state> = {
     async fetchDecks(
         { commit },
         options: IQueryOptions = {},

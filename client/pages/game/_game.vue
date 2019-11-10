@@ -97,15 +97,9 @@ export default class AppGame extends Vue {
     return origin + pathname
   }
 
-  /** @var $socket - The socket connection to the server. */
-  get $socket(): SocketIOClient.Socket {
-    // @ts-ignore
-    return window.$socket
-  }
-
   beforeMount() {
-    this.$socket.on('session-join', this.onSessionJoin.bind(this))
-    this.$socket.on('session-exit', this.updateSession.bind(this))
+    window.$socket.on('session-join', this.onSessionJoin.bind(this))
+    window.$socket.on('session-exit', this.updateSession.bind(this))
   }
 
   async mounted() {

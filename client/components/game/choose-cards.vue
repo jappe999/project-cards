@@ -98,12 +98,6 @@ export default class AppChooseCards extends Vue {
 
   @Action('cards/fetchCards') fetchCards
 
-  /** @var $socket - The socket connection to the server. */
-  get $socket(): SocketIOClient.Socket {
-    const name = '$socket'
-    return window[name]
-  }
-
   async mounted() {
     this.cards = await this.fetchCards({
       type: 'A',
@@ -167,7 +161,7 @@ export default class AppChooseCards extends Vue {
 
   @Emit('submit')
   playCards() {
-    this.$socket.emit('session-play-card', {
+    window.$socket.emit('session-play-card', {
       session: this.session,
       cards: this.selectedCards,
       round: this.round,

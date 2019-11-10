@@ -1,17 +1,15 @@
+import { GetterTree, MutationTree, ActionTree } from 'vuex/types/index'
 import { GameView } from '~/models/Game'
 import * as types from './mutation-types'
 
-type state = {
-  games: GameView[]
-  currentGameId: string
-}
-
-export const state = (): state => ({
+export const state = () => ({
   games: [],
   currentGameId: null,
 })
 
-export const getters = {
+export type state = ReturnType<typeof state>
+
+export const getters: GetterTree<state, state> = {
   games: ({ games }: state) => games,
   currentGame: ({ games, currentGameId }: state) =>
     games.find(({ id }) => id === currentGameId),
@@ -21,7 +19,7 @@ export const getters = {
   }
 }
 
-export const mutations = {
+export const mutations: MutationTree<state> = {
   [types.SET_CURRENT_GAME_ID](state: state, id: string) {
     state.currentGameId = id
   },
@@ -57,7 +55,7 @@ export const mutations = {
   },
 }
 
-export const actions: { [key: string]: any } = {
+export const actions: ActionTree<state, state> = {
   async fetchGames({ commit }): Promise<GameView[]> {
     const { data }: { data: GameView[] } = await this.$axios.get(`games`)
     commit(types.FETCH_GAMES, data)

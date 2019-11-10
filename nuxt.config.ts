@@ -43,6 +43,7 @@ const config: NuxtConfiguration = {
     '~/plugins/Form',
     '~/plugins/SelectOnFocus',
     '~/plugins/vue-click-outside',
+    '~/plugins/axios',
     { src: '~/plugins/socket.io', ssr: false },
   ],
   /*
@@ -122,11 +123,8 @@ const config: NuxtConfiguration = {
         tailwindcss: './client/tailwind.config.js',
       },
     },
-    /*
-     ** You can extend webpack config here
-     */
-    extend(config, ctx) { },
   },
+  buildModules: ['@nuxt/typescript-build']
 }
 
 export default config

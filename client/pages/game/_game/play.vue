@@ -73,12 +73,6 @@ export default class PlayGame extends Vue {
   /** @var state - The current state of the game session. */
   @Getter('session/gameState') state: gameState
 
-  /** @var $socket - The socket connection to the server. */
-  get $socket(): SocketIOClient.Socket {
-    // @ts-ignore
-    return window.$socket
-  }
-
   /** Determine if the current user is the card czar */
   get isCzar(): boolean {
     return this.session.currentCzarId === this.$auth.user.id
@@ -93,11 +87,11 @@ export default class PlayGame extends Vue {
   ) => void
 
   beforeMount() {
-    this.$socket.on('session-join', this.onSessionJoin.bind(this))
-    this.$socket.on('session-exit', this.onSessionExit.bind(this))
-    this.$socket.on('session-next-round', this.onSessionNextRound.bind(this))
-    this.$socket.on('session-play-card', this.onSessionPlayCard.bind(this))
-    this.$socket.on(
+    window.$socket.on('session-join', this.onSessionJoin.bind(this))
+    window.$socket.on('session-exit', this.onSessionExit.bind(this))
+    window.$socket.on('session-next-round', this.onSessionNextRound.bind(this))
+    window.$socket.on('session-play-card', this.onSessionPlayCard.bind(this))
+    window.$socket.on(
       'session-choose-card-combination',
       this.onSessionChooseCardCombination.bind(this),
     )
@@ -128,7 +122,7 @@ export default class PlayGame extends Vue {
 
   onSessionNextRound(session) {
     this.onSessionJoin(session)
-    this.updateGameState('choose-cards')
+    this.updateSession(session)
   }
 
   onSessionPlayCard(playerSession) {

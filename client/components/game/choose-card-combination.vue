@@ -57,6 +57,7 @@
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
 import { Action, Getter } from 'vuex-class'
 import { CardView } from '~/models/Card'
+import { SessionView } from '~/models/Session'
 
 @Component({
   components: {
@@ -74,17 +75,13 @@ export default class AppChooseCardCombination extends Vue {
   @Prop({ default: () => [], type: Array }) cards!: CardView[]
   @Prop({ default: () => [], type: Array }) selectedCards!: CardView[]
 
-  /** @var $socket - The socket connection to the server. */
-  get $socket(): SocketIOClient.Socket {
-    const name = '$socket'
-    return window[name]
-  }
-
   get canSelectCard() {
     return this.selectedCards.length < 1
   }
 
-  @Action('session/playCards') chooseCardCombination: (cards: CardView) => void
+  @Action('session/playCards') chooseCardCombination: (
+    cards: CardView[],
+  ) => void
 
   /**
    * Add a card if it's not already selected. Else remove it from the array.
