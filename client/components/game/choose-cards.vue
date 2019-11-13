@@ -90,7 +90,7 @@ export default class AppChooseCards extends Vue {
 
   @Getter('session/blackCard') blackCard!: CardView
   @Getter('session/round') round!: number
-  @Getter('session/game') game!: GameView
+  @Getter('games/currentGame') game!: GameView
   @Getter('session/session') session!: SessionView
 
   @Prop({ default: false, type: Boolean }) isCzar!: boolean

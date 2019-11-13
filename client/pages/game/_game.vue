@@ -78,7 +78,7 @@ export default class AppGame extends Vue {
   settingsViewOpen: boolean = false
 
   /** @var game - The game that is currently being played. */
-  @Getter('session/game') game!: GameView
+  @Getter('games/currentGame') game!: GameView
 
   @Mutation(`session/${types.UPDATE_SESSION}`) updateSession: (
     session: Partial<SessionView>,

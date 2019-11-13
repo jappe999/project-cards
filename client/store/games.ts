@@ -12,7 +12,7 @@ export type state = ReturnType<typeof state>
 export const getters: GetterTree<state, state> = {
   games: ({ games }: state) => games,
   currentGame: ({ games, currentGameId }: state) =>
-    games.find(({ id }) => id === currentGameId),
+    games.find(({ id }) => id === currentGameId) || {},
   gameDecks: ({ games, currentGameId }: state) => {
     const game = games.find(({ id }) => id === currentGameId)
     return game && game.decks ? game.decks : []

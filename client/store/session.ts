@@ -6,7 +6,6 @@ import { PlayerView } from '~/models/Player'
 import { CardView } from '~/models/Card'
 
 export type gameState =
-  | ''
   | 'choose-cards'
   | 'choose-card-combination'
   | 'show-best-combination'
@@ -20,7 +19,6 @@ export type state = ReturnType<typeof state>
 
 export const getters: GetterTree<state, state> = {
   session: ({ session }): SessionView => session || <SessionView>{},
-  game: ({ session }): GameView => (session && session.game) || <GameView>{},
   blackCard: ({ session }): CardView => (session && session.currentCard) || <CardView>{},
   round: ({ session }): number => (session && session.currentRound) || 0,
   gameState: ({ gameState }): gameState => gameState,

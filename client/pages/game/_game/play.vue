@@ -62,7 +62,7 @@ export default class PlayGame extends Vue {
   selectedCardCombination: CardView[] = []
 
   /** @var game - The game that is currently being played. */
-  @Getter('session/game') game: GameView
+  @Getter('games/currentGame') game: GameView
 
   /** @var session - The session the user is currently in. */
   @Getter('session/session') session: SessionView
