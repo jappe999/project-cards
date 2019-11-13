@@ -14,7 +14,6 @@ export type gameState =
 export const state = () => ({
   session: null as SessionView,
   gameState: '' as gameState,
-  players: [] as PlayerView[],
 })
 
 export type state = ReturnType<typeof state>
@@ -25,7 +24,6 @@ export const getters: GetterTree<state, state> = {
   blackCard: ({ session }): CardView => (session && session.currentCard) || <CardView>{},
   round: ({ session }): number => (session && session.currentRound) || 0,
   gameState: ({ gameState }): gameState => gameState,
-  players: ({ players }): PlayerView[] => players,
 }
 
 export const mutations: MutationTree<state> = {
@@ -38,7 +36,6 @@ export const mutations: MutationTree<state> = {
 
   [types.CLEAR_SESSION](state: state): void {
     state.session = null
-    state.players = []
     state.gameState = 'choose-cards'
   },
 

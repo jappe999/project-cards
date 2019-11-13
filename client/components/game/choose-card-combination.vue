@@ -85,7 +85,6 @@ export default class AppChooseCardCombination extends Vue {
 
   /**
    * Add a card if it's not already selected. Else remove it from the array.
-   *
    * @param cards - The array of cards to toggle in the list of selected cards.
    */
   @Emit('select')

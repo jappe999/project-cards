@@ -8,7 +8,7 @@ interface IQueryOptions {
   take?: number
   order?: number
   type?: 'Q' | 'A'
-  decks?: DeckView[]
+  gameId?: string
 }
 
 const getQuery = (options: IQueryOptions = {}): string => {

@@ -126,7 +126,12 @@ export default class AppGame extends Vue {
     this.updateSession(session)
   }
 
-  toggleSettings(state = null, timeout = 0) {
+  /**
+   * Open or close the settings panel.
+   * @param state - To close or not to close the panel. If left blank it'll be toggled.
+   * @param timeout - The time to wait with executing the toggle.
+   */
+  toggleSettings(state: boolean = null, timeout: number = 0) {
     setTimeout(() => {
       if (state === null) {
         this.settingsViewOpen = !this.settingsViewOpen

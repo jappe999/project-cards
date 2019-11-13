@@ -3,8 +3,8 @@ import { GameView } from '~/models/Game'
 import * as types from './mutation-types'
 
 export const state = () => ({
-  games: [],
-  currentGameId: null,
+  games: [] as GameView[],
+  currentGameId: null as string,
 })
 
 export type state = ReturnType<typeof state>
@@ -57,14 +57,14 @@ export const mutations: MutationTree<state> = {
 
 export const actions: ActionTree<state, state> = {
   async fetchGames({ commit }): Promise<GameView[]> {
-    const { data }: { data: GameView[] } = await this.$axios.get(`games`)
+    const { data } = await this.$axios.get<GameView[]>(`games`)
     commit(types.FETCH_GAMES, data)
     return data
   },
 
   async fetchGame({ commit }, id: string): Promise<GameView> {
     try {
-      const { data }: { data: GameView } = await this.$axios.get(`games/${id}`)
+      const { data } = await this.$axios.get<GameView>(`games/${id}`)
       commit(types.FETCH_GAME, data)
       return data
     } catch (error) {
@@ -74,7 +74,7 @@ export const actions: ActionTree<state, state> = {
 
   async updateGame({ commit, getters }, game: GameView): Promise<GameView> {
     try {
-      const { data }: { data: GameView } = await this.$axios.put('games', {
+      const { data } = await this.$axios.put<GameView>('games', {
         ...getters.currentGame,
         ...game
       })
