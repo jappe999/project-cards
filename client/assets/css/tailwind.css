@@ -28,6 +28,17 @@ focus {
   opacity: 0;
 }
 
+.tab-enter-active,
+.tab-leave-active {
+  position: absolute;
+  transition: opacity 0.2s;
+}
+
+.tab-enter,
+.tab-leave-active {
+  opacity: 0;
+}
+
 .game-state-enter-active,
 .game-state-leave-active {
   position: absolute;
@@ -45,4 +56,24 @@ focus {
 
 .game-state-leave-active {
   transform: translateX(-30px);
+}
+
+.game-settings-enter-active,
+.game-settings-enter-active>div,
+.game-settings-leave-active,
+.game-settings-leave-active>div {
+  transition: all 0.2s;
+}
+
+.game-settings-enter,
+.game-settings-leave-active {
+  opacity: 0;
+}
+
+.game-settings-enter>div {
+  transform: translateX(30px);
+}
+
+.game-settings-leave-active>div {
+  transform: translateX(30px);
 }

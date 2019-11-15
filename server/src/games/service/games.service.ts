@@ -9,9 +9,13 @@ export class GamesService {
   constructor(
     @InjectRepository(Game)
     private readonly gameRepository: Repository<Game>,
-  ) {}
+  ) { }
 
   create(game: GameCreateDto): Promise<Game> {
+    return this.gameRepository.save(game)
+  }
+
+  update(game: GameCreateDto): Promise<Game> {
     return this.gameRepository.save(game)
   }
 

@@ -1,10 +1,5 @@
-import { IsNotEmpty, IsNumber, IsBoolean, MaxLength } from 'class-validator';
+import { IsNotEmpty, MaxLength } from 'class-validator'
 
-export class SessionJoinDto {
-  @IsNotEmpty()
-  id!: string;
+export class SessionUpdateDto {
 
-  @IsNotEmpty()
-  @MaxLength(128)
-  name!: string;
 }

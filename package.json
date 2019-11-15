@@ -28,6 +28,7 @@
     "@nestjs/swagger": "^3.0.2",
     "@nestjs/typeorm": "^6.1.2",
     "@nestjs/websockets": "^6.3.1",
+    "@nuxt/typescript-build": "^0.3.4",
     "@nuxtjs/auth": "^4.8.1",
     "@nuxtjs/axios": "^5.3.6",
     "@nuxtjs/eslint-module": "^0.0.1",
@@ -52,6 +53,7 @@
     "socket.io-client": "^2.2.0",
     "swagger-ui-express": "^4.0.6",
     "typeorm": "^0.2.18",
+    "vue-click-outside": "^1.0.7",
     "vue-property-decorator": "^8.1.1",
     "vuex-class": "^0.3.2",
     "webpack-shell-plugin": "^0.5.0"

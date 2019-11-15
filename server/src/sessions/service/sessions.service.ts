@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Session } from '../session.entity'
-import { Repository } from 'typeorm'
+import { Repository, In } from 'typeorm'
 import { Socket } from 'socket.io'
 import { from, Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
@@ -22,7 +22,7 @@ export class SessionsService {
     private readonly cardsService: CardsService,
     private readonly gamesService: GamesService,
     private readonly playerInSessionsService: PlayerSessionService,
-  ) {}
+  ) { }
 
   /**
    * Let a user join a particular game.
@@ -216,6 +216,7 @@ export class SessionsService {
     return this.sessionRepository.findOne(id, {
       relations: [
         'game',
+        'game.decks',
         'currentCard',
         'playerInSession',
         'playerInSession.player',
@@ -244,10 +245,22 @@ export class SessionsService {
     room: string
     currentRound?: number
   }) {
-    const [currentCard] = await this.cardsService.findAll({
+    const query = {
       skip: 0,
       take: 1,
       type: 'Q',
+    }
+
+    // TODO: Move to cards service
+    let fetchedGame = null
+    fetchedGame = await this.gamesService.findOne({
+      where: { id: game.id },
+      relations: ['decks']
+    })
+
+    const [currentCard] = await this.cardsService.findAll({
+      ...query,
+      deckId: In(fetchedGame.decks.map(({ id }) => id))
     })
 
     return this.sessionRepository.save({
@@ -271,7 +284,7 @@ export class SessionsService {
     game: GameJoinDto,
     room: string,
   ): Promise<Session> {
-    let session = await this.sessionRepository.findOne({ where: { room } })
+    let session = await this.sessionRepository.findOne({ where: { game } })
 
     if (!session) {
       session = await this.setupSession({ game, room })

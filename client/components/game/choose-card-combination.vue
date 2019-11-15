@@ -55,7 +55,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
+import { Action, Getter } from 'vuex-class'
 import { CardView } from '~/models/Card'
+import { SessionView } from '~/models/Session'
 
 @Component({
   components: {
@@ -65,26 +67,24 @@ import { CardView } from '~/models/Card'
   },
 })
 export default class AppChooseCardCombination extends Vue {
+  @Getter('session/blackCard') blackCard!: CardView
+  @Getter('session/round') round!: number
+  @Getter('session/session') session!: SessionView
+
   @Prop({ default: false, type: Boolean }) isCzar!: boolean
-  @Prop({ default: 0, type: Number }) round!: number
-  @Prop({ default: () => ({}), type: Object }) blackCard!: CardView
   @Prop({ default: () => [], type: Array }) cards!: CardView[]
   @Prop({ default: () => [], type: Array }) selectedCards!: CardView[]
-  @Prop({ default: () => ({}), type: Object }) session!: any
-
-  /** @var $socket - The socket connection to the server. */
-  get $socket(): SocketIOClient.Socket {
-    const name = '$socket'
-    return window[name]
-  }
 
   get canSelectCard() {
     return this.selectedCards.length < 1
   }
 
+  @Action('session/playCards') chooseCardCombination: (
+    cards: CardView[],
+  ) => void
+
   /**
    * Add a card if it's not already selected. Else remove it from the array.
-   *
    * @param cards - The array of cards to toggle in the list of selected cards.
    */
   @Emit('select')
@@ -98,11 +98,7 @@ export default class AppChooseCardCombination extends Vue {
 
   @Emit('submit')
   playCards() {
-    this.$socket.emit('session-choose-card-combination', {
-      session: this.session,
-      cards: this.selectedCards,
-      round: this.round,
-    })
+    this.chooseCardCombination(this.selectedCards)
   }
 }
 </script>

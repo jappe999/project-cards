@@ -13,6 +13,6 @@ module.exports = {
       : false,
   url: `postgres://${user}:${pass}@${host}:${port}/${name}`,
   synchronize: true,
-  seeds: ['server/database/seeders/**/*.seeder.ts'],
+  seeds: ['server/database/seeders/database.seeder.ts'],
   factories: ['server/database/factories/**/*.factory.ts'],
 }

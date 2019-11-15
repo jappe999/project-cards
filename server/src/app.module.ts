@@ -9,6 +9,7 @@ import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConne
 import { UsersModule } from './users/users.module'
 import { AuthModule } from './auth/auth.module'
 import { PlayerSessionModule } from './player-session/player-session.module'
+import { DecksModule } from './decks/decks.module'
 
 @Module({
   imports: [
@@ -19,9 +20,10 @@ import { PlayerSessionModule } from './player-session/player-session.module'
     GamesModule,
     SessionsModule,
     CardsModule,
+    DecksModule,
     UsersModule,
     AuthModule,
     PlayerSessionModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

@@ -1,19 +1,29 @@
+import { GetterTree, MutationTree, ActionTree } from 'vuex/types/index'
 import { GameView } from '~/models/Game'
 import * as types from './mutation-types'
 
-type state = {
-  games: GameView[]
-}
-
-export const state = (): state => ({
-  games: [],
+export const state = () => ({
+  games: [] as GameView[],
+  currentGameId: null as string,
 })
 
-export const getters = {
+export type state = ReturnType<typeof state>
+
+export const getters: GetterTree<state, state> = {
   games: ({ games }: state) => games,
+  currentGame: ({ games, currentGameId }: state) =>
+    games.find(({ id }) => id === currentGameId) || {},
+  gameDecks: ({ games, currentGameId }: state) => {
+    const game = games.find(({ id }) => id === currentGameId)
+    return game && game.decks ? game.decks : []
+  }
 }
 
-export const mutations = {
+export const mutations: MutationTree<state> = {
+  [types.SET_CURRENT_GAME_ID](state: state, id: string) {
+    state.currentGameId = id
+  },
+
   [types.FETCH_GAMES](state: state, games: GameView[]) {
     state.games = [
       ...state.games,
@@ -33,7 +43,11 @@ export const mutations = {
   },
 
   [types.UPDATE_GAME](state: state, game: GameView) {
-    state.games = state.games.map(item => (item.id === game.id ? game : item))
+    state.games = state.games.map(item => (
+      item.id === game.id
+        ? { ...item, ...game }
+        : item
+    ))
   },
 
   [types.REMOVE_GAME](state: state, game: GameView) {
@@ -41,16 +55,16 @@ export const mutations = {
   },
 }
 
-export const actions: { [key: string]: any } = {
+export const actions: ActionTree<state, state> = {
   async fetchGames({ commit }): Promise<GameView[]> {
-    const { data }: { data: GameView[] } = await this.$axios.get(`games`)
+    const { data } = await this.$axios.get<GameView[]>(`games`)
     commit(types.FETCH_GAMES, data)
     return data
   },
 
   async fetchGame({ commit }, id: string): Promise<GameView> {
     try {
-      const { data }: { data: GameView } = await this.$axios.get(`games/${id}`)
+      const { data } = await this.$axios.get<GameView>(`games/${id}`)
       commit(types.FETCH_GAME, data)
       return data
     } catch (error) {
@@ -58,7 +72,16 @@ export const actions: { [key: string]: any } = {
     }
   },
 
-  joinGame(state: state, game: GameView): Promise<GameView> {
-    return Promise.resolve(game)
+  async updateGame({ commit, getters }, game: GameView): Promise<GameView> {
+    try {
+      const { data } = await this.$axios.put<GameView>('games', {
+        ...getters.currentGame,
+        ...game
+      })
+      commit(types.UPDATE_GAME, data)
+      return data
+    } catch (error) {
+      return <GameView>{}
+    }
   },
 }

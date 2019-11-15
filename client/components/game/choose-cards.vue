@@ -54,8 +54,10 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator'
-import { Action } from 'vuex-class'
+import { Action, Getter } from 'vuex-class'
 import { CardView } from '~/models/Card'
+import { SessionView } from '~/models/Session'
+import { GameView } from '~/models/Game'
 
 @Component({
   components: {
@@ -86,22 +88,21 @@ export default class AppChooseCards extends Vue {
 
   isPreviousCzar: boolean = false
 
+  @Getter('session/blackCard') blackCard!: CardView
+  @Getter('session/round') round!: number
+  @Getter('games/currentGame') game!: GameView
+  @Getter('session/session') session!: SessionView
+
   @Prop({ default: false, type: Boolean }) isCzar!: boolean
-  @Prop({ default: 0, type: Number }) round!: number
-  @Prop({ default: {}, type: Object }) blackCard!: CardView
   @Prop({ default: [], type: Array }) selectedCards!: CardView[]
-  @Prop({ default: {}, type: Object }) session!: any
 
   @Action('cards/fetchCards') fetchCards
 
-  /** @var $socket - The socket connection to the server. */
-  get $socket(): SocketIOClient.Socket {
-    const name = '$socket'
-    return window[name]
-  }
-
   async mounted() {
-    this.cards = await this.fetchCards({ type: 'A' })
+    this.cards = await this.fetchCards({
+      type: 'A',
+      gameId: this.game.id,
+    })
   }
 
   /**
@@ -126,6 +127,7 @@ export default class AppChooseCards extends Vue {
   async fetchNewCards(amount: number = 1) {
     const newCards = await this.fetchCards({
       type: 'A',
+      gameId: this.game.id,
       take: amount,
     })
 
@@ -159,7 +161,7 @@ export default class AppChooseCards extends Vue {
 
   @Emit('submit')
   playCards() {
-    this.$socket.emit('session-play-card', {
+    window.$socket.emit('session-play-card', {
       session: this.session,
       cards: this.selectedCards,
       round: this.round,

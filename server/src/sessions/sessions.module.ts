@@ -8,16 +8,18 @@ import { AuthModule } from '../auth/auth.module'
 import { PlayerSessionModule } from '../player-session/player-session.module'
 import { UsersModule } from '../users/users.module'
 import { GamesModule } from '../games/games.module'
+import { DecksModule } from '../decks/decks.module'
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Session]),
     GamesModule,
     CardsModule,
+    DecksModule,
     AuthModule,
     UsersModule,
     PlayerSessionModule,
   ],
   providers: [SessionsService, SessionsGateway],
 })
-export class SessionsModule {}
+export class SessionsModule { }

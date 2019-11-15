@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsUUID } from 'class-validator';
 import { CardType } from './card.entity';
+import { DeckViewDto } from '../decks/deck.dto';
 
 export class CardViewDto {
   @IsUUID()
@@ -13,5 +14,5 @@ export class CardViewDto {
 
   numAnswers!: number;
 
-  expansion!: string;
+  deck?: DeckViewDto;
 }
