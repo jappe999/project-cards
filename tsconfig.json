@@ -10,6 +10,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowJs": true,
+    "skipLibCheck": true,
     "resolveJsonModule": true,
     "sourceMap": false,
     "outDir": "./dist",
