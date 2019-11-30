@@ -30,7 +30,10 @@ export class PlayerInSession {
   /**
    * The session the player is playing in.
    */
-  @ManyToOne(() => Session, session => session.playerInSession)
+  @ManyToOne(() => Session, session => session.playerInSession, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   public session!: Session
 
   /**

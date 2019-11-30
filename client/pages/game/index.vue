@@ -37,7 +37,7 @@
         <span
           class="lg:max-w-0 group-hover:max-w-xs overflow-hidden whitespace-no-wrap transition-slow"
         >
-          Or create a game
+          Create a game
         </span>
       </app-button-link>
     </div>
@@ -96,15 +96,25 @@
           </app-card>
         </nuxt-link>
       </div>
+      <div
+        v-if="games.length === 0"
+        class="w-full flex flex-col justify-center items-center pb-4 px-2 text-center"
+      >
+        <h2 class="text-2xl mb-4">There are no games yet.</h2>
+        <app-button-link to="/game/create">
+          Create a game
+        </app-button-link>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { Getter } from 'vuex-class'
+import { Getter, Mutation } from 'vuex-class'
 import { Context } from '@nuxt/vue-app'
-import { GameView } from '../../models/Game'
+import * as types from '~/store/mutation-types'
+import { GameView } from '~/models/Game'
 
 @Component({
   components: {
@@ -119,6 +129,20 @@ import { GameView } from '../../models/Game'
 })
 export default class Home extends Vue {
   @Getter('games/games') games!: GameView[]
+
+  @Mutation(`games/${types.REMOVE_GAME}`) removeGame: (game) => void
+
+  beforeMount() {
+    if (window.$socket) {
+      window.$socket.on('session-exit', this.onSessionExit.bind(this))
+    }
+  }
+
+  onSessionExit({ session }) {
+    if (session.playerInSession <= 1) {
+      this.removeGame({ id: session.gameId })
+    }
+  }
 
   numberOfPlayers(game): number {
     if (!game.session) return 0

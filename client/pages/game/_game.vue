@@ -51,11 +51,22 @@
     </div>
 
     <main class="h-full w-full relative overflow-x-hidden overflow-y-auto">
-      <keep-alive>
-        <nuxt-child />
-      </keep-alive>
+      <template v-if="gameExists">
+        <keep-alive>
+          <nuxt-child />
+        </keep-alive>
 
-      <app-game-settings :show="settingsViewOpen" @close="toggleSettings" />
+        <app-game-settings :show="settingsViewOpen" @close="toggleSettings" />
+      </template>
+
+      <div v-else class="h-full flex justify-center items-center text-center">
+        <app-card-content>
+          <h2 class="text-2xl mb-4">This game doesn't exist (anymore).</h2>
+          <app-button-link to="/game">
+            Back to all games
+          </app-button-link>
+        </app-card-content>
+      </div>
     </main>
   </div>
 </template>
@@ -69,11 +80,16 @@ import { SessionView } from '~/models/Session'
 
 @Component({
   components: {
+    AppCardContent: () => import('~/components/card/card-content.vue'),
+    AppButtonLink: () => import('~/components/button/button-link.vue'),
     AppShare: () => import('~/components/share.vue'),
     AppGameSettings: () => import('~/components/game/settings.vue'),
   },
 })
 export default class AppGame extends Vue {
+  /** @var gameExists - Does the game exist on the server. */
+  gameExists: boolean = true
+
   /** @var settingsViewOpen - Is the settings view open or not. */
   settingsViewOpen: boolean = false
 
@@ -108,7 +124,10 @@ export default class AppGame extends Vue {
       .split('-')
       .slice(0, 5)
       .join('-')
+
     const game = await this.fetchGame(gameId)
+    this.gameExists = game !== null && Object.keys(game).length > 0
+
     this.joinSession(game)
 
     window.onbeforeunload = () => {

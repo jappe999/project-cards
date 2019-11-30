@@ -5,7 +5,6 @@ import { Game } from '../game.entity'
 import { AuthGuard } from '@nestjs/passport'
 import { User } from '../../users/user.entity'
 import { CurrentUser } from '../../users/decorator/user.decorator'
-import { ValidationPipe } from '../../validation.pipe'
 
 @Controller('games')
 export class GamesController {
@@ -37,7 +36,6 @@ export class GamesController {
 
   @Put()
   @UseGuards(AuthGuard('jwt'))
-  @UsePipes(new ValidationPipe(GameCreateDto))
   updateSession(@Body() game: GameCreateDto) {
     return this.gamesService.update(game)
   }
