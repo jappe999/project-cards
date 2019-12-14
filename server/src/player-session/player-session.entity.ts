@@ -4,7 +4,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   OneToMany,
-  JoinTable,
+  JoinColumn,
 } from 'typeorm'
 import { User } from '../users/user.entity'
 import { Session } from '../sessions/session.entity'
@@ -30,16 +30,17 @@ export class PlayerInSession {
   /**
    * The session the player is playing in.
    */
-  @ManyToOne(() => Session, session => session.playerInSession, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(
+    () => Session,
+    session => session.playerInSession,
+    { cascade: true, onDelete: 'CASCADE', }
+  )
+  @JoinColumn()
   public session!: Session
 
   /**
    * The connection to the cards the player has played in the current session.
    */
   @OneToMany(() => PlayerInCard, playerInCard => playerInCard.playerSession)
-  @JoinTable()
   public playerCards!: PlayerInCard[]
 }

@@ -4,11 +4,7 @@
       class="w-full flex justify-between sm:px-4 text-white bg-gray-900 shadow"
     >
       <div class="w-2/3 md:w-auto md:w-80 flex -ml-4 pl-4">
-        <nuxt-link
-          class="flex items-center p-4 sm:p-3"
-          to="/game"
-          @click.native="exitSession(game)"
-        >
+        <nuxt-link class="flex items-center p-4 sm:p-3" to="/game">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
@@ -51,22 +47,26 @@
     </div>
 
     <main class="h-full w-full relative overflow-x-hidden overflow-y-auto">
-      <template v-if="gameExists">
-        <keep-alive>
-          <nuxt-child />
-        </keep-alive>
+      <template v-if="gameLoaded">
+        <template v-if="gameExists">
+          <keep-alive>
+            <nuxt-child />
+          </keep-alive>
 
-        <app-game-settings :show="settingsViewOpen" @close="toggleSettings" />
+          <app-game-settings :show="settingsViewOpen" @close="toggleSettings" />
+        </template>
+
+        <div v-else class="h-full flex justify-center items-center text-center">
+          <app-card-content>
+            <h2 class="text-2xl mb-4">This game doesn't exist (anymore).</h2>
+            <app-button-link to="/game">
+              Back to all games
+            </app-button-link>
+          </app-card-content>
+        </div>
       </template>
 
-      <div v-else class="h-full flex justify-center items-center text-center">
-        <app-card-content>
-          <h2 class="text-2xl mb-4">This game doesn't exist (anymore).</h2>
-          <app-button-link to="/game">
-            Back to all games
-          </app-button-link>
-        </app-card-content>
-      </div>
+      <app-splash-screen v-else />
     </main>
   </div>
 </template>
@@ -80,15 +80,21 @@ import { SessionView } from '~/models/Session'
 
 @Component({
   components: {
+    AppSplashScreen: () => import('~/components/page/splash-screen.vue'),
     AppCardContent: () => import('~/components/card/card-content.vue'),
     AppButtonLink: () => import('~/components/button/button-link.vue'),
     AppShare: () => import('~/components/share.vue'),
+    AppLoader: () => import('~/components/loader.vue'),
     AppGameSettings: () => import('~/components/game/settings.vue'),
   },
 })
 export default class AppGame extends Vue {
   /** @var gameExists - Does the game exist on the server. */
-  gameExists: boolean = true
+  get gameExists(): boolean {
+    return this.game !== null && Object.keys(this.game).length > 0
+  }
+
+  gameLoaded = false
 
   /** @var settingsViewOpen - Is the settings view open or not. */
   settingsViewOpen: boolean = false
@@ -126,7 +132,9 @@ export default class AppGame extends Vue {
       .join('-')
 
     const game = await this.fetchGame(gameId)
-    this.gameExists = game !== null && Object.keys(game).length > 0
+    this.setCurrentGameId(gameId)
+
+    this.gameLoaded = true
 
     this.joinSession(game)
 
@@ -141,7 +149,6 @@ export default class AppGame extends Vue {
   }
 
   onSessionJoin(session) {
-    this.setCurrentGameId(session.gameId)
     this.updateSession(session)
   }
 

@@ -29,7 +29,7 @@ export class Session {
   @Column({ type: 'int', nullable: true })
   currentRound: number = 0
 
-  @OneToOne(() => Game)
+  @OneToOne(() => Game, { cascade: true, onDelete: 'CASCADE', })
   @JoinColumn()
   game!: Game
 

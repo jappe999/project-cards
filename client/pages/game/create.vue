@@ -33,7 +33,9 @@
 
         <app-card-content>
           <div class="flex justify-end">
-            <app-button type="submit">Create game</app-button>
+            <app-button type="submit" :loading="game.busy">
+              Create game
+            </app-button>
           </div>
         </app-card-content>
       </form>

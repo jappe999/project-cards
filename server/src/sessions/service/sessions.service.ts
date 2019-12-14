@@ -318,13 +318,7 @@ export class SessionsService {
       await this.chooseCzar(session, true)
     }
 
-    await this.playerInSessionsService.remove({
-      playerId: user.id,
-      sessionId: session.id,
-    })
-
-    if (!('playerInSession' in session) || session.playerInSession.length < 1) {
-      await this.sessionRepository.delete(session.id)
+    if (!('playerInSession' in session) || session.playerInSession.length <= 1) {
       await this.gamesService.remove(session.gameId)
       return session
     } else {
