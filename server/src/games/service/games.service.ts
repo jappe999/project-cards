@@ -19,7 +19,7 @@ export class GamesService {
     return this.gameRepository.save(game)
   }
 
-  remove(options: FindConditions<Game>) {
+  remove(options: string | string[] | number | number[] | Date | Date[] | FindConditions<Game>) {
     return this.gameRepository.delete(options)
   }
 

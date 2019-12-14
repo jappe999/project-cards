@@ -263,6 +263,7 @@ export class SessionsService {
       deckId: In(fetchedGame.decks.map(({ id }) => id))
     })
 
+
     return this.sessionRepository.save({
       id,
       game,
@@ -305,20 +306,23 @@ export class SessionsService {
    * @param user - The authenticated user.
    * @param room - The name of the game room.
    */
-  async exitRoom(client: Socket, user: User, room: string) {
+  async exitRoom(client: Socket, user: User, room: string): Promise<Session> {
     client.leave(room)
 
-    const session = await this.sessionRepository.findOne({ where: { room } })
+    const session = await this.sessionRepository.findOne({
+      relations: ['playerInSession'],
+      where: { room }
+    })
 
-    if (session.currentCzarId === user.id) {
+    if ('playerInSession' in session && session.playerInSession.length > 1 && session.currentCzarId === user.id) {
       await this.chooseCzar(session, true)
     }
 
-    await this.playerInSessionsService.remove({
-      playerId: user.id,
-      sessionId: session.id,
-    })
-
-    return this.getSession(session.id)
+    if (!('playerInSession' in session) || session.playerInSession.length <= 1) {
+      await this.gamesService.remove(session.gameId)
+      return session
+    } else {
+      return this.getSession(session.id)
+    }
   }
 }

@@ -97,6 +97,17 @@ export default class PlayGame extends Vue {
     )
   }
 
+  beforeDestroy() {
+    window.$socket.off('session-join', this.onSessionJoin.bind(this))
+    window.$socket.off('session-exit', this.onSessionExit.bind(this))
+    window.$socket.off('session-next-round', this.onSessionNextRound.bind(this))
+    window.$socket.off('session-play-card', this.onSessionPlayCard.bind(this))
+    window.$socket.off(
+      'session-choose-card-combination',
+      this.onSessionChooseCardCombination.bind(this),
+    )
+  }
+
   onSessionJoin(session) {
     this.updateGameState('choose-cards')
     this.updatePlayedCards(session)
@@ -110,6 +121,10 @@ export default class PlayGame extends Vue {
    * @param payload.user - The user that has left the game.
    */
   onSessionExit({ session, user }) {
+    if (user.id === this.$auth.user.id) {
+      return
+    }
+
     this.updateSession({
       ...session,
       playerInSession: session.playerInSession.filter(

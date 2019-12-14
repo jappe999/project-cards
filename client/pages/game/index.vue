@@ -3,7 +3,7 @@
     <div
       class="flex flex-wrap justify-between items-center pt-12 pb-8 px-4 sm:px-8"
     >
-      <header class="flex items-center mb-4 mr-0 lg:mr-4">
+      <header class="flex items-center mr-0 lg:mr-4">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -34,10 +34,8 @@
             d="M17 11a1 1 0 0 1 0 2h-4v4a1 1 0 0 1-2 0v-4H7a1 1 0 0 1 0-2h4V7a1 1 0 0 1 2 0v4h4z"
           />
         </svg>
-        <span
-          class="lg:max-w-0 group-hover:max-w-xs overflow-hidden whitespace-no-wrap transition-slow"
-        >
-          Or create a game
+        <span class="px-1">
+          Create a game
         </span>
       </app-button-link>
     </div>
@@ -96,15 +94,26 @@
           </app-card>
         </nuxt-link>
       </div>
+      <div
+        v-if="games.length === 0"
+        class="w-full flex flex-col justify-center items-center pb-4 px-2 text-center"
+      >
+        <strong class="text-2xl pb-2 mb-2 border-b border-gray-400 font-normal">
+          There are no games yet.
+        </strong>
+        <small class="text-base">Maybe it's time you create one!</small>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { Getter } from 'vuex-class'
+import { Getter, Mutation } from 'vuex-class'
 import { Context } from '@nuxt/vue-app'
-import { GameView } from '../../models/Game'
+import { GameView } from '~/models/Game'
+import { SessionView } from '~/models/Session'
+import { REMOVE_GAME } from '~/store/mutation-types'
 
 @Component({
   components: {
@@ -120,7 +129,21 @@ import { GameView } from '../../models/Game'
 export default class Home extends Vue {
   @Getter('games/games') games!: GameView[]
 
-  numberOfPlayers(game): number {
+  @Mutation(`games/${REMOVE_GAME}`) removeGame: (game) => void
+
+  beforeMount() {
+    if (window.$socket) {
+      window.$socket.on('session-exit', this.onSessionExit.bind(this))
+    }
+  }
+
+  onSessionExit({ session }: { session: SessionView }) {
+    if (session.playerInSession.length <= 1) {
+      this.removeGame({ id: session.gameId })
+    }
+  }
+
+  numberOfPlayers(game: GameView): number {
     if (!game.session) return 0
     return game.session.playerInSession.length
   }

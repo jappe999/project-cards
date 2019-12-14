@@ -6,6 +6,7 @@ import { AppModule } from './app.module'
 import config from '../../nuxt.config'
 import NuxtServer from './nuxt'
 import { NuxtFilter } from './nuxt/nuxt.filter'
+import { ValidationPipe } from '@nestjs/common'
 
 declare const module: any
 
@@ -30,6 +31,9 @@ async function bootstrap() {
   )
 
   app.useGlobalFilters(new NuxtFilter(nuxt))
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+  }));
 
   await app.listen(port, () => {
     consola.ready({

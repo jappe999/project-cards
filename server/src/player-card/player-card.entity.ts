@@ -5,6 +5,7 @@ import {
   ManyToMany,
   Column,
   JoinTable,
+  JoinColumn,
 } from 'typeorm'
 import { PlayerInSession } from '../player-session/player-session.entity'
 import { Card } from '../cards/card.entity'
@@ -26,7 +27,9 @@ export class PlayerInCard {
   @ManyToOne(
     () => PlayerInSession,
     playerInSession => playerInSession.playerCards,
+    { cascade: true, onDelete: 'CASCADE', }
   )
+  @JoinColumn()
   public playerSession: PlayerInSession
 
   /**

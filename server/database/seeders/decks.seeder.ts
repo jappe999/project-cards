@@ -14,7 +14,6 @@ export default class DecksSeeder implements Seeder {
     const decks = Object.keys(groupBy(cards, 'deck'))
       .map(name => ({ id: name.replace(/\s/g, '').toLowerCase(), name }))
 
-
     await connection
       .createQueryBuilder()
       .insert()
