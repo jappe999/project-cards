@@ -84,7 +84,6 @@ import { SessionView } from '~/models/Session'
     AppCardContent: () => import('~/components/card/card-content.vue'),
     AppButtonLink: () => import('~/components/button/button-link.vue'),
     AppShare: () => import('~/components/share.vue'),
-    AppLoader: () => import('~/components/loader.vue'),
     AppGameSettings: () => import('~/components/game/settings.vue'),
   },
 })
