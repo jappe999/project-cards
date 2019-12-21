@@ -263,7 +263,6 @@ export class SessionsService {
       deckId: In(fetchedGame.decks.map(({ id }) => id))
     })
 
-
     return this.sessionRepository.save({
       id,
       game,
@@ -317,6 +316,11 @@ export class SessionsService {
     if ('playerInSession' in session && session.playerInSession.length > 1 && session.currentCzarId === user.id) {
       await this.chooseCzar(session, true)
     }
+
+    await this.playerInSessionsService.remove({
+      playerId: user.id,
+      sessionId: session.id,
+    })
 
     if (!('playerInSession' in session) || session.playerInSession.length <= 1) {
       await this.gamesService.remove(session.gameId)
