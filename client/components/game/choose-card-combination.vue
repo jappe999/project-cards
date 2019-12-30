@@ -8,9 +8,9 @@
         :text="blackCard.text"
       />
       <app-button
-        v-if="isCzar"
+        v-if="showCards && isCzar"
         class="w-full"
-        :disabled="canSelectCard || !isCzar"
+        :disabled="canSelectCard"
         @click.native="playCards"
       >
         Choose combination
@@ -21,7 +21,7 @@
       <div
         v-for="_cards in cards"
         :key="_cards.id"
-        class="relative flex flex-wrap -mt-2 mb-auto group"
+        class="w-full lg:w-auto relative flex flex-wrap -mt-2 group"
         @click="toggleChoice(_cards)"
       >
         <div
@@ -36,7 +36,7 @@
             class="h-full lg:h-96 w-full lg:w-64"
             :disabled="!canSelectCard || !isCzar"
             :step="index + 1"
-            :text="card.text"
+            :text="getText(card)"
           />
         </div>
 
@@ -67,12 +67,15 @@ import { SessionView } from '~/models/Session'
   },
 })
 export default class AppChooseCardCombination extends Vue {
+  $auth!: any
+
   @Getter('session/blackCard') blackCard!: CardView
   @Getter('session/round') round!: number
   @Getter('session/session') session!: SessionView
 
   @Prop({ default: false, type: Boolean }) isCzar!: boolean
   @Prop({ default: () => [], type: Array }) cards!: CardView[]
+  @Prop({ default: false, type: Boolean }) showCards!: boolean
   @Prop({ default: () => [], type: Array }) selectedCards!: CardView[]
 
   get canSelectCard() {
@@ -83,13 +86,18 @@ export default class AppChooseCardCombination extends Vue {
     cards: CardView[],
   ) => void
 
+  getText({ text, playerId }: CardView & { playerId: string }) {
+    const isCardOwner = playerId === this.$auth.user.id
+    return this.showCards || isCardOwner ? text : ''
+  }
+
   /**
    * Add a card if it's not already selected. Else remove it from the array.
    * @param cards - The array of cards to toggle in the list of selected cards.
    */
   @Emit('select')
   toggleChoice(cards: CardView[]) {
-    if (this.isCzar) {
+    if (this.showCards && this.isCzar) {
       return cards
     } else {
       return []

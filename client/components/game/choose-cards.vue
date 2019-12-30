@@ -88,13 +88,15 @@ export default class AppChooseCards extends Vue {
 
   isPreviousCzar: boolean = false
 
+  /** @var selectedCards - The cards that the player has selected this round. */
+  selectedCards: CardView[] = []
+
   @Getter('session/blackCard') blackCard!: CardView
   @Getter('session/round') round!: number
   @Getter('games/currentGame') game!: GameView
   @Getter('session/session') session!: SessionView
 
   @Prop({ default: false, type: Boolean }) isCzar!: boolean
-  @Prop({ default: [], type: Array }) selectedCards!: CardView[]
 
   @Action('cards/fetchCards') fetchCards
 
@@ -123,7 +125,6 @@ export default class AppChooseCards extends Vue {
    * Replace the previously chosen cards with new ones.
    * @param amount - The amount of cards to fetch.
    */
-  @Emit('select')
   async fetchNewCards(amount: number = 1) {
     const newCards = await this.fetchCards({
       type: 'A',
@@ -140,9 +141,6 @@ export default class AppChooseCards extends Vue {
     if (cardsWithoutOld.length !== 10) {
       this.cards = cardsWithoutOld.concat(newCards)
     }
-
-    // Reset the selected cards with an empty array.
-    return []
   }
 
   /**
@@ -150,12 +148,11 @@ export default class AppChooseCards extends Vue {
    *
    * @param card - The card to toggle in the list of selected cards.
    */
-  @Emit('select')
   toggleCard(card: CardView) {
     if (this.canSelectCard && !this.selectedCards.includes(card)) {
-      return [...this.selectedCards, card]
+      this.selectedCards = [...this.selectedCards, card]
     } else {
-      return this.selectedCards.filter(c => c.id !== card.id)
+      this.selectedCards = this.selectedCards.filter(c => c.id !== card.id)
     }
   }
 
