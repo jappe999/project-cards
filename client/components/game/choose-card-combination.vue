@@ -36,7 +36,7 @@
             class="h-full lg:h-96 w-full lg:w-64"
             :disabled="!canSelectCard || !isCzar"
             :step="index + 1"
-            :text="showCards ? card.text : ''"
+            :text="getText(card)"
           />
         </div>
 
@@ -67,6 +67,8 @@ import { SessionView } from '~/models/Session'
   },
 })
 export default class AppChooseCardCombination extends Vue {
+  $auth!: any
+
   @Getter('session/blackCard') blackCard!: CardView
   @Getter('session/round') round!: number
   @Getter('session/session') session!: SessionView
@@ -83,6 +85,11 @@ export default class AppChooseCardCombination extends Vue {
   @Action('session/playCards') chooseCardCombination: (
     cards: CardView[],
   ) => void
+
+  getText({ text, playerId }: CardView & { playerId: string }) {
+    const isCardOwner = playerId === this.$auth.user.id
+    return this.showCards || isCardOwner ? text : ''
+  }
 
   /**
    * Add a card if it's not already selected. Else remove it from the array.

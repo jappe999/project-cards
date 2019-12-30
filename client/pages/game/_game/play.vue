@@ -148,7 +148,10 @@ export default class PlayGame extends Vue {
 
   onSessionPlayCard(playerSession) {
     const latestIndex = playerSession.playerCards.length - 1
-    const cards = playerSession.playerCards[latestIndex].cards
+    const cards = playerSession.playerCards[latestIndex].cards.map(card => ({
+      ...card,
+      playerId: playerSession.playerId,
+    }))
     const playedCards = this.playedCards[this.round] || []
 
     this.playedCards[this.round] = [...playedCards, cards]
