@@ -4,8 +4,6 @@
       v-if="state === 'choose-cards'"
       key="choose-cards"
       :is-czar="isCzar"
-      :selected-cards="selectedCards"
-      @select="selectCards"
       @submit="playCards"
     />
 
@@ -15,6 +13,7 @@
       :is-czar="isCzar"
       :selected-cards="selectedCardCombination"
       :cards="playedCards[round]"
+      :show-cards="allPlayersPlayedCards"
       @select="selectCardCombination"
     />
 
@@ -55,9 +54,6 @@ export default class PlayGame extends Vue {
   /** @var bestCards - The best cards from each round. */
   bestCards: CardView[][] = []
 
-  /** @var selectedCards - The cards that the player has selected this round. */
-  selectedCards: CardView[] = []
-
   /** @var selectedCardCombination - The cards that the player has selected this round. */
   selectedCardCombination: CardView[] = []
 
@@ -76,6 +72,14 @@ export default class PlayGame extends Vue {
   /** Determine if the current user is the card czar */
   get isCzar(): boolean {
     return this.session.currentCzarId === this.$auth.user.id
+  }
+
+  get allPlayersPlayedCards(): boolean {
+    return (
+      this.playedCards[this.round] &&
+      this.playedCards[this.round].length >=
+        this.session.playerInSession.length - 1
+    )
   }
 
   @Mutation(`session/${types.UPDATE_SESSION}`) updateSession: (
@@ -109,7 +113,9 @@ export default class PlayGame extends Vue {
   }
 
   onSessionJoin(session) {
-    this.updateGameState('choose-cards')
+    if (!this.state || this.state === 'show-best-combination') {
+      this.updateGameState('choose-cards')
+    }
     this.updatePlayedCards(session)
   }
 
@@ -132,7 +138,7 @@ export default class PlayGame extends Vue {
       ),
     })
 
-    this.updatePlayedCards(session)
+    this.updatePlayedCards(this.session)
   }
 
   onSessionNextRound(session) {
@@ -148,13 +154,11 @@ export default class PlayGame extends Vue {
     this.playedCards[this.round] = [...playedCards, cards]
     this.playedCards = [...this.playedCards]
 
-    const allPlayersPlayedCards =
-      this.playedCards[this.round].length >=
-      this.session.playerInSession.length - 1
-
-    if (allPlayersPlayedCards) {
-      this.updateGameState('choose-card-combination')
-    }
+    this.$nextTick(() => {
+      if (this.allPlayersPlayedCards || this.isCzar) {
+        this.updateGameState('choose-card-combination')
+      }
+    })
   }
 
   onSessionChooseCardCombination({ cards }) {
@@ -175,10 +179,6 @@ export default class PlayGame extends Vue {
 
     this.playedCards[this.round] = cardsByActivePlayers
     this.playedCards = [...this.playedCards]
-  }
-
-  selectCards(cards: CardView[]) {
-    this.selectedCards = cards
   }
 
   selectCardCombination(cards: CardView[]) {

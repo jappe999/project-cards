@@ -8,9 +8,9 @@
         :text="blackCard.text"
       />
       <app-button
-        v-if="isCzar"
+        v-if="showCards && isCzar"
         class="w-full"
-        :disabled="canSelectCard || !isCzar"
+        :disabled="canSelectCard"
         @click.native="playCards"
       >
         Choose combination
@@ -21,7 +21,7 @@
       <div
         v-for="_cards in cards"
         :key="_cards.id"
-        class="relative flex flex-wrap -mt-2 mb-auto group"
+        class="w-full lg:w-auto relative flex flex-wrap -mt-2 group"
         @click="toggleChoice(_cards)"
       >
         <div
@@ -36,7 +36,7 @@
             class="h-full lg:h-96 w-full lg:w-64"
             :disabled="!canSelectCard || !isCzar"
             :step="index + 1"
-            :text="card.text"
+            :text="showCards ? card.text : ''"
           />
         </div>
 
@@ -73,6 +73,7 @@ export default class AppChooseCardCombination extends Vue {
 
   @Prop({ default: false, type: Boolean }) isCzar!: boolean
   @Prop({ default: () => [], type: Array }) cards!: CardView[]
+  @Prop({ default: false, type: Boolean }) showCards!: boolean
   @Prop({ default: () => [], type: Array }) selectedCards!: CardView[]
 
   get canSelectCard() {
@@ -89,7 +90,7 @@ export default class AppChooseCardCombination extends Vue {
    */
   @Emit('select')
   toggleChoice(cards: CardView[]) {
-    if (this.isCzar) {
+    if (this.showCards && this.isCzar) {
       return cards
     } else {
       return []
